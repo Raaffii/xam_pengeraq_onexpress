@@ -22,4 +22,20 @@ const getStudent = async (page, limit, search = "") => {
   return { data: rows, total };
 };
 
-module.exports = { getStudent };
+const postStudent = async (data) => {
+  const { studentname, studentidno, examseriesid } = data;
+  console.log("here", data);
+  try {
+    const sql =
+      "INSERT INTO students (studentname, studentidno, examseriesid) VALUES (?, ?,?)";
+    const [result] = await pool.query(sql, [
+      studentname,
+      studentidno,
+      examseriesid,
+    ]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+module.exports = { getStudent, postStudent };

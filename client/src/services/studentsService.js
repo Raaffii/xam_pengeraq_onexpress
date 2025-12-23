@@ -20,4 +20,20 @@ export const studentService = {
       return error;
     }
   },
+
+  insertStudents: async (data) => {
+    // const margedData = { data1, data2 };
+    const token = authService.getToken();
+    try {
+      const response = await api.post(`${API_BASE_URL}/api/student`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error registation", error);
+      throw error;
+    }
+  },
 };

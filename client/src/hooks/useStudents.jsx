@@ -57,6 +57,36 @@ export const useStudents = () => {
     }
   }, []);
 
+  const createStudents = useCallback(async (data) => {
+    try {
+      setLoading(true);
+      const response = await studentService.insertStudents(data);
+      fetchStudents();
+      return { success: true, data: response.data };
+    } catch (err) {
+      console.log("err", err);
+      let errorMessage = "Failed to update";
+      // Handle specific error types
+      if (err.response?.status === 403) {
+        errorMessage = "You don't have permission to view Expalloc";
+      } else if (err.response?.status === 404) {
+        errorMessage = "Expalloc not found";
+      } else if (err.response?.status >= 500) {
+        errorMessage =
+          "A server error occurred, possibly caused by a duplicate code";
+      } else if (err.response.data.message) {
+        errorMessage = err.response.data.message;
+      }
+
+      setError(errorMessage);
+
+      setLoading(false);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const onSearch = useCallback(
     async (search) => {
       const newParams = { ...params, search };
@@ -88,6 +118,7 @@ export const useStudents = () => {
     fetchStudents,
     onPageChange,
     onPageSizeChange,
+    createStudents,
     onSearch,
     students,
     loading,

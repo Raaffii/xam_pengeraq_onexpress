@@ -10,6 +10,17 @@ const getStudent = async (page, limit, search) => {
   }
 };
 
+const postStudent = async (data) => {
+  try {
+    const result = await Students.postStudent(data);
+    return result;
+  } catch (error) {
+    console.error("Service error:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   getStudent,
+  postStudent,
 };

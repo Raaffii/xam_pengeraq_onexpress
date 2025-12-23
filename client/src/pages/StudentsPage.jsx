@@ -7,6 +7,7 @@ import Add_modal from "@/components/modals/Add_modal";
 import Edit_modal from "@/components/modals/Edit_modal";
 import Delete_modal from "@/components/modals/Delete_modal";
 import { useStudents } from "@/hooks/useStudents";
+import { useExamSeries } from "@/hooks/useExamSeries";
 
 const StudentsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,6 +17,7 @@ const StudentsPage = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const typingTimeoutRef = useRef(null);
   const {
+    createStudents,
     fetchStudents,
     onSearch,
     students,
@@ -24,13 +26,16 @@ const StudentsPage = () => {
     onPageSizeChange,
   } = useStudents();
 
+  const { fetchExamSeries, examSeries } = useExamSeries();
+
   useEffect(() => {
     const fetchData = async () => {
       await fetchStudents();
+      await fetchExamSeries();
     };
 
     fetchData();
-  }, []);
+  }, [fetchExamSeries, fetchStudents]);
 
   const openEditModal = (student) => {
     setSelectedStudent(student);
@@ -49,12 +54,12 @@ const StudentsPage = () => {
   };
 
   const handleStudentSubmit = async (formData) => {
-    console.log("formdata create", formData);
-    // const result = await createStudents(formData);
-    // if (result.success) {
-    //   setCurrentPage(1);
-    // }
-    // return result.success;
+    // console.log("formdata create", formData);
+    const result = await createStudents(formData);
+    if (result.success) {
+      // setCurrentPage(1);
+    }
+    return result.success;
   };
 
   const handleStudentDelete = async (entityData) => {
@@ -129,6 +134,16 @@ const StudentsPage = () => {
     }
   };
 
+  const examSeriesOptions = [
+    { value: "all", label: "Exam Series" },
+    ...examSeries.map((series) => ({
+      value: series.examseriesid,
+      label: series.examseries,
+    })),
+  ];
+
+  console.log("Exam ser", examSeries);
+
   return (
     <div className='min-h-screen '>
       <PageHeader
@@ -167,6 +182,9 @@ const StudentsPage = () => {
           onSubmit={handleStudentSubmit}
           fields={fields}
           title='Add New Student'
+          dropdowns={{
+            examseriesid: examSeriesOptions,
+          }}
         />
       )}
 
