@@ -1,8 +1,8 @@
-const Students = require("../models/studentModel");
+const Exam = require("../models/examModel");
 
-const getStudent = async (page, limit, search) => {
+const getExam = async (page, limit, search) => {
   try {
-    const result = await Students.getStudent(page, limit, search);
+    const result = await Exam.getExam(page, limit, search);
     return result;
   } catch (error) {
     console.error("Service error:", error);
@@ -10,9 +10,9 @@ const getStudent = async (page, limit, search) => {
   }
 };
 
-const postStudent = async (data) => {
+const postExam = async (data) => {
   try {
-    const result = await Students.postStudent(data);
+    const result = await Exam.postExam(data);
     return result;
   } catch (error) {
     console.error("Service error:", error);
@@ -20,9 +20,9 @@ const postStudent = async (data) => {
   }
 };
 
-const putStudent = async (id, data) => {
+const putExam = async (id, data) => {
   try {
-    const result = await Students.putStudent(id, data);
+    const result = await Exam.putExam(id, data);
     return result;
   } catch (error) {
     console.error("Service error:", error);
@@ -30,9 +30,9 @@ const putStudent = async (id, data) => {
   }
 };
 
-const deleteStudent = async (id) => {
+const deleteExam = async (id) => {
   try {
-    const result = await Students.deleteStudent(id);
+    const result = await Exam.deleteExam(id);
     return result;
   } catch (error) {
     console.error("Service error:", error);
@@ -41,8 +41,8 @@ const deleteStudent = async (id) => {
 };
 
 module.exports = {
-  getStudent,
-  postStudent,
-  putStudent,
-  deleteStudent,
+  getExam,
+  postExam,
+  putExam,
+  deleteExam,
 };

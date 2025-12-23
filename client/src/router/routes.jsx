@@ -7,6 +7,8 @@ import DashboardPage from "@/pages/DashboardPage";
 import ProfilePage from "@/pages/ProfilePage";
 import StudentsPage from "@/pages/StudentsPage";
 import StudentsDetailPage from "@/components/student/StudentsDetailPage";
+import ExamsPage from "@/pages/ExamsPage";
+import ExamsSeriesPage from "@/pages/ExamsSeriesPage";
 
 const privateRoutes = {
   path: "/",
@@ -19,6 +21,8 @@ const privateRoutes = {
     { index: true, element: <DashboardPage /> },
     { path: "dashboard", element: <DashboardPage /> },
     { path: "profile", element: <ProfilePage /> },
+    { path: "exams", element: <ExamsPage /> },
+    { path: "series", element: <ExamsSeriesPage /> },
     { path: "students", element: <StudentsPage /> },
     { path: "students/:id", element: <StudentsDetailPage /> },
   ],

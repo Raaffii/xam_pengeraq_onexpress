@@ -1,8 +1,8 @@
-import { studentService } from "@/services/studentsService";
+import { examsService } from "@/services/examsService";
 import { useState, useCallback } from "react";
 
-export const useStudents = () => {
-  const [students, setStudents] = useState([]);
+export const useExams = () => {
+  const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -14,7 +14,7 @@ export const useStudents = () => {
   });
   const [params, setParams] = useState({ page: 1, limit: 10 });
 
-  const fetchStudents = useCallback(async (overrideParams = {}) => {
+  const fetchExams = useCallback(async (overrideParams = {}) => {
     try {
       setLoading(true);
 
@@ -22,7 +22,7 @@ export const useStudents = () => {
       const apiParams = {
         ...finalParams,
       };
-      const response = await studentService.getStudents(apiParams);
+      const response = await examsService.getExams(apiParams);
 
       setPagination(
         response.pagination || {
@@ -32,7 +32,7 @@ export const useStudents = () => {
           totalItems: 0,
         }
       );
-      setStudents(response.data);
+      setExams(response.data);
       //   alert("cek");
       return response.data;
     } catch (err) {
@@ -57,11 +57,11 @@ export const useStudents = () => {
     }
   }, []);
 
-  const createStudents = useCallback(async (data) => {
+  const createExams = useCallback(async (data) => {
     try {
       setLoading(true);
-      const response = await studentService.insertStudents(data);
-      fetchStudents();
+      const response = await examsService.insertExams(data);
+      fetchExams();
       return { success: true, data: response.data };
     } catch (err) {
       console.log("err", err);
@@ -87,12 +87,12 @@ export const useStudents = () => {
     }
   }, []);
 
-  const updateStudents = useCallback(
+  const updateExams = useCallback(
     async (id, data) => {
       try {
         setLoading(true);
-        await studentService.updateStudents(id, data);
-        fetchStudents();
+        await examsService.updateExams(id, data);
+        fetchExams();
         return { success: true };
       } catch (err) {
         let errorMessage = "Failed to update";
@@ -115,15 +115,15 @@ export const useStudents = () => {
         setLoading(false);
       }
     },
-    [fetchStudents]
+    [fetchExams]
   );
 
-  const deleteStudent = useCallback(
+  const deleteExams = useCallback(
     async (id) => {
       try {
         setLoading(true);
-        await studentService.deleteStudents(id);
-        fetchStudents();
+        await examsService.deleteExams(id);
+        fetchExams();
         return { success: true };
       } catch (err) {
         let errorMessage = "Failed to update";
@@ -146,7 +146,7 @@ export const useStudents = () => {
         setLoading(false);
       }
     },
-    [fetchStudents]
+    [fetchExams]
   );
 
   const onSearch = useCallback(
@@ -154,37 +154,37 @@ export const useStudents = () => {
       const newParams = { ...params, search };
       setParams(newParams);
 
-      return await fetchStudents({ search, page: 1 });
+      return await fetchExams({ search, page: 1 });
     },
-    [fetchStudents, setParams, params]
+    [fetchExams, setParams, params]
   );
 
   const onPageChange = useCallback(
     async (page) => {
       const newParams = { ...params, page };
       setParams(newParams);
-      return await fetchStudents({ page });
+      return await fetchExams({ page });
     },
-    [params, fetchStudents]
+    [params, fetchExams]
   );
 
   const onPageSizeChange = useCallback(
     async (limit) => {
       const newParams = { ...params, limit, page: 1 };
       setParams(newParams);
-      return await fetchStudents({ limit, page: 1 });
+      return await fetchExams({ limit, page: 1 });
     },
-    [params, fetchStudents]
+    [params, fetchExams]
   );
   return {
-    fetchStudents,
-    updateStudents,
+    fetchExams,
+    updateExams,
     onPageChange,
     onPageSizeChange,
-    createStudents,
-    deleteStudent,
+    createExams,
+    deleteExams,
     onSearch,
-    students,
+    exams,
     loading,
     error,
     pagination,

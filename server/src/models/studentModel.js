@@ -38,4 +38,31 @@ const postStudent = async (data) => {
     throw err;
   }
 };
-module.exports = { getStudent, postStudent };
+
+const putStudent = async (id, data) => {
+  const { studentname, studentidno, examseriesid } = data;
+
+  try {
+    const sql = ` UPDATE students SET studentname = ?, studentidno = ?, examseriesid = ? WHERE studentid = ? ;`;
+    const [result] = await pool.query(sql, [
+      studentname,
+      studentidno,
+      examseriesid,
+      id,
+    ]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const deleteStudent = async (id) => {
+  try {
+    const sql = `DELETE FROM students WHERE studentid = ?;`;
+    const [result] = await pool.query(sql, [id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+module.exports = { getStudent, postStudent, putStudent, deleteStudent };

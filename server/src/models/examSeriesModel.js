@@ -8,7 +8,7 @@ const getExamSeries = async (page, limit, search = "") => {
   const searchValue = `%${search}%`;
 
   const query = `
-    SELECT es.examseriesdescription as examseries, es.examseriesid
+    SELECT es.* 
     FROM examseries es `;
   const [rows] = await pool.query(query, [searchValue]);
 

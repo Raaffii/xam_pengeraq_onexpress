@@ -1,9 +1,9 @@
-const studentService = require("../services/studentService");
+const examService = require("../services/examService");
 
-const getStudent = async (req, res) => {
+const getExam = async (req, res) => {
   try {
     let { page, limit, search } = req.query;
-    const result = await studentService.getStudent(page, limit, search);
+    const result = await examService.getExam(page, limit, search);
     res.status(200).json({
       data: result.data,
       pagination: {
@@ -24,9 +24,9 @@ const getStudent = async (req, res) => {
   }
 };
 
-const postStudent = async (req, res) => {
+const postExam = async (req, res) => {
   try {
-    const data = await studentService.postStudent(req.body);
+    const data = await examService.postExam(req.body);
     res.status(200).json(data);
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {
@@ -43,11 +43,11 @@ const postStudent = async (req, res) => {
   }
 };
 
-const putStudent = async (req, res) => {
+const putExam = async (req, res) => {
   try {
     console.log("Cekcek", req.params.id, req.body);
 
-    const data = await studentService.putStudent(req.params.id, req.body);
+    const data = await examService.putExam(req.params.id, req.body);
     res.status(200).json(data);
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {
@@ -64,11 +64,11 @@ const putStudent = async (req, res) => {
   }
 };
 
-const deleteStudent = async (req, res) => {
+const deleteExam = async (req, res) => {
   try {
     console.log("Cekcek", req.params.id, req.body);
 
-    const data = await studentService.deleteStudent(req.params.id);
+    const data = await examService.deleteExam(req.params.id);
     res.status(200).json(data);
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {
@@ -85,8 +85,8 @@ const deleteStudent = async (req, res) => {
   }
 };
 module.exports = {
-  getStudent,
-  postStudent,
-  putStudent,
-  deleteStudent,
+  getExam,
+  postExam,
+  putExam,
+  deleteExam,
 };

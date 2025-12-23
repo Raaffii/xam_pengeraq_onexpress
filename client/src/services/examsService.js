@@ -3,12 +3,12 @@ import api from "@/utils/api";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-export const studentService = {
-  getStudents: async (params) => {
+export const examsService = {
+  getExams: async (params) => {
     // const margedData = { data1, data2 };
     const token = authService.getToken();
     try {
-      const response = await api.get(`${API_BASE_URL}/api/student`, {
+      const response = await api.get(`${API_BASE_URL}/api/exam`, {
         params,
         headers: {
           Authorization: `Bearer ${token}`,
@@ -20,19 +20,15 @@ export const studentService = {
       return error;
     }
   },
-  updateStudent: async (id, data) => {
+  updateExams: async (id, data) => {
     // const margedData = { data1, data2 };
     const token = authService.getToken();
     try {
-      const response = await api.put(
-        `${API_BASE_URL}/api/student/${id}`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await api.put(`${API_BASE_URL}/api/exam/${id}`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data;
     } catch (error) {
       console.error("Error update", error);
@@ -40,11 +36,11 @@ export const studentService = {
     }
   },
 
-  insertStudents: async (data) => {
+  insertExams: async (data) => {
     // const margedData = { data1, data2 };
     const token = authService.getToken();
     try {
-      const response = await api.post(`${API_BASE_URL}/api/student`, data, {
+      const response = await api.post(`${API_BASE_URL}/api/exam`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -55,12 +51,12 @@ export const studentService = {
       throw error;
     }
   },
-  deleteStudents: async (id) => {
+  deleteExams: async (id) => {
     // const margedData = { data1, data2 };
 
     const token = authService.getToken();
     try {
-      const response = await api.delete(`${API_BASE_URL}/api/student/${id}`, {
+      const response = await api.delete(`${API_BASE_URL}/api/exam/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -6,68 +6,63 @@ import { DataTable } from "@/components/table";
 import Add_modal from "@/components/modals/Add_modal";
 import Edit_modal from "@/components/modals/Edit_modal";
 import Delete_modal from "@/components/modals/Delete_modal";
-import { useStudents } from "@/hooks/useStudents";
-import { useExamSeries } from "@/hooks/useExamsSeries";
-import toast from "react-hot-toast";
+import { useExams } from "@/hooks/useExams";
 
-const StudentsPage = () => {
+const ExamsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedSExam, setSelectedExam] = useState(null);
   const typingTimeoutRef = useRef(null);
   const {
-    createStudents,
-    fetchStudents,
-    updateStudents,
-    deleteStudent,
+    createExams,
+    fetchExams,
     onSearch,
-    students,
+    deleteExams,
+    updateExams,
+    exams,
     pagination,
     onPageChange,
     onPageSizeChange,
-  } = useStudents();
-
-  const { fetchExamSeries, examSeries } = useExamSeries();
+  } = useExams();
 
   useEffect(() => {
     const fetchData = async () => {
-      await fetchStudents();
-      await fetchExamSeries();
+      await fetchExams();
     };
 
     fetchData();
-  }, [fetchExamSeries, fetchStudents]);
+  }, [fetchExams]);
 
   const openEditModal = (student) => {
-    setSelectedStudent(student);
+    setSelectedExam(student);
     setIsEditModalOpen(true);
   };
 
   const openDeleteModal = (student) => {
-    setSelectedStudent(student);
+    setSelectedExam(student);
     setIsDeleteModalOpen(true);
   };
 
   const handleStudentEdit = async (formData) => {
     console.log("formdata edit", formData);
-    const result = await updateStudents(selectedStudent.studentid, formData);
+    const result = await updateExams(selectedSExam.examid, formData);
     return result.success;
   };
 
   const handleStudentSubmit = async (formData) => {
     // console.log("formdata create", formData);
-    const result = await createStudents(formData);
+    const result = await createExams(formData);
     if (result.success) {
-      toast.success("Add Data Completed");
+      // setCurrentPage(1);
     }
     return result.success;
   };
 
   const handleStudentDelete = async (entityData) => {
-    console.log("student to delete", entityData.studentid);
-    const result = await deleteStudent(entityData.studentid);
+    console.log("student to delete", entityData.examid);
+    const result = await deleteExams(entityData.examid);
     if (result.success) {
       // const totalAfterDelete = filteredStudents.length - 1;
       // const maxPage = Math.ceil(totalAfterDelete / pageLimit);
@@ -80,18 +75,13 @@ const StudentsPage = () => {
 
   const columns = [
     {
-      accessorKey: "studentidno",
-      header: <div className='text-left w-full'>ID</div>,
+      accessorKey: "examname",
+      header: <div className='text-left w-full'>Name</div>,
       cellClassName: "text-left",
     },
     {
-      accessorKey: "studentname",
-      header: <div className='text-left w-full'>Student Name</div>,
-      cellClassName: "text-left",
-    },
-    {
-      accessorKey: "currentexamseries",
-      header: <div className='text-left w-full'>Curent Series</div>,
+      accessorKey: "examdescription",
+      header: <div className='text-left w-full'>Description</div>,
       cellClassName: "text-left",
     },
   ];
@@ -99,26 +89,21 @@ const StudentsPage = () => {
   const fields = [
     {
       label: "",
-      name: "studentid",
+      name: "examid",
       type: "hidden",
     },
     {
-      label: "ID",
-      name: "studentidno",
-      type: "text",
-      required: true,
-      maxLength: 4,
-    },
-    {
       label: "Name",
-      name: "studentname",
+      name: "examname",
       type: "text",
+      maxLength: 45,
       required: true,
     },
     {
-      label: "Exam Series",
-      name: "examseriesid",
-      type: "dropdown",
+      label: "Description",
+      name: "examdescription",
+      type: "textarea",
+      maxLength: 50,
       required: true,
     },
   ];
@@ -137,20 +122,10 @@ const StudentsPage = () => {
     }
   };
 
-  const examSeriesOptions = [
-    { value: "all", label: "Exam Series" },
-    ...(Array.isArray(examSeries)
-      ? examSeries.map((series) => ({
-          value: String(series.examseriesid),
-          label: series.examseriesdescription,
-        }))
-      : []),
-  ];
-
   return (
     <div className='min-h-screen '>
       <PageHeader
-        title='Students'
+        title='Exams'
         subtitle='Manage student records and exam series assignments'
         primaryAction={{
           label: "Add Student",
@@ -167,10 +142,10 @@ const StudentsPage = () => {
       />
 
       <DataTable
-        data={students}
+        data={exams}
         columns={columns}
-        detailPage='students'
-        idAccessor='studentid'
+        detailPage='exams'
+        idAccessor='examid'
         onEdit={openEditModal}
         onDelete={openDeleteModal}
         onPageChange={onPageChange}
@@ -185,38 +160,32 @@ const StudentsPage = () => {
           onSubmit={handleStudentSubmit}
           fields={fields}
           title='Add New Student'
-          dropdowns={{
-            examseriesid: examSeriesOptions,
-          }}
         />
       )}
 
-      {isEditModalOpen && selectedStudent && (
+      {isEditModalOpen && selectedSExam && (
         <Edit_modal
           open={isEditModalOpen}
           setOpen={setIsEditModalOpen}
           onSubmit={handleStudentEdit}
           fields={fields}
-          entityData={selectedStudent}
+          entityData={selectedSExam}
           title='Edit Student'
-          dropdowns={{
-            examseriesid: examSeriesOptions,
-          }}
         />
       )}
 
-      {isDeleteModalOpen && selectedStudent && (
+      {isDeleteModalOpen && selectedSExam && (
         <Delete_modal
           open={isDeleteModalOpen}
           setOpen={setIsDeleteModalOpen}
           onSubmit={handleStudentDelete}
-          entityData={selectedStudent}
+          entityData={selectedSExam}
           title='Delete Student'
-          confirmationText={`Are you sure you want to delete student "${selectedStudent.studentname}"? This action cannot be undone.`}
+          confirmationText={`Are you sure you want to delete student "${selectedSExam.examname}"? This action cannot be undone.`}
         />
       )}
     </div>
   );
 };
 
-export default StudentsPage;
+export default ExamsPage;
