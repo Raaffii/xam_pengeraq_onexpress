@@ -1,23 +1,26 @@
 import { Outlet } from "react-router-dom";
-import Navbar from "./Navbar";
 import { useState } from "react";
-import Sidebar from "../../components/layout/Sidebar";
+import { Sidebar } from "./Sidebar";
+import { Navbar } from "./Navbar";
 
 export const Layout = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
-    <div className='min-h-screen w-auto bg-gray-50'>
-      <div className='fixed top-0 left-0 h-screen z-50'>
-        <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
-      </div>
-      <div
-        className={`transition-all duration-300 ${
-          isCollapsed ? "ml-20" : "ml-64"
-        }`}>
-        <main className='p-4'>
-          <section className='bg-white rounded-sm shadow-sm min-h-screen p-4'>
+    <div className="min-h-screen bg-gray-50">
+      {/* Sidebar */}
+      <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+
+      {/* Main Content Area */}
+      <div className="md:pl-64">
+        {/* Navbar */}
+        <Navbar toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+
+        {/* Page Content */}
+        <main className="flex-1">
+          <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <Outlet />
-          </section>
+          </div>
         </main>
       </div>
     </div>

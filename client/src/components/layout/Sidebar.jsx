@@ -1,204 +1,109 @@
-import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { LogOut, ChevronDown } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getUserInitials } from "@/utils";
-import { useAuth } from "@/providers/AuthProvider";
-import { Calendar, LayoutDashboard, Users } from "lucide-react";
-import PropTypes from "prop-types";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import {
+  Folder,
+  Home,
+  Inbox,
+  Users,
+  GraduationCap,
+  FileText,
+  UserCircle,
+  ClipboardList,
+  Calendar,
+} from "lucide-react";
+import { useLocation, Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
-export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
-  const [openDropdown, setOpenDropdown] = useState(null);
+const navigation = [
+  { name: "Dashboard", href: "/", icon: Home },
+  { name: "Schedule", href: "/schedule", icon: Calendar },
+  { name: "Students", href: "/students", icon: Users },
+  { name: "Exams", href: "/exams", icon: ClipboardList },
+  { name: "Series", href: "/series", icon: Folder },
+  { name: "Final Grades", href: "/finalgrades", icon: GraduationCap },
+  { name: "Subjects", href: "/subjects", icon: FileText },
+  { name: "Users", href: "/users", icon: UserCircle },
+  { name: "Transcripts", href: "/transcripts", icon: Inbox },
+];
 
-  const { user, logout } = useAuth();
+export const Sidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation();
-  const navigate = useNavigate();
+  const pathname =
+    location.pathname === "/" ? "" : location.pathname.split("/")[1];
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-
-  const navItems = [
-    { path: "/", label: "Home", icon: LayoutDashboard },
-    { path: "/students", label: "Student", icon: Users },
-    { path: "/profile", label: "Schedule", icon: Calendar },
-    {
-      label: "Setup",
-      icon: Calendar,
-      dropdown: [
-        { path: "/setup/menu1", label: "Menu 1" },
-        { path: "/setup/menu2", label: "Menu 2" },
-        { path: "/setup/menu3", label: "Menu 3" },
-      ],
-    },
-  ];
-
-  if (!user) return null;
-
-  return (
-    <>
-      {/* Sidebar */}
-      <div
-        className={`top-0 left-0 h-screen bg-primarygray  border-r border-gray-800 shadow-xl flex flex-col gap-10  justify-between transition-all duration-300 z-50
-        ${isCollapsed ? "w-20" : "w-64"}`}>
-        {/* Logo Section */}
-        <div className='p-4 flex items-center justify-between border-b border-gray-800 font-sans italic bg-black/50'>
-          <span
-            className={`text-2xl text-white transition-all justify-center w-full flex ${
-              isCollapsed ? "block" : "block"
-            }`}>
-            {isCollapsed ? "Pgq" : "Pengeraq Exam"}
+  const SidebarContent = () => (
+    <div className="flex min-h-0 flex-1 flex-col bg-gradient-to-b from-gray-800 to-gray-900">
+      {/* Header */}
+      <div className="flex h-16 flex-shrink-0 items-center bg-gray-900 px-4 shadow-lg border-b border-gray-700">
+        <div className="flex items-baseline">
+          <h1 className="text-2xl font-extrabold italic text-white tracking-wide">
+            {import.meta.env.VITE_APP_NAME_SHORT || "Prime"}
+          </h1>
+          <span className="text-sm font-medium italic text-gray-300 ml-2 mt-1">
+            {import.meta.env.VITE_APP_NAME_SUFFIX || "Exams"}
           </span>
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className='text-gray-300 hover:text-emerald-400'>
-            {isCollapsed ? "»" : "«"}
-          </button>
         </div>
+      </div>
 
-        {/* Navigation */}
-        <div className='flex flex-col flex-1 py-4 gap-1'>
-          {navItems?.map((item) => {
-            const IconComponent = item.icon;
-            const isActive = item.path && location.pathname === item.path;
-
-            const isDropdownActive =
-              item.dropdown &&
-              location.pathname.startsWith(
-                item.dropdown[0].path.split("/").slice(0, -1).join("/")
-              );
-
-            const baseClass =
-              "h-10 w-full flex items-center transition-colors duration-200";
-
-            const spacingClass = isCollapsed
-              ? "justify-center px-0"
-              : "justify-between px-4";
-
-            const stateClass =
-              isActive || isDropdownActive
-                ? "bg-lightgreenprime/50 text-white"
-                : "text-gray-200 hover:bg-lightgreenprime/60";
-
-            // ================= DROPDOWN =================
-            if (item.dropdown) {
-              return (
-                <div key={item.label} className='px-3 mb-1'>
-                  <button
-                    onClick={() =>
-                      setOpenDropdown(
-                        openDropdown === item.label ? null : item.label
-                      )
-                    }
-                    className={`${baseClass} ${spacingClass} ${stateClass} rounded-md hover:bg-primaryblue`}>
-                    <div className='flex items-center gap-3'>
-                      {IconComponent && <IconComponent size={20} />}
-                      {!isCollapsed && (
-                        <span className='text-sm font-medium'>
-                          {item.label}
-                        </span>
-                      )}
-                    </div>
-
-                    {!isCollapsed && (
-                      <ChevronDown
-                        size={16}
-                        className={`transition-transform ${
-                          openDropdown === item.label ? "rotate-180" : ""
-                        }`}
-                      />
-                    )}
-                  </button>
-
-                  {!isCollapsed && openDropdown === item.label && (
-                    <div className='mt-1 ml-6 space-y-1'>
-                      {item.dropdown.map((sub) => (
-                        <Link
-                          key={sub.path}
-                          to={sub.path}
-                          className='block h-9 px-4 flex items-center rounded-md text-sm
-                text-gray-300 hover:bg-lightgreenprime/40'>
-                          {sub.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            }
-
-            // ================= LINK =================
+      {/* Navigation */}
+      <div className="flex flex-1 flex-col overflow-y-auto">
+        <nav className="flex-1 space-y-2 px-3 py-6">
+          {navigation.map((item) => {
+            const isCurrent =
+              item.href === "/"
+                ? pathname === ""
+                : pathname === item.href.split("/")[1];
+            const Icon = item.icon;
             return (
               <Link
-                key={item.path}
-                to={item.path}
-                className={`px-3 mb-1 block`}>
-                <div
-                  className={`${baseClass} ${spacingClass} ${stateClass} rounded-md hover:border p-5 border-primaryblue hover:border-l-8 ${
-                    isActive ? "border border-l-8" : ""
-                  }`}>
-                  <div className='flex items-center gap-3'>
-                    {IconComponent && <IconComponent size={20} />}
-                    {!isCollapsed && (
-                      <span className='text-sm font-medium'>{item.label}</span>
-                    )}
-                  </div>
-                </div>
+                key={item.name}
+                to={item.href}
+                className={cn(
+                  "group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95",
+                  isCurrent
+                    ? "bg-gray-900 text-white shadow-md border-l-4 border-blue-400"
+                    : "text-gray-300 hover:bg-gray-700 hover:text-white hover:shadow-sm",
+                )}
+                onClick={() => setIsOpen(false)}
+              >
+                <Icon
+                  className={cn(
+                    "mr-3 flex-shrink-0 h-5 w-5 transition-colors duration-200",
+                    isCurrent
+                      ? "text-blue-400"
+                      : "text-gray-400 group-hover:text-gray-300",
+                  )}
+                  aria-hidden="true"
+                />
+                <span className="truncate">{item.name}</span>
               </Link>
             );
           })}
-        </div>
+        </nav>
 
-        {/* Profile Section */}
-        <div className='p-4 border-t border-gray-800'>
-          <div className='flex items-center space-x-3 justify-between'>
-            <div className='flex gap-2 items-center'>
-              <Avatar className='h-9 w-9 ring-2 ring-gray-800 group-hover:ring-emerald-400 transition-all duration-200'>
-                <AvatarImage src='/api/placeholder/32/32' alt='Profile' />
-                <AvatarFallback className='bg-gray-300 text-black text-sm'>
-                  {getUserInitials(user?.userName || "User")}
-                </AvatarFallback>
-              </Avatar>
-              {!isCollapsed && (
-                <p className='text-verylightgreenprime'>{user?.name}</p>
-              )}
-
-              {!isCollapsed && (
-                <div className='flex-1 min-w-0'>
-                  <p className='text-sm font-medium text-gray-200 truncate'>
-                    {user?.userName}
-                  </p>
-                  <p className='text-xs text-gray-400 truncate'>
-                    {user?.email}
-                  </p>
-                </div>
-              )}
-            </div>
-            {!isCollapsed && (
-              <div>
-                <div className='flex space-x-2 mt-1'>
-                  <Button
-                    variant='ghost'
-                    size='sm'
-                    className='text-gray-300 hover:text-red-400'
-                    onClick={handleLogout}>
-                    <LogOut size={14} />
-                  </Button>
-                </div>
-              </div>
-            )}
+        {/* Footer */}
+        <div className="flex-shrink-0 px-3 py-4 border-t border-gray-700">
+          <div className="text-xs text-gray-400 text-center">
+            © {new Date().getFullYear()}{" "}
+            {import.meta.env.VITE_APP_NAME_SHORT || "Prime"} System
           </div>
         </div>
       </div>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop sidebar */}
+      <div className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col md:z-40">
+        <SidebarContent />
+      </div>
+
+      {/* Mobile sidebar */}
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <SheetContent side="left" className="p-0 w-64 bg-transparent border-0">
+          <SidebarContent />
+        </SheetContent>
+      </Sheet>
     </>
   );
 };
-
-Sidebar.propTypes = {
-  isCollapsed: PropTypes.bool.isRequired,
-  setIsCollapsed: PropTypes.func.isRequired,
-};
-
-export default Sidebar;
