@@ -29,17 +29,14 @@ export const authService = {
 
     try {
       const decoded = jwtDecode(token);
-
       if (decoded.exp && decoded.exp * 1000 < Date.now()) {
         authService.removeToken();
         return false;
       }
-
       if (!decoded.userId || !decoded.iat || !decoded.jti) {
         authService.removeToken();
         return false;
       }
-
       return true;
     } catch {
       authService.removeToken();
@@ -51,7 +48,6 @@ export const authService = {
     try {
       const token = authService.getToken();
       if (!token) return null;
-
       const decoded = jwtDecode(token);
       return {
         userId: decoded.userId,
@@ -61,5 +57,37 @@ export const authService = {
     } catch {
       return null;
     }
+  },
+
+  getTokenExpiry: () => {
+    try {
+      const token = authService.getToken();
+      if (!token) return null;
+
+      const decoded = jwtDecode(token);
+      return decoded.exp ? decoded.exp * 1000 : null;
+    } catch {
+      return null;
+    }
+  },
+
+  getTimeUntilExpiry: () => {
+    const expiresAt = authService.getTokenExpiry();
+    if (!expiresAt) return null;
+
+    const timeRemaining = expiresAt - Date.now();
+    return timeRemaining > 0 ? timeRemaining : 0;
+  },
+
+  isTokenExpired: () => {
+    const expiresAt = authService.getTokenExpiry();
+    if (!expiresAt) return true;
+
+    return Date.now() >= expiresAt;
+  },
+
+  getTokenExpiryDate: () => {
+    const expiresAt = authService.getTokenExpiry();
+    return expiresAt ? new Date(expiresAt) : null;
   },
 };
