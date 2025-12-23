@@ -55,7 +55,7 @@ const validateMultiple = (schemas) => {
                 field: err.path.join("."),
                 message: err.message,
                 code: err.code,
-              }))
+              })),
             );
           }
         }
@@ -72,7 +72,7 @@ const validateMultiple = (schemas) => {
                 field: err.path.join("."),
                 message: err.message,
                 code: err.code,
-              }))
+              })),
             );
           }
         }
@@ -89,7 +89,7 @@ const validateMultiple = (schemas) => {
                 field: err.path.join("."),
                 message: err.message,
                 code: err.code,
-              }))
+              })),
             );
           }
         }
