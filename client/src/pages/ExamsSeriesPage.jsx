@@ -51,9 +51,8 @@ const ExamsSeriesPage = () => {
   };
 
   const handleStudentEdit = async (formData) => {
-    console.log("formdata edit", formData);
     const result = await updateExamsSeries(
-      selectedSExam.examseriesid,
+      selectedSExam.examSeriesId,
       formData
     );
     return result.success;
@@ -69,7 +68,7 @@ const ExamsSeriesPage = () => {
   };
 
   const handleStudentDelete = async (entityData) => {
-    const result = await deleteExamsSeries(entityData.examseriesid);
+    const result = await deleteExamsSeries(entityData.examSeriesId);
     if (result.success) {
       // const totalAfterDelete = filteredStudents.length - 1;
       // const maxPage = Math.ceil(totalAfterDelete / pageLimit);
@@ -82,22 +81,22 @@ const ExamsSeriesPage = () => {
 
   const columns = [
     {
-      accessorKey: "examname",
+      accessorKey: "examName",
       header: <div className='text-left w-full'>Exam</div>,
       cellClassName: "text-left",
     },
     {
-      accessorKey: "examseriesdescription",
+      accessorKey: "examSeriesDescription",
       header: <div className='text-left w-full'>Description</div>,
       cellClassName: "text-left",
     },
     {
-      accessorKey: "examseriesstartdate",
+      accessorKey: "examSeriesStartDate",
       header: <div className='text-left w-full'>Start Date</div>,
       cellClassName: "text-left",
     },
     {
-      accessorKey: "examseriesenddate",
+      accessorKey: "examSeriesEndDate",
       header: <div className='text-left w-full'>End Date</div>,
       cellClassName: "text-left",
     },
@@ -111,30 +110,30 @@ const ExamsSeriesPage = () => {
   const fields = [
     {
       label: "",
-      name: "examseriesid",
+      name: "examSeriesId",
       type: "hidden",
     },
     {
       label: "Exam",
-      name: "examid",
+      name: "examId",
       type: "dropdown",
       required: true,
     },
     {
       label: "Description",
-      name: "examseriesdescription",
+      name: "examSeriesDescription",
       type: "text",
       required: true,
     },
     {
       label: "Start Date",
-      name: "examseriesstartdate",
+      name: "examSeriesStartDate",
       type: "date",
       required: true,
     },
     {
       label: "End Date",
-      name: "examseriesenddate",
+      name: "examSeriesEndDate",
       type: "date",
       required: true,
     },
@@ -164,8 +163,8 @@ const ExamsSeriesPage = () => {
     { value: "all", label: "Exam Series" },
     ...(Array.isArray(examSeries)
       ? exams.map((item) => ({
-          value: item.examid,
-          label: item.examname,
+          value: item.examId,
+          label: item.examName,
         }))
       : []),
   ];
@@ -209,7 +208,7 @@ const ExamsSeriesPage = () => {
           fields={fields}
           title='Add New Exam Series'
           dropdowns={{
-            examid: examOptions,
+            examId: examOptions,
           }}
         />
       )}
@@ -223,7 +222,7 @@ const ExamsSeriesPage = () => {
           entityData={selectedSExam}
           title='Edit Exam Series'
           dropdowns={{
-            examid: examOptions,
+            examId: examOptions,
           }}
         />
       )}

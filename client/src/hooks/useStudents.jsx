@@ -15,10 +15,10 @@ export const useStudents = () => {
   });
   const [params, setParams] = useState({ page: 1, limit: 10 });
 
-  const formatUserData = useCallback((rawUsers) => {
-    return rawUsers.map((item) => ({
+  const formatStudentrData = useCallback((rawStudent) => {
+    return rawStudent.map((item) => ({
       ...item,
-      id: item.userId,
+      id: item.studentId,
     }));
   }, []);
 
@@ -32,7 +32,7 @@ export const useStudents = () => {
           ...finalParams,
         };
         const response = await studentService.getStudents(apiParams);
-        const data = formatUserData(response.data);
+        const data = formatStudentrData(response.data);
 
         setStudents(data);
         setPagination(
@@ -41,12 +41,12 @@ export const useStudents = () => {
             pageSize: 10,
             totalPages: 1,
             totalItems: 0,
-          }
+          },
         );
 
         return { success: true, data: data };
       } catch (err) {
-        console.error("Error fetching users:", err);
+        console.error("Error fetching Student:", err);
 
         setError(err.message);
         setStudents([]);
@@ -56,7 +56,7 @@ export const useStudents = () => {
         setIsLoading(false);
       }
     },
-    [params, formatUserData]
+    [params, formatStudentrData],
   );
 
   const createStudents = useCallback(async (data) => {
@@ -65,13 +65,14 @@ export const useStudents = () => {
       setIsSubmitting(true);
       setError(null);
       toastId = toast.loading("Creating new students...");
+
       const response = await studentService.insertStudents(data);
       toast.success("Student added successfully!", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating user:", err);
-      toast.error(err.message || "Failed to create user", { id: toastId });
+      console.error("Error creating student:", err);
+      toast.error(err.message || "Failed to create student", { id: toastId });
       setError(err.message);
 
       return { success: false, error: err.message };
@@ -88,7 +89,7 @@ export const useStudents = () => {
       setError(null);
       toastId = toast.loading("Updating student details...");
       const response = await studentService.updateStudent(id, data);
-      toast.success("User updated successfully", { id: toastId });
+      toast.success("student updated successfully", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
@@ -111,7 +112,7 @@ export const useStudents = () => {
       setIsSubmitting(true);
       setError(null);
       await studentService.deleteStudents(id);
-      toast.success("User deleted successfully");
+      toast.success("student deleted successfully");
 
       return { success: true };
     } catch (err) {
@@ -132,7 +133,7 @@ export const useStudents = () => {
 
       return await fetchStudents({ search, page: 1 });
     },
-    [fetchStudents, setParams, params]
+    [fetchStudents, setParams, params],
   );
 
   const onPageChange = useCallback(
@@ -141,7 +142,7 @@ export const useStudents = () => {
       setParams(newParams);
       return await fetchStudents({ page });
     },
-    [params, fetchStudents]
+    [params, fetchStudents],
   );
 
   const onPageSizeChange = useCallback(
@@ -150,7 +151,7 @@ export const useStudents = () => {
       setParams(newParams);
       return await fetchStudents({ limit, page: 1 });
     },
-    [params, fetchStudents]
+    [params, fetchStudents],
   );
   return {
     fetchStudents,

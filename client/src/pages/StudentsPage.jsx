@@ -51,7 +51,7 @@ const StudentsPage = () => {
   };
 
   const handleStudentEdit = async (formData) => {
-    const result = await updateStudents(selectedStudent.studentid, formData);
+    const result = await updateStudents(selectedStudent.studentId, formData);
     if (result.success) {
       fetchStudents();
     }
@@ -68,7 +68,7 @@ const StudentsPage = () => {
   };
 
   const handleStudentDelete = async (entityData) => {
-    const result = await deleteStudent(entityData.studentid);
+    const result = await deleteStudent(entityData.studentId);
     if (result.success) {
       setParams((prev) => ({ ...prev, page: 1 }));
       fetchStudents({ page: 1 });
@@ -78,18 +78,18 @@ const StudentsPage = () => {
 
   const columns = [
     {
-      accessorKey: "studentidno",
-      header: <div className='text-left w-full'>ID</div>,
+      accessorKey: "studentIdNo",
+      header: <div className="text-left w-full">ID</div>,
       cellClassName: "text-left",
     },
     {
-      accessorKey: "studentname",
-      header: <div className='text-left w-full'>Student Name</div>,
+      accessorKey: "studentName",
+      header: <div className="text-left w-full">Student Name</div>,
       cellClassName: "text-left",
     },
     {
-      accessorKey: "currentexamseries",
-      header: <div className='text-left w-full'>Curent Series</div>,
+      accessorKey: "examSeriesDescription",
+      header: <div className="text-left w-full">Curent Series</div>,
       cellClassName: "text-left",
     },
   ];
@@ -97,25 +97,25 @@ const StudentsPage = () => {
   const fields = [
     {
       label: "",
-      name: "studentid",
+      name: "studentId",
       type: "hidden",
     },
     {
       label: "ID",
-      name: "studentidno",
+      name: "studentIdNo",
       type: "text",
       required: true,
       maxLength: 4,
     },
     {
       label: "Name",
-      name: "studentname",
+      name: "studentName",
       type: "text",
       required: true,
     },
     {
       label: "Exam Series",
-      name: "examseriesid",
+      name: "examSeriesId",
       type: "dropdown",
       required: true,
     },
@@ -139,17 +139,17 @@ const StudentsPage = () => {
     { value: "all", label: "Exam Series" },
     ...(Array.isArray(examSeries)
       ? examSeries.map((series) => ({
-          value: series.examseriesid,
-          label: series.examseriesdescription,
+          value: series.examSeriesId,
+          label: series.examSeriesDescription,
         }))
       : []),
   ];
 
   return (
-    <div className='min-h-screen '>
+    <div className="min-h-screen ">
       <PageHeader
-        title='Students'
-        subtitle='Manage student records and exam series assignments'
+        title="Students"
+        subtitle="Manage student records and exam series assignments"
         primaryAction={{
           label: "Add Student",
           onClick: () => setIsModalOpen(true),
@@ -157,9 +157,9 @@ const StudentsPage = () => {
       />
 
       <Input
-        type='search'
+        type="search"
         placeholder={"Search..."}
-        className='pl-8 w-full bg-background h-10 my-5'
+        className="pl-8 w-full bg-background h-10 my-5"
         maxLength={50}
         onChange={handleSearch}
       />
@@ -167,8 +167,8 @@ const StudentsPage = () => {
       <DataTable
         data={students}
         columns={columns}
-        detailPage='students'
-        idAccessor='studentid'
+        detailPage="students"
+        idAccessor="studentid"
         onEdit={openEditModal}
         onDelete={openDeleteModal}
         onPageChange={onPageChange}
@@ -182,9 +182,9 @@ const StudentsPage = () => {
           setOpen={setIsModalOpen}
           onSubmit={handleStudentSubmit}
           fields={fields}
-          title='Add New Student'
+          title="Add New Student"
           dropdowns={{
-            examseriesid: examSeriesOptions,
+            examSeriesId: examSeriesOptions,
           }}
         />
       )}
@@ -196,9 +196,9 @@ const StudentsPage = () => {
           onSubmit={handleStudentEdit}
           fields={fields}
           entityData={selectedStudent}
-          title='Edit Student'
+          title="Edit Student"
           dropdowns={{
-            examseriesid: examSeriesOptions,
+            examSeriesId: examSeriesOptions,
           }}
         />
       )}
@@ -209,8 +209,8 @@ const StudentsPage = () => {
           setOpen={setIsDeleteModalOpen}
           onSubmit={handleStudentDelete}
           entityData={selectedStudent}
-          title='Delete Student'
-          confirmationText={`Are you sure you want to delete student "${selectedStudent.studentname}"? This action cannot be undone.`}
+          title="Delete Student"
+          confirmationText={`Are you sure you want to delete student "${selectedStudent.studentName}"? This action cannot be undone.`}
         />
       )}
     </div>

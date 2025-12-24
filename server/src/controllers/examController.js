@@ -45,8 +45,6 @@ const postExam = async (req, res) => {
 
 const putExam = async (req, res) => {
   try {
-    console.log("Cekcek", req.params.id, req.body);
-
     const data = await examService.putExam(req.params.id, req.body);
     res.status(200).json(data);
   } catch (error) {
@@ -66,8 +64,6 @@ const putExam = async (req, res) => {
 
 const deleteExam = async (req, res) => {
   try {
-    console.log("Cekcek", req.params.id, req.body);
-
     const data = await examService.deleteExam(req.params.id);
     res.status(200).json(data);
   } catch (error) {

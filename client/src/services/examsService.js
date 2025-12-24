@@ -1,70 +1,47 @@
-import { authService } from "./authService";
 import api from "@/utils/api";
+import { handleServiceError } from "@/utils/errorHandler";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = "/api/exam";
 
 export const examsService = {
   getExams: async (params) => {
     // const margedData = { data1, data2 };
-    const token = authService.getToken();
     try {
-      const response = await api.get(`${API_BASE_URL}/api/exam`, {
+      const response = await api.get(BASE_URL, {
         params,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
       return response.data;
     } catch (error) {
-      console.error("Error fetch", error);
-      return error;
+      handleServiceError(error, "Failed to fetch users");
     }
   },
   updateExams: async (id, data) => {
     // const margedData = { data1, data2 };
-    const token = authService.getToken();
     try {
-      const response = await api.put(`${API_BASE_URL}/api/exam/${id}`, data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await api.put(`${BASE_URL}/${id}`, data);
       return response.data;
     } catch (error) {
-      console.error("Error update", error);
-      return error;
+      handleServiceError(error, "Failed to fetch users");
     }
   },
 
   insertExams: async (data) => {
     // const margedData = { data1, data2 };
-    const token = authService.getToken();
     try {
-      const response = await api.post(`${API_BASE_URL}/api/exam`, data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await api.post(BASE_URL, data);
       return response.data;
     } catch (error) {
-      console.error("Error insert", error);
-      throw error;
+      handleServiceError(error, "Failed to fetch users");
     }
   },
   deleteExams: async (id) => {
     // const margedData = { data1, data2 };
 
-    const token = authService.getToken();
     try {
-      const response = await api.delete(`${API_BASE_URL}/api/exam/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await api.delete(`${BASE_URL}/${id}`);
       return response.data;
     } catch (error) {
-      console.error("Error delete", error);
-      return error;
+      handleServiceError(error, "Failed to fetch users");
     }
   },
 };

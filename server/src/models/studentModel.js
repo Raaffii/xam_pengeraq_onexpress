@@ -8,7 +8,12 @@ const getStudent = async (page, limit, search = "") => {
   const searchValue = `%${search}%`;
 
   const query = `
-    SELECT s.*, es.examseriesdescription as currentexamseries
+    SELECT 
+    s.studentid as studentId,
+    s.studentname as studentName,
+    s.studentidno as studentIdNo,
+    s.examseriesid as examSeriesId, 
+    es.examseriesdescription as examSeriesDescription
     FROM students s 
     LEFT JOIN examseries es ON s.examseriesid=es.examseriesid
     WHERE studentname LIKE ? ORDER BY s.createddate DESC
@@ -23,15 +28,15 @@ const getStudent = async (page, limit, search = "") => {
 };
 
 const postStudent = async (data) => {
-  const { studentname, studentidno, examseriesid } = data;
+  const { studentName, studentIdNo, examSeriesId } = data;
 
   try {
     const sql =
       "INSERT INTO students (studentname, studentidno, examseriesid) VALUES (?, ?,?)";
     const [result] = await pool.query(sql, [
-      studentname,
-      studentidno,
-      examseriesid,
+      studentName,
+      studentIdNo,
+      examSeriesId,
     ]);
     return result;
   } catch (err) {
@@ -40,14 +45,14 @@ const postStudent = async (data) => {
 };
 
 const putStudent = async (id, data) => {
-  const { studentname, studentidno, examseriesid } = data;
+  const { studentName, studentIdNo, examSeriesId } = data;
 
   try {
     const sql = ` UPDATE students SET studentname = ?, studentidno = ?, examseriesid = ? WHERE studentid = ? ;`;
     const [result] = await pool.query(sql, [
-      studentname,
-      studentidno,
-      examseriesid,
+      studentName,
+      studentIdNo,
+      examSeriesId,
       id,
     ]);
     return result;
