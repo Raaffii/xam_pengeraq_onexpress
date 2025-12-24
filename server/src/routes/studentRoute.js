@@ -6,14 +6,32 @@ const {
   putStudent,
   deleteStudent,
 } = require("../controllers/studentController");
+
+const {
+  validateQuery,
+  validateMultiple,
+  validateBody,
+  validateParams,
+} = require("../middlewares/validateSchema");
+
+const {
+  createStudentSchema,
+  updateUserSchema,
+  idParamsSchema,
+  fetchStudentsQuerySchema,
+} = require("../schemas/studentSchema");
+
 const router = express.Router();
 
-router.get("/", authenticateToken, getStudent);
-router.post("/", authenticateToken, postStudent);
-router.put("/:id", authenticateToken, putStudent);
-router.delete("/:id", authenticateToken, deleteStudent);
-// router.post("/", authenticateToken, postExpaloc);
-// router.put("/:id", authenticateToken, putExpaloc);
-// router.delete("/:id", authenticateToken, deleteExpaloc);
+router.use(authenticateToken);
+
+router.get("/", validateQuery(fetchStudentsQuerySchema), getStudent);
+router.post("/", validateBody(createStudentSchema), postStudent);
+router.put(
+  "/:id",
+  validateMultiple({ params: idParamsSchema, body: updateUserSchema }),
+  putStudent
+);
+router.delete("/:id", validateParams(idParamsSchema), deleteStudent);
 
 module.exports = router;

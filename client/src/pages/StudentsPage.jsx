@@ -8,7 +8,6 @@ import Edit_modal from "@/components/modals/Edit_modal";
 import Delete_modal from "@/components/modals/Delete_modal";
 import { useStudents } from "@/hooks/useStudents";
 import { useExamSeries } from "@/hooks/useExamsSeries";
-import toast from "react-hot-toast";
 
 const StudentsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,6 +24,7 @@ const StudentsPage = () => {
     onSearch,
     students,
     pagination,
+    setParams,
     onPageChange,
     onPageSizeChange,
   } = useStudents();
@@ -51,29 +51,27 @@ const StudentsPage = () => {
   };
 
   const handleStudentEdit = async (formData) => {
-    console.log("formdata edit", formData);
     const result = await updateStudents(selectedStudent.studentid, formData);
+    if (result.success) {
+      fetchStudents();
+    }
     return result.success;
   };
 
   const handleStudentSubmit = async (formData) => {
-    // console.log("formdata create", formData);
     const result = await createStudents(formData);
     if (result.success) {
-      toast.success("Add Data Completed");
+      setParams((prev) => ({ ...prev, page: 1 }));
+      fetchStudents({ page: 1 });
     }
     return result.success;
   };
 
   const handleStudentDelete = async (entityData) => {
-    console.log("student to delete", entityData.studentid);
     const result = await deleteStudent(entityData.studentid);
     if (result.success) {
-      // const totalAfterDelete = filteredStudents.length - 1;
-      // const maxPage = Math.ceil(totalAfterDelete / pageLimit);
-      // if (currentPage > maxPage && maxPage > 0) {
-      //   setCurrentPage(maxPage);
-      // }
+      setParams((prev) => ({ ...prev, page: 1 }));
+      fetchStudents({ page: 1 });
     }
     return result.success;
   };
@@ -141,7 +139,7 @@ const StudentsPage = () => {
     { value: "all", label: "Exam Series" },
     ...(Array.isArray(examSeries)
       ? examSeries.map((series) => ({
-          value: String(series.examseriesid),
+          value: series.examseriesid,
           label: series.examseriesdescription,
         }))
       : []),
