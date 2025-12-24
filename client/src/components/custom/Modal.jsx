@@ -1,5 +1,3 @@
-"use client";
-
 import PropTypes from "prop-types";
 import {
   Dialog,
@@ -8,8 +6,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-
-import Button from "./Button";
 
 export default function Modal({
   open,
@@ -37,33 +33,25 @@ export default function Modal({
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent
-        className={`w-full ${sizeClasses[size]} max-h-[90vh] overflow-y-auto px-6 sm:px-8 pt-6 pb-6 ${className}`}>
-        {showCloseButton && (
-          <Button
-            variant='ghost'
-            size='sm'
-            onClick={onClose}
-            className='absolute right-4 top-4 rounded-md text-gray-400 hover:text-gray-500'>
-            <span className='sr-only'>Close</span>
-          </Button>
-        )}
-
+        className={`w-full ${sizeClasses[size]} max-h-[90vh] overflow-y-auto px-6 sm:px-8 pt-6 pb-6 ${className}`}
+      >
         {title && (
           <DialogHeader>
             <DialogTitle
               className={`text-lg font-semibold leading-6 text-gray-900 ${
                 showCloseButton ? "pr-8" : ""
-              }`}>
+              }`}
+            >
               {title}
             </DialogTitle>
 
-            <DialogDescription className='sr-only'>
-              + Dialog form +
+            <DialogDescription className="sr-only">
+              Dialog form
             </DialogDescription>
           </DialogHeader>
         )}
 
-        <div className='w-full'>{children}</div>
+        <div className="w-full">{children}</div>
       </DialogContent>
     </Dialog>
   );
@@ -88,4 +76,5 @@ Modal.propTypes = {
     "full",
   ]),
   showCloseButton: PropTypes.bool,
+  className: PropTypes.string,
 };
