@@ -98,6 +98,8 @@ export default function PageHeader({
       {/* Filters and Search Section */}
       {(children || showSearch) && (
         <div className="flex flex-wrap items-center gap-2 flex-shrink-0 justify-end">
+          <div className="flex-1 min-w-0">{children}</div>
+
           {/* Search Bar */}
           {showSearch && (
             <div className="relative w-full sm:w-auto sm:min-w-[280px] md:min-w-[320px]">
@@ -114,7 +116,6 @@ export default function PageHeader({
               />
             </div>
           )}
-          {children}
         </div>
       )}
     </div>
