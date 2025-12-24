@@ -11,7 +11,7 @@ export const userService = {
       });
       return response.data;
     } catch (error) {
-      handleServiceError("Error registation", error);
+      handleServiceError(error, "Failed to fetch users");
     }
   },
 
@@ -20,7 +20,7 @@ export const userService = {
       const response = await api.post(BASE_URL, data);
       return response.data;
     } catch (error) {
-      handleServiceError("Error registation", error);
+      handleServiceError(error, "Failed to create user");
     }
   },
 
@@ -29,7 +29,7 @@ export const userService = {
       const response = await api.put(`${BASE_URL}/${userId}`, data);
       return response.data;
     } catch (error) {
-      handleServiceError("Error registation", error);
+      handleServiceError(error, "Failed to update user");
     }
   },
 
@@ -38,7 +38,7 @@ export const userService = {
       const response = await api.delete(`${BASE_URL}/${userId}`);
       return response.data;
     } catch (error) {
-      handleServiceError("Error registation", error);
+      handleServiceError(error, "Failed to delete user");
     }
   },
 };

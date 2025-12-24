@@ -1,17 +1,16 @@
 import PageHeader from "@/components/common/PageHeader";
-import Add_modal from "@/components/modals/Add_modal";
 import Delete_modal from "@/components/modals/Delete_modal";
-import Edit_modal from "@/components/modals/Edit_modal";
 import { DataTable } from "@/components/table";
+import { UserFilter, UserForm } from "@/components/users";
 import { useUser } from "@/hooks/useUsers";
 import { CheckCircle2Icon, XCircleIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const UsersPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [modalMode, setModalMode] = useState("create");
 
   const {
     fetchUsers,
@@ -25,6 +24,9 @@ const UsersPage = () => {
     setParams,
     onSearch,
     isLoading,
+    onFilterChange,
+    params,
+    isSubmitting,
   } = useUser();
 
   useEffect(() => {
@@ -58,29 +60,10 @@ const UsersPage = () => {
     },
   ];
 
-  const fields = [
-    {
-      label: "",
-      name: "userId",
-      type: "hidden",
-    },
-    {
-      label: "Name",
-      name: "userName",
-      type: "text",
-      required: true,
-    },
-    {
-      label: "Email",
-      name: "emailAddress",
-      type: "email",
-      required: true,
-    },
-  ];
-
   const openEditModal = (data) => {
     setSelectedUser(data);
-    setIsEditModalOpen(true);
+    setModalMode("edit");
+    setIsModalOpen(true);
   };
 
   const openDeleteModal = (data) => {
@@ -88,21 +71,45 @@ const UsersPage = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleUserSubmit = async (formData) => {
-    const result = await newUser(formData);
-    if (result.success) {
-      setParams((prev) => ({ ...prev, page: 1 }));
-      fetchUsers({ page: 1 });
+  const initialFormValues = useMemo(() => {
+    if (modalMode === "edit" && selectedUser) {
+      return {
+        userId: selectedUser.userId,
+        userName: selectedUser.userName || "",
+        emailAddress: selectedUser.emailAddress || "",
+        role: selectedUser.role || "",
+        studentId: selectedUser.studentId || null,
+        studentName: selectedUser.studentName || "",
+      };
     }
-    return result.success;
-  };
 
-  const handleEdit = async (formData) => {
-    const result = await updateDetails(selectedUser.userId, formData);
-    if (result.success) {
-      fetchUsers();
+    return {
+      userName: "",
+      emailAddress: "",
+      password: "",
+      role: "",
+      studentId: null,
+    };
+  }, [modalMode, selectedUser]);
+
+  const handleFormSubmit = async (formData) => {
+    let response;
+    if (modalMode === "create") {
+      response = await newUser(formData);
+    } else {
+      response = await updateDetails(selectedUser.id, formData);
     }
-    return result.success;
+
+    if (response?.success) {
+      if (modalMode === "create") {
+        setParams((prev) => ({ ...prev, page: 1 }));
+        fetchUsers({ page: 1 });
+      } else {
+        fetchUsers();
+      }
+      setIsModalOpen(false);
+      setSelectedUser(null);
+    }
   };
 
   const handleDelete = async () => {
@@ -121,13 +128,24 @@ const UsersPage = () => {
         subtitle="Manage system users and their access"
         primaryAction={{
           label: "Add User",
-          onClick: () => setIsModalOpen(true),
+          onClick: () => {
+            setModalMode("create");
+            setIsModalOpen(true);
+            setSelectedUser(null);
+          },
         }}
         showSearch={true}
         searchPlaceholder="Search by name or email"
         onSearch={onSearch}
         searchMaxLength={50}
-      />
+      >
+        <UserFilter
+          onFilterChange={onFilterChange}
+          initialFilters={{
+            byRole: params.byRole,
+          }}
+        />
+      </PageHeader>
       <DataTable
         data={users}
         isLoading={isLoading}
@@ -139,36 +157,14 @@ const UsersPage = () => {
         onEdit={openEditModal}
         onDelete={openDeleteModal}
       />
-      {isModalOpen && (
-        <Add_modal
-          open={isModalOpen}
-          setOpen={setIsModalOpen}
-          onSubmit={handleUserSubmit}
-          fields={[
-            ...fields,
-            {
-              label: "Password",
-              name: "password",
-              type: "password",
-              required: true,
-              minLength: 6,
-              maxLength: 100,
-            },
-          ]}
-          title="Add New User"
-        />
-      )}
-
-      {isEditModalOpen && selectedUser && (
-        <Edit_modal
-          open={isEditModalOpen}
-          setOpen={setIsEditModalOpen}
-          onSubmit={handleEdit}
-          fields={fields}
-          entityData={selectedUser}
-          title="Edit User"
-        />
-      )}
+      <UserForm
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        initialValues={initialFormValues}
+        onSubmit={handleFormSubmit}
+        isSubmitting={isSubmitting}
+        mode={modalMode}
+      />
 
       {isDeleteModalOpen && selectedUser && (
         <Delete_modal
