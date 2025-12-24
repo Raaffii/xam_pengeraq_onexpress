@@ -1,9 +1,11 @@
 import { examsService } from "@/services/examsService";
 import { useState, useCallback } from "react";
+import toast from "react-hot-toast";
 
 export const useExams = () => {
   const [exams, setExams] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
   const [pagination, setPagination] = useState({
@@ -14,140 +16,115 @@ export const useExams = () => {
   });
   const [params, setParams] = useState({ page: 1, limit: 10 });
 
-  const fetchExams = useCallback(async (overrideParams = {}) => {
-    try {
-      setLoading(true);
-
-      const finalParams = { ...params, ...overrideParams };
-      const apiParams = {
-        ...finalParams,
-      };
-      const response = await examsService.getExams(apiParams);
-
-      setPagination(
-        response.pagination || {
-          currentPage: 1,
-          pageSize: 10,
-          totalPages: 1,
-          totalItems: 0,
-        }
-      );
-      setExams(response.data);
-      //   alert("cek");
-      return response.data;
-    } catch (err) {
-      let errorMessage = "Failed to update";
-      // Handle specific error types
-      if (err.response?.status === 403) {
-        errorMessage = "You don't have permission to view contacts";
-      } else if (err.response?.status === 404) {
-        errorMessage = "Contacts not found";
-      } else if (err.response?.status >= 500) {
-        errorMessage = "Server error occurred while loading contacts";
-      } else if (err.message) {
-        errorMessage = err.message;
-      }
-
-      setError(errorMessage);
-
-      setLoading(false);
-      return { success: false, error: errorMessage };
-    } finally {
-      setLoading(false);
-    }
+  const formatExamsData = useCallback((rawExams) => {
+    return rawExams.map((item) => ({
+      ...item,
+      id: item.userId,
+    }));
   }, []);
+
+  const fetchExams = useCallback(
+    async (overrideParams = {}) => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const finalParams = { ...params, ...overrideParams };
+        const apiParams = {
+          ...finalParams,
+        };
+        const response = await examsService.getExams(apiParams);
+        const data = formatExamsData(response.data);
+        setPagination(
+          response.pagination || {
+            currentPage: 1,
+            pageSize: 10,
+            totalPages: 1,
+            totalItems: 0,
+          }
+        );
+        setExams(data);
+        return { success: true, data: data };
+      } catch (err) {
+        console.error("Error fetching exams:", err);
+
+        setError(err.message);
+        setExams([]);
+
+        return { success: false, error: err.message };
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [params, formatExamsData]
+  );
 
   const createExams = useCallback(async (data) => {
+    let toastId;
     try {
-      setLoading(true);
+      setIsSubmitting(true);
+      setError(null);
+      toastId = toast.loading("Creating new exam...");
       const response = await examsService.insertExams(data);
-      fetchExams();
+      toast.success("Exam added successfully!", { id: toastId });
+
       return { success: true, data: response.data };
     } catch (err) {
-      console.log("err", err);
-      let errorMessage = "Failed to update";
-      // Handle specific error types
-      if (err.response?.status === 403) {
-        errorMessage = "You don't have permission to view Expalloc";
-      } else if (err.response?.status === 404) {
-        errorMessage = "Expalloc not found";
-      } else if (err.response?.status >= 500) {
-        errorMessage =
-          "A server error occurred, possibly caused by a duplicate code";
-      } else if (err.response.data.message) {
-        errorMessage = err.response.data.message;
-      }
+      console.error("Error creating exam:", err);
+      toast.error(err.message || "Failed to create exam", { id: toastId });
+      setError(err.message);
 
-      setError(errorMessage);
-
-      setLoading(false);
-      return { success: false, error: errorMessage };
+      return { success: false, error: err.message };
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   }, []);
 
-  const updateExams = useCallback(
-    async (id, data) => {
-      try {
-        setLoading(true);
-        await examsService.updateExams(id, data);
-        fetchExams();
-        return { success: true };
-      } catch (err) {
-        let errorMessage = "Failed to update";
-        // Handle specific error types
-        if (err.response?.status === 403) {
-          errorMessage = "You don't have permission to view Expalloc";
-        } else if (err.response?.status === 404) {
-          errorMessage = "Expalloc not found";
-        } else if (err.response?.status >= 500) {
-          errorMessage = "Server error occurred while loading Expalloc";
-        } else if (err.response.data.message) {
-          errorMessage = err.response.data.message;
-        }
+  const updateExams = useCallback(async (id, data) => {
+    if (!id) return;
+    let toastId;
+    try {
+      setIsSubmitting(true);
+      setError(null);
 
-        setError(errorMessage);
+      toastId = toast.loading("Updating exam details...");
+      const response = await examsService.updateExams(id, data);
+      toast.success("Exam updated successfully", { id: toastId });
 
-        setLoading(false);
-        return { success: false, error: errorMessage };
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchExams]
-  );
+      return { success: true, data: response.data };
+    } catch (err) {
+      console.error("Error updating exam:", err);
+      toast.error(err.message || "Failed to update approval", {
+        id: toastId,
+      });
+      setError(err.message);
 
-  const deleteExams = useCallback(
-    async (id) => {
-      try {
-        setLoading(true);
-        await examsService.deleteExams(id);
-        fetchExams();
-        return { success: true };
-      } catch (err) {
-        let errorMessage = "Failed to update";
-        // Handle specific error types
-        if (err.response?.status === 403) {
-          errorMessage = "You don't have permission to view Expalloc";
-        } else if (err.response?.status === 404) {
-          errorMessage = "Expalloc not found";
-        } else if (err.response?.status >= 500) {
-          errorMessage = "Server error occurred while loading Expalloc";
-        } else if (err.response.data.message) {
-          errorMessage = err.response.data.message;
-        }
+      return { success: false, error: err.message };
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-        setError(errorMessage);
+  const deleteExams = useCallback(async (id) => {
+    if (!id) return;
+    try {
+      setIsSubmitting(true);
+      setError(null);
 
-        setLoading(false);
-        return { success: false, error: errorMessage };
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchExams]
-  );
+      const response = await examsService.deleteExams(id);
+      toast.success("User deleted successfully");
+
+      return { success: true, data: response };
+    } catch (err) {
+      console.error("Error deleting user:", err);
+      toast.error(err.message);
+      setError(err.message);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const onSearch = useCallback(
     async (search) => {
@@ -184,8 +161,10 @@ export const useExams = () => {
     createExams,
     deleteExams,
     onSearch,
+    setParams,
+    isSubmitting,
     exams,
-    loading,
+    isLoading,
     error,
     pagination,
     params,

@@ -14,6 +14,7 @@ const getExam = async (page, limit, search = "") => {
     e.examid as examId
     FROM exam e 
     WHERE e.examname LIKE ? OR e.examdescription LIKE ?
+    ORDER BY e.createddate DESC
     LIMIT ? OFFSET ?`;
   const [rows] = await pool.query(query, [
     searchValue,
@@ -33,11 +34,11 @@ const getExam = async (page, limit, search = "") => {
 };
 
 const postExam = async (data) => {
-  const { examname, examdescription } = data;
+  const { examName, examDescription } = data;
 
   try {
     const sql = "INSERT INTO exam (examname, examdescription) VALUES (?, ?)";
-    const [result] = await pool.query(sql, [examname, examdescription]);
+    const [result] = await pool.query(sql, [examName, examDescription]);
     return result;
   } catch (err) {
     throw err;
@@ -45,11 +46,11 @@ const postExam = async (data) => {
 };
 
 const putExam = async (id, data) => {
-  const { examname, examdescription } = data;
+  const { examName, examDescription } = data;
 
   try {
     const sql = ` UPDATE exam SET examname = ?, examdescription = ? WHERE examid = ? ;`;
-    const [result] = await pool.query(sql, [examname, examdescription, id]);
+    const [result] = await pool.query(sql, [examName, examDescription, id]);
     return result;
   } catch (err) {
     throw err;

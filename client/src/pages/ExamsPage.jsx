@@ -23,6 +23,7 @@ const ExamsPage = () => {
     updateExams,
     exams,
     pagination,
+    setParams,
     onPageChange,
     onPageSizeChange,
   } = useExams();
@@ -46,29 +47,27 @@ const ExamsPage = () => {
   };
 
   const handleStudentEdit = async (formData) => {
-    console.log("formdata edit", formData);
-    const result = await updateExams(selectedSExam.examid, formData);
-    return result.success;
-  };
-
-  const handleStudentSubmit = async (formData) => {
-    // console.log("formdata create", formData);
-    const result = await createExams(formData);
+    const result = await updateExams(selectedSExam.examId, formData);
     if (result.success) {
-      // setCurrentPage(1);
+      fetchExams();
     }
     return result.success;
   };
 
-  const handleStudentDelete = async (entityData) => {
-    console.log("student to delete", entityData.examid);
-    const result = await deleteExams(entityData.examid);
+  const handleExamSubmit = async (formData) => {
+    const result = await createExams(formData);
     if (result.success) {
-      // const totalAfterDelete = filteredStudents.length - 1;
-      // const maxPage = Math.ceil(totalAfterDelete / pageLimit);
-      // if (currentPage > maxPage && maxPage > 0) {
-      //   setCurrentPage(maxPage);
-      // }
+      setParams((prev) => ({ ...prev, page: 1 }));
+      fetchExams({ page: 1 });
+    }
+    return result.success;
+  };
+
+  const handleExamDelete = async (entityData) => {
+    const result = await deleteExams(entityData.examId);
+    if (result.success) {
+      setParams((prev) => ({ ...prev, page: 1 }));
+      fetchExams({ page: 1 });
     }
     return result.success;
   };
@@ -128,7 +127,7 @@ const ExamsPage = () => {
         title='Exams'
         subtitle='Manage student records and exam series assignments'
         primaryAction={{
-          label: "Add Student",
+          label: "Add Exam",
           onClick: () => setIsModalOpen(true),
         }}
       />
@@ -145,7 +144,7 @@ const ExamsPage = () => {
         data={exams}
         columns={columns}
         detailPage='exams'
-        idAccessor='examid'
+        idAccessor='examId'
         onEdit={openEditModal}
         onDelete={openDeleteModal}
         onPageChange={onPageChange}
@@ -157,7 +156,7 @@ const ExamsPage = () => {
         <Add_modal
           open={isModalOpen}
           setOpen={setIsModalOpen}
-          onSubmit={handleStudentSubmit}
+          onSubmit={handleExamSubmit}
           fields={fields}
           title='Add New Student'
         />
@@ -178,10 +177,10 @@ const ExamsPage = () => {
         <Delete_modal
           open={isDeleteModalOpen}
           setOpen={setIsDeleteModalOpen}
-          onSubmit={handleStudentDelete}
+          onSubmit={handleExamDelete}
           entityData={selectedSExam}
           title='Delete Student'
-          confirmationText={`Are you sure you want to delete student "${selectedSExam.examname}"? This action cannot be undone.`}
+          confirmationText={`Are you sure you want to delete student "${selectedSExam.examName}"? This action cannot be undone.`}
         />
       )}
     </div>

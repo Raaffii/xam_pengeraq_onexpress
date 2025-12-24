@@ -47,11 +47,11 @@ const UsersPage = () => {
       accessorKey: "studentId",
       align: "center",
       cell: (row) => (
-        <div className="flex justify-center">
+        <div className='flex justify-center'>
           {row.studentId && row.studentName ? (
-            <CheckCircle2Icon className="text-green-800" />
+            <CheckCircle2Icon className='text-green-800' />
           ) : (
-            <XCircleIcon className="text-red-800" />
+            <XCircleIcon className='text-red-800' />
           )}
         </div>
       ),
@@ -115,16 +115,16 @@ const UsersPage = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className='min-h-screen'>
       <PageHeader
-        title="Users"
-        subtitle="Manage system users and their access"
+        title='Users'
+        subtitle='Manage system users and their access'
         primaryAction={{
           label: "Add User",
           onClick: () => setIsModalOpen(true),
         }}
         showSearch={true}
-        searchPlaceholder="Search by name or email"
+        searchPlaceholder='Search by name or email'
         onSearch={onSearch}
         searchMaxLength={50}
       />
@@ -132,7 +132,7 @@ const UsersPage = () => {
         data={users}
         isLoading={isLoading}
         columns={columns}
-        idAccessor="userId"
+        idAccessor='userId'
         onPageChange={onPageChange}
         onSizeChange={onPageSizeChange}
         pagination={pagination}
@@ -155,7 +155,7 @@ const UsersPage = () => {
               maxLength: 100,
             },
           ]}
-          title="Add New User"
+          title='Add New User'
         />
       )}
 
@@ -166,7 +166,7 @@ const UsersPage = () => {
           onSubmit={handleEdit}
           fields={fields}
           entityData={selectedUser}
-          title="Edit User"
+          title='Edit User'
         />
       )}
 
@@ -176,7 +176,7 @@ const UsersPage = () => {
           setOpen={setIsDeleteModalOpen}
           onSubmit={handleDelete}
           entityData={selectedUser}
-          title="Delete User"
+          title='Delete User'
           confirmationText={`Are you sure you want to delete user "${selectedUser.userName}"? This action cannot be undone.`}
         />
       )}
