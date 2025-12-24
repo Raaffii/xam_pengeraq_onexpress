@@ -26,6 +26,7 @@ const ExamsSeriesPage = () => {
     deleteExamsSeries,
     examSeries,
     pagination,
+    setParams,
     onSearch,
     onPageChange,
     onPageSizeChange,
@@ -55,6 +56,9 @@ const ExamsSeriesPage = () => {
       selectedSExam.examSeriesId,
       formData
     );
+    if (result.success) {
+      fetchExamSeries();
+    }
     return result.success;
   };
 
@@ -62,7 +66,8 @@ const ExamsSeriesPage = () => {
     console.log("formdata create", formData);
     const result = await createExamsSeries(formData);
     if (result.success) {
-      // setCurrentPage(1);
+      setParams((prev) => ({ ...prev, page: 1 }));
+      fetchExamSeries({ page: 1 });
     }
     return result.success;
   };
@@ -70,11 +75,8 @@ const ExamsSeriesPage = () => {
   const handleStudentDelete = async (entityData) => {
     const result = await deleteExamsSeries(entityData.examSeriesId);
     if (result.success) {
-      // const totalAfterDelete = filteredStudents.length - 1;
-      // const maxPage = Math.ceil(totalAfterDelete / pageLimit);
-      // if (currentPage > maxPage && maxPage > 0) {
-      //   setCurrentPage(maxPage);
-      // }
+      setParams((prev) => ({ ...prev, page: 1 }));
+      fetchExamSeries({ page: 1 });
     }
     return result.success;
   };

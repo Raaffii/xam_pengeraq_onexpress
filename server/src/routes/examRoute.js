@@ -6,12 +6,33 @@ const {
   putExam,
   deleteExam,
 } = require("../controllers/examController");
+
+const {
+  validateQuery,
+  validateMultiple,
+  validateBody,
+  validateParams,
+} = require("../middlewares/validateSchema");
+
+const {
+  createExamSchema,
+  updateExamSchema,
+  idParamsSchema,
+  fetchExamsQuerySchema,
+} = require("../schemas/examSchema");
+
 const router = express.Router();
 
-router.get("/", authenticateToken, getExam);
-router.post("/", authenticateToken, postExam);
-router.put("/:id", authenticateToken, putExam);
-router.delete("/:id", authenticateToken, deleteExam);
+router.use(authenticateToken);
+
+router.get("/", validateQuery(fetchExamsQuerySchema), getExam);
+router.post("/", validateBody(createExamSchema), postExam);
+router.put(
+  "/:id",
+  validateMultiple({ params: idParamsSchema, body: updateExamSchema }),
+  putExam
+);
+router.delete("/:id", validateParams(idParamsSchema), deleteExam);
 // router.post("/", authenticateToken, postExpaloc);
 // router.put("/:id", authenticateToken, putExpaloc);
 // router.delete("/:id", authenticateToken, deleteExpaloc);

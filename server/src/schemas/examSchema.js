@@ -2,33 +2,24 @@ const { z } = require("zod");
 const { passwordSchema } = require("./authSchema");
 const { paginationSchema } = require(".");
 
-const studentNameSchema = z
+const ExamNameSchema = z
   .string("Name is required")
   .max(45, "Name must not exceed 45 characters")
   .trim();
 
-const studentIdNoSchema = z
-  .string("Student Id No is required")
-  .max(10, "Student Id no must not exceed 10 characters")
+const ExamDescription = z
+  .string("Exam Id No is required")
+  .max(50, "Exam Id no must not exceed 10 characters")
   .trim();
 
-const examSeriesIdSchema = z
-  .number()
-  .int("Exam Series ID must be an integer")
-  .positive("Exam Series ID must be positive")
-  .optional()
-  .nullable();
-
-const createStudentSchema = z.object({
-  studentName: studentNameSchema,
-  studentIdNo: studentIdNoSchema,
-  examSeriesId: examSeriesIdSchema,
+const createExamSchema = z.object({
+  ExamName: ExamNameSchema,
+  ExamDescription: ExamDescription,
 });
 
-const updateStudentSchema = z.object({
-  studentName: studentNameSchema.optional(),
-  studentIdNo: studentIdNoSchema.optional(),
-  examSeriesId: examSeriesIdSchema.optional(),
+const updateExamSchema = z.object({
+  ExamName: ExamNameSchema.optional(),
+  ExamDescription: ExamDescription.optional(),
 });
 
 const idParamsSchema = z.object({
@@ -36,13 +27,13 @@ const idParamsSchema = z.object({
     .string("User ID is required")
     .pipe(
       z.coerce
-        .number("Invalid  student ID")
+        .number("Invalid  Exam ID")
         .int()
-        .positive("Student ID must be a positive number")
+        .positive("Exam ID must be a positive number")
     ),
 });
 
-const fetchStudentsQuerySchema = z
+const fetchExamsQuerySchema = z
   .object({
     searchTerm: z.string().max(100, "Search term too long").trim().optional(),
     isActive: z
@@ -65,8 +56,8 @@ const fetchStudentsQuerySchema = z
   .and(paginationSchema);
 
 module.exports = {
-  createStudentSchema,
-  updateStudentSchema,
+  createExamSchema,
+  updateExamSchema,
   idParamsSchema,
-  fetchStudentsQuerySchema,
+  fetchExamsQuerySchema,
 };

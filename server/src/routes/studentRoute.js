@@ -16,7 +16,7 @@ const {
 
 const {
   createStudentSchema,
-  updateUserSchema,
+  updateStudentSchema,
   idParamsSchema,
   fetchStudentsQuerySchema,
 } = require("../schemas/studentSchema");
@@ -29,7 +29,7 @@ router.get("/", validateQuery(fetchStudentsQuerySchema), getStudent);
 router.post("/", validateBody(createStudentSchema), postStudent);
 router.put(
   "/:id",
-  validateMultiple({ params: idParamsSchema, body: updateUserSchema }),
+  validateMultiple({ params: idParamsSchema, body: updateStudentSchema }),
   putStudent
 );
 router.delete("/:id", validateParams(idParamsSchema), deleteStudent);

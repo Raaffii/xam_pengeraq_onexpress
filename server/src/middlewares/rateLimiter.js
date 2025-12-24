@@ -44,7 +44,7 @@ const publicLimiter = createRateLimiter({
 
 const apiLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000,
-  limit: 100,
+  limit: 900,
   message:
     "You've made too many requests. Please wait a few minutes and try again.",
   keyPrefix: "api",

@@ -1,9 +1,11 @@
 import { examSeriesService } from "@/services/examSeriesService";
 import { useState, useCallback } from "react";
+import toast from "react-hot-toast";
 
 export const useExamSeries = () => {
   const [examSeries, setExamSeries] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
   const [pagination, setPagination] = useState({
@@ -14,141 +16,119 @@ export const useExamSeries = () => {
   });
   const [params, setParams] = useState({ page: 1, limit: 10 });
 
-  const fetchExamSeries = useCallback(async (overrideParams = {}) => {
-    try {
-      setLoading(true);
-
-      const finalParams = { ...params, ...overrideParams };
-      const apiParams = {
-        ...finalParams,
-      };
-      const response = await examSeriesService.getExamSeries(apiParams);
-
-      setPagination(
-        response.pagination || {
-          currentPage: 1,
-          pageSize: 10,
-          totalPages: 1,
-          totalItems: 0,
-        }
-      );
-      setExamSeries(response.data);
-      //   alert("cek");
-      return response.data;
-    } catch (err) {
-      let errorMessage = "Failed to update";
-      // Handle specific error types
-      if (err.response?.status === 403) {
-        errorMessage = "You don't have permission to view contacts";
-      } else if (err.response?.status === 404) {
-        errorMessage = "Contacts not found";
-      } else if (err.response?.status >= 500) {
-        errorMessage = "Server error occurred while loading contacts";
-      } else if (err.message) {
-        errorMessage = err.message;
-      }
-
-      setError(errorMessage);
-
-      setLoading(false);
-      return { success: false, error: errorMessage };
-    } finally {
-      setLoading(false);
-    }
+  const formaExamSeriesData = useCallback((rawExamSeries) => {
+    return rawExamSeries.map((item) => ({
+      ...item,
+      id: item.userId,
+    }));
   }, []);
+
+  const fetchExamSeries = useCallback(
+    async (overrideParams = {}) => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const finalParams = { ...params, ...overrideParams };
+        const apiParams = {
+          ...finalParams,
+        };
+        const response = await examSeriesService.getExamSeries(apiParams);
+        const data = formaExamSeriesData(response.data);
+
+        setPagination(
+          response.pagination || {
+            currentPage: 1,
+            pageSize: 10,
+            totalPages: 1,
+            totalItems: 0,
+          }
+        );
+        setExamSeries(data);
+        //   alert("cek");
+
+        return { success: true, data: data };
+      } catch (err) {
+        console.error("Error fetching users:", err);
+
+        setError(err.message);
+        setExamSeries([]);
+
+        return { success: false, error: err.message };
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [params, formaExamSeriesData]
+  );
 
   const createExamsSeries = useCallback(async (data) => {
+    let toastId;
     try {
-      setLoading(true);
+      setIsSubmitting(true);
+      setError(null);
+      toastId = toast.loading("Creating new user...");
       const response = await examSeriesService.insertExamSeries(data);
-      fetchExamSeries();
+      toast.success("Exam Series added successfully!", { id: toastId });
+
       return { success: true, data: response.data };
     } catch (err) {
-      let errorMessage = "Failed to update";
-      // Handle specific error types
-      if (err.response?.status === 403) {
-        errorMessage = "You don't have permission to view Expalloc";
-      } else if (err.response?.status === 404) {
-        errorMessage = "Expalloc not found";
-      } else if (err.response?.status >= 500) {
-        errorMessage =
-          "A server error occurred, possibly caused by a duplicate code";
-      } else if (err.response.data.message) {
-        errorMessage = err.response.data.message;
-      }
+      console.error("Error creating Exam Series:", err);
+      toast.error(err.message || "Failed to create exam series", {
+        id: toastId,
+      });
+      setError(err.message);
 
-      setError(errorMessage);
-
-      setLoading(false);
-      return { success: false, error: errorMessage };
+      return { success: false, error: err.message };
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   }, []);
 
-  const updateExamsSeries = useCallback(
-    async (id, data) => {
-      try {
-        setLoading(true);
+  const updateExamsSeries = useCallback(async (id, data) => {
+    if (!id) return;
+    let toastId;
+    try {
+      setIsSubmitting(true);
+      setError(null);
 
-        await examSeriesService.updateExamsSeries(id, data);
-        fetchExamSeries();
-        return { success: true };
-      } catch (err) {
-        let errorMessage = "Failed to update";
-        // Handle specific error types
-        if (err.response?.status === 403) {
-          errorMessage = "You don't have permission to view Expalloc";
-        } else if (err.response?.status === 404) {
-          errorMessage = "Expalloc not found";
-        } else if (err.response?.status >= 500) {
-          errorMessage = "Server error occurred while loading Expalloc";
-        } else if (err.response.data.message) {
-          errorMessage = err.response.data.message;
-        }
+      toastId = toast.loading("Updating exam series details...");
+      const response = await examSeriesService.updateExamsSeries(id, data);
+      toast.success("Exam Series updated successfully", { id: toastId });
 
-        setError(errorMessage);
+      return { success: true, data: response.data };
+    } catch (err) {
+      console.error("Error updating exam series:", err);
+      toast.error(err.message || "Failed to update approval", {
+        id: toastId,
+      });
+      setError(err.message);
 
-        setLoading(false);
-        return { success: false, error: errorMessage };
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchExamSeries]
-  );
+      return { success: false, error: err.message };
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, []);
 
-  const deleteExamsSeries = useCallback(
-    async (id) => {
-      try {
-        setLoading(true);
-        console.log("here i  here");
-        await examSeriesService.deleteExamSeries(id);
-        fetchExamSeries();
-        return { success: true };
-      } catch (err) {
-        let errorMessage = "Failed to update";
-        // Handle specific error types
-        if (err.response?.status === 403) {
-          errorMessage = "You don't have permission to view Expalloc";
-        } else if (err.response?.status === 404) {
-          errorMessage = "Expalloc not found";
-        } else if (err.response?.status >= 500) {
-          errorMessage = "Server error occurred while loading Expalloc";
-        } else if (err.response.data.message) {
-          errorMessage = err.response.data.message;
-        }
+  const deleteExamsSeries = useCallback(async (id) => {
+    if (!id) return;
+    try {
+      setIsSubmitting(true);
+      setError(null);
+      const response = await examSeriesService.deleteExamSeries(id);
+      toast.success("User deleted successfully");
 
-        setError(errorMessage);
+      return { success: true, data: response };
+    } catch (err) {
+      console.error("Error deleting user:", err);
+      toast.error(err.message);
+      setError(err.message);
 
-        setLoading(false);
-        return { success: false, error: errorMessage };
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchExamSeries]
-  );
+      return { success: false, error: err.message };
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, []);
 
   const onSearch = useCallback(
     async (search) => {
@@ -185,8 +165,10 @@ export const useExamSeries = () => {
     createExamsSeries,
     deleteExamsSeries,
     onSearch,
+    setParams,
+    isSubmitting,
     examSeries,
-    loading,
+    isLoading,
     error,
     pagination,
     params,

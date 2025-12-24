@@ -2,33 +2,24 @@ const { z } = require("zod");
 const { passwordSchema } = require("./authSchema");
 const { paginationSchema } = require(".");
 
-const studentNameSchema = z
+const ExamSeriesNameSchema = z
   .string("Name is required")
   .max(45, "Name must not exceed 45 characters")
   .trim();
 
-const studentIdNoSchema = z
-  .string("Student Id No is required")
-  .max(10, "Student Id no must not exceed 10 characters")
+const ExamSeriesDescription = z
+  .string("ExamSeries Id No is required")
+  .max(50, "ExamSeries Id no must not exceed 10 characters")
   .trim();
 
-const examSeriesIdSchema = z
-  .number()
-  .int("Exam Series ID must be an integer")
-  .positive("Exam Series ID must be positive")
-  .optional()
-  .nullable();
-
-const createStudentSchema = z.object({
-  studentName: studentNameSchema,
-  studentIdNo: studentIdNoSchema,
-  examSeriesId: examSeriesIdSchema,
+const createExamSeriesSchema = z.object({
+  ExamSeriesName: ExamSeriesNameSchema,
+  ExamSeriesDescription: ExamSeriesDescription,
 });
 
-const updateStudentSchema = z.object({
-  studentName: studentNameSchema.optional(),
-  studentIdNo: studentIdNoSchema.optional(),
-  examSeriesId: examSeriesIdSchema.optional(),
+const updateExamSeriesSchema = z.object({
+  ExamSeriesName: ExamSeriesNameSchema.optional(),
+  ExamSeriesDescription: ExamSeriesDescription.optional(),
 });
 
 const idParamsSchema = z.object({
@@ -36,13 +27,13 @@ const idParamsSchema = z.object({
     .string("User ID is required")
     .pipe(
       z.coerce
-        .number("Invalid  student ID")
+        .number("Invalid  ExamSeries ID")
         .int()
-        .positive("Student ID must be a positive number")
+        .positive("ExamSeries ID must be a positive number")
     ),
 });
 
-const fetchStudentsQuerySchema = z
+const fetchExamSeriessQuerySchema = z
   .object({
     searchTerm: z.string().max(100, "Search term too long").trim().optional(),
     isActive: z
@@ -65,8 +56,8 @@ const fetchStudentsQuerySchema = z
   .and(paginationSchema);
 
 module.exports = {
-  createStudentSchema,
-  updateStudentSchema,
+  createExamSeriesSchema,
+  updateExamSeriesSchema,
   idParamsSchema,
-  fetchStudentsQuerySchema,
+  fetchExamSeriessQuerySchema,
 };
