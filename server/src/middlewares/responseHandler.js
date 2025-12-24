@@ -50,12 +50,13 @@ exports.responseFormatter = (req, res, next) => {
       // If data has a message, extract it to top level and remove from data
       else if (message) {
         const { message: _, ...restData } = data;
-        response.data = Object.keys(restData).length > 0 ? restData : null;
+        response.data =
+          Object.keys(restData).length > 0 ? restData.data || restData : null;
         response.message = message;
       }
       // Otherwise, use data as is
       else {
-        response.data = data;
+        response.data = data?.data || data;
       }
 
       response.error = null;
@@ -76,7 +77,7 @@ exports.responseFormatter = (req, res, next) => {
   res.error = function (
     message,
     statusCode = StatusCodes.INTERNAL_SERVER_ERROR,
-    details = null
+    details = null,
   ) {
     this.status(statusCode).json({
       message,

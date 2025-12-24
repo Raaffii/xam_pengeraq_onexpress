@@ -1,78 +1,122 @@
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useRef, useState } from "react";
 
 export default function PageHeader({
   title,
   subtitle,
   actions = [],
   primaryAction,
-  className = "",
+  children,
+  showSearch = false,
+  searchPlaceholder = "Search...",
+  onSearch,
+  searchMaxLength = 50,
+  searchDebounceMs = 500,
+  searchMinLength = 3,
 }) {
-  return (
-    <div className={`bg-white border-b border-gray-200 ${className}`}>
-      <div className='px-4 sm:px-6 py-6'>
-        <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
-          {/* Title Section */}
-          <div className='flex-1 min-w-0'>
-            <h1 className='text-2xl font-bold text-gray-900 tracking-tight'>
-              {title}
-            </h1>
-            {subtitle && (
-              <p className='mt-1 text-sm text-gray-500'>{subtitle}</p>
-            )}
-          </div>
+  const [searchQuery, setSearchQuery] = useState("");
+  const typingTimeoutRef = useRef(null);
 
-          {/* Actions Section */}
-          <div className='flex flex-col sm:flex-row gap-3 sm:gap-2'>
+  const handleSearchChange = (e) => {
+    const search = e.target.value;
+    setSearchQuery(search);
+    const words = search.length;
+
+    if (words >= searchMinLength || words === 0) {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      typingTimeoutRef.current = setTimeout(() => {
+        onSearch?.(search);
+      }, searchDebounceMs);
+    }
+  };
+
+  return (
+    <div className="space-y-4 mb-6">
+      {/* Header Content */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+        {/* Title Section */}
+        <div className="flex-1 min-w-0 space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="text-sm text-muted-foreground max-w-2xl">
+              {subtitle}
+            </p>
+          )}
+        </div>
+
+        {/* Actions Section */}
+        {(actions.length > 0 || primaryAction) && (
+          <div className="flex flex-wrap items-center gap-2 flex-shrink-0">
             {/* Secondary Actions */}
             {actions.map((action, index) => (
-              <button
+              <Button
                 key={index}
-                type='button'
-                className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border transition-colors duration-200 ${
-                  action.variant === "outline"
-                    ? "border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-gray-500"
-                    : action.variant === "danger"
-                    ? "border-red-600 text-red-600 bg-white hover:bg-red-50 focus:ring-red-500"
-                    : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-gray-500"
-                } focus:outline-none focus:ring-2 focus:ring-offset-2`}
+                variant={action.variant || "outline"}
+                size={action.size || "default"}
                 onClick={action.onClick}
-                disabled={action.disabled}>
-                {action.icon && (
-                  <action.icon className='h-4 w-4 mr-2' aria-hidden='true' />
-                )}
+                disabled={action.disabled}
+                className={`w-full sm:w-auto h-10 py-4 ${action.className}`}
+              >
+                {action.icon && <action.icon className="mr-2 h-4 w-4" />}
                 {action.label}
-              </button>
+              </Button>
             ))}
 
             {/* Primary Action */}
             {primaryAction && (
               <>
                 {primaryAction.component ? (
-                  // Render custom component
                   primaryAction.component
                 ) : (
-                  // Render standard button
-                  <button
-                    type='button'
-                    className='inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200'
+                  <Button
+                    variant={primaryAction.variant || "default"}
+                    size={primaryAction.size || "default"}
                     onClick={primaryAction.onClick}
-                    disabled={primaryAction.disabled}>
+                    disabled={primaryAction.disabled}
+                    className={`w-full sm:w-auto h-10 ${primaryAction.className}`}
+                  >
                     {primaryAction.icon ? (
-                      <primaryAction.icon
-                        className='h-4 w-4 mr-2'
-                        aria-hidden='true'
-                      />
+                      <primaryAction.icon className="mr-2 h-4 w-4" />
                     ) : (
-                      <Plus className='h-4 w-4 mr-2' aria-hidden='true' />
+                      <Plus className="mr-2 h-4 w-4" />
                     )}
                     {primaryAction.label}
-                  </button>
+                  </Button>
                 )}
               </>
             )}
           </div>
-        </div>
+        )}
       </div>
+
+      {/* Filters and Search Section */}
+      {(children || showSearch) && (
+        <div className="flex flex-wrap items-center gap-2 flex-shrink-0 justify-end">
+          {/* Search Bar */}
+          {showSearch && (
+            <div className="relative w-full sm:w-auto sm:min-w-[280px] md:min-w-[320px]">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                <Search className="h-4 w-4" />
+              </div>
+              <Input
+                type="search"
+                placeholder={searchPlaceholder}
+                value={searchQuery}
+                onChange={handleSearchChange}
+                maxLength={searchMaxLength}
+                className="pl-9 w-full bg-white border-gray-300 h-10 text-sm focus:ring-2 focus:ring-gray-700 focus:border-gray-700"
+              />
+            </div>
+          )}
+          {children}
+        </div>
+      )}
     </div>
   );
 }

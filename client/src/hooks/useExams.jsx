@@ -9,8 +9,8 @@ export const useExams = () => {
   const [pagination, setPagination] = useState({
     page: 1,
     pageSize: 10,
-    totalPage: 1,
-    totalItem: 0,
+    totalPages: 1,
+    totalItems: 0,
   });
   const [params, setParams] = useState({ page: 1, limit: 10 });
 

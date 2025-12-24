@@ -16,27 +16,29 @@ const ExamsSeriesPage = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedSExam, setSelectedExam] = useState(null);
   const typingTimeoutRef = useRef(null);
+
+  const { fetchExams, exams } = useExams();
+
   const {
-    createExams,
-    fetchExams,
-    onSearch,
-    deleteExams,
-    updateExams,
-    exams,
+    fetchExamSeries,
+    createExamsSeries,
+    updateExamsSeries,
+    deleteExamsSeries,
+    examSeries,
     pagination,
+    onSearch,
     onPageChange,
     onPageSizeChange,
-  } = useExams();
-
-  const { fetchExamSeries, examSeries } = useExamSeries();
+  } = useExamSeries();
 
   useEffect(() => {
     const fetchData = async () => {
       await fetchExamSeries();
+      await fetchExams();
     };
 
     fetchData();
-  }, [fetchExamSeries]);
+  }, [fetchExamSeries, fetchExams]);
 
   const openEditModal = (student) => {
     setSelectedExam(student);
@@ -50,13 +52,16 @@ const ExamsSeriesPage = () => {
 
   const handleStudentEdit = async (formData) => {
     console.log("formdata edit", formData);
-    const result = await updateExams(selectedSExam.examid, formData);
+    const result = await updateExamsSeries(
+      selectedSExam.examseriesid,
+      formData
+    );
     return result.success;
   };
 
-  const handleStudentSubmit = async (formData) => {
-    // console.log("formdata create", formData);
-    const result = await createExams(formData);
+  const handleExamSeriesSubmit = async (formData) => {
+    console.log("formdata create", formData);
+    const result = await createExamsSeries(formData);
     if (result.success) {
       // setCurrentPage(1);
     }
@@ -64,8 +69,7 @@ const ExamsSeriesPage = () => {
   };
 
   const handleStudentDelete = async (entityData) => {
-    console.log("student to delete", entityData.examid);
-    const result = await deleteExams(entityData.examid);
+    const result = await deleteExamsSeries(entityData.examseriesid);
     if (result.success) {
       // const totalAfterDelete = filteredStudents.length - 1;
       // const maxPage = Math.ceil(totalAfterDelete / pageLimit);
@@ -78,7 +82,7 @@ const ExamsSeriesPage = () => {
 
   const columns = [
     {
-      accessorKey: "examseriesdescription",
+      accessorKey: "examname",
       header: <div className='text-left w-full'>Exam</div>,
       cellClassName: "text-left",
     },
@@ -107,21 +111,37 @@ const ExamsSeriesPage = () => {
   const fields = [
     {
       label: "",
-      name: "examseriesidid",
+      name: "examseriesid",
       type: "hidden",
     },
     {
-      label: "Name",
-      name: "examname",
-      type: "text",
-      maxLength: 45,
+      label: "Exam",
+      name: "examid",
+      type: "dropdown",
       required: true,
     },
     {
       label: "Description",
-      name: "examdescription",
-      type: "textarea",
-      maxLength: 50,
+      name: "examseriesdescription",
+      type: "text",
+      required: true,
+    },
+    {
+      label: "Start Date",
+      name: "examseriesstartdate",
+      type: "date",
+      required: true,
+    },
+    {
+      label: "End Date",
+      name: "examseriesenddate",
+      type: "date",
+      required: true,
+    },
+    {
+      label: "Credits",
+      name: "credits",
+      type: "number",
       required: true,
     },
   ];
@@ -140,11 +160,21 @@ const ExamsSeriesPage = () => {
     }
   };
 
+  const examOptions = [
+    { value: "all", label: "Exam Series" },
+    ...(Array.isArray(examSeries)
+      ? exams.map((item) => ({
+          value: item.examid,
+          label: item.examname,
+        }))
+      : []),
+  ];
+
   return (
     <div className='min-h-screen '>
       <PageHeader
         title='Exams'
-        subtitle='Manage student records and exam series assignments'
+        subtitle='Manage student records and exam item assignments'
         primaryAction={{
           label: "Add Student",
           onClick: () => setIsModalOpen(true),
@@ -175,9 +205,12 @@ const ExamsSeriesPage = () => {
         <Add_modal
           open={isModalOpen}
           setOpen={setIsModalOpen}
-          onSubmit={handleStudentSubmit}
+          onSubmit={handleExamSeriesSubmit}
           fields={fields}
-          title='Add New Student'
+          title='Add New Exam Series'
+          dropdowns={{
+            examid: examOptions,
+          }}
         />
       )}
 
@@ -188,7 +221,10 @@ const ExamsSeriesPage = () => {
           onSubmit={handleStudentEdit}
           fields={fields}
           entityData={selectedSExam}
-          title='Edit Student'
+          title='Edit Exam Series'
+          dropdowns={{
+            examid: examOptions,
+          }}
         />
       )}
 

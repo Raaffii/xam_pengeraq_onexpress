@@ -57,14 +57,13 @@ export const useExamSeries = () => {
     }
   }, []);
 
-  const createExams = useCallback(async (data) => {
+  const createExamsSeries = useCallback(async (data) => {
     try {
       setLoading(true);
-      const response = await examSeriesService.insertExams(data);
+      const response = await examSeriesService.insertExamSeries(data);
       fetchExamSeries();
       return { success: true, data: response.data };
     } catch (err) {
-      console.log("err", err);
       let errorMessage = "Failed to update";
       // Handle specific error types
       if (err.response?.status === 403) {
@@ -87,11 +86,11 @@ export const useExamSeries = () => {
     }
   }, []);
 
-  const updateExams = useCallback(
+  const updateExamsSeries = useCallback(
     async (id, data) => {
       try {
         setLoading(true);
-        await examSeriesService.updateExams(id, data);
+        await examSeriesService.updateExamsSeries(id, data);
         fetchExamSeries();
         return { success: true };
       } catch (err) {
@@ -118,11 +117,12 @@ export const useExamSeries = () => {
     [fetchExamSeries]
   );
 
-  const deleteExams = useCallback(
+  const deleteExamsSeries = useCallback(
     async (id) => {
       try {
         setLoading(true);
-        await examSeriesService.deleteExams(id);
+        console.log("here i  here");
+        await examSeriesService.deleteExamSeries(id);
         fetchExamSeries();
         return { success: true };
       } catch (err) {
@@ -178,11 +178,11 @@ export const useExamSeries = () => {
   );
   return {
     fetchExamSeries,
-    updateExams,
+    updateExamsSeries,
     onPageChange,
     onPageSizeChange,
-    createExams,
-    deleteExams,
+    createExamsSeries,
+    deleteExamsSeries,
     onSearch,
     examSeries,
     loading,
