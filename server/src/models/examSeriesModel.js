@@ -8,10 +8,18 @@ const getExamSeries = async (page, limit, search = "") => {
   const searchValue = `%${search}%`;
 
   const query = `
-    SELECT es.*, e.examname 
+    SELECT 
+    es.examseriesid as examSeriesId,
+    es.examseriesdescription as examSeriesDescription,
+    es.examseriesenddate as examSeriesEndDate,
+    es.examseriesstartdate as examSeriesStartDate,
+    es.credits as credits,
+    es.examid as examId,
+    e.examname as examName 
     FROM examseries es
     LEFT JOIN exam e ON es.examid =e.examid   
-    WHERE es.examseriesdescription LIKE ?
+    WHERE es.examseriesdescription LIKE ? 
+    ORDER BY es.createddate DESC
     LIMIT ? OFFSET ? `;
   const [rows] = await pool.query(query, [searchValue, limit, offset]);
 
@@ -28,21 +36,21 @@ const getExamSeries = async (page, limit, search = "") => {
 
 const postExamSeries = async (data) => {
   const {
-    examid,
-    examseriesdescription,
-    examseriesstartdate,
-    examseriesenddate,
+    examId,
+    examSeriesDescription,
+    examSeriesStartDate,
+    examSeriesEndDate,
     credits,
   } = data;
-  console.log("data data", data);
+
   try {
     const sql =
       "INSERT INTO examseries (examid,  examseriesdescription,examseriesstartdate,examseriesenddate,credits) VALUES (?, ?,?,?,?)";
     const [result] = await pool.query(sql, [
-      examid,
-      examseriesdescription,
-      examseriesstartdate,
-      examseriesenddate,
+      examId,
+      examSeriesDescription,
+      examSeriesStartDate,
+      examSeriesEndDate,
       credits,
     ]);
     return result;
@@ -52,13 +60,11 @@ const postExamSeries = async (data) => {
 };
 
 const putExamSeries = async (id, data) => {
-  console.log("ceko", data);
-
   const {
-    examid,
-    examseriesdescription,
-    examseriesstartdate,
-    examseriesenddate,
+    examId,
+    examSeriesDescription,
+    examSeriesStartDate,
+    examSeriesEndDate,
     credits,
   } = data;
 
@@ -69,10 +75,10 @@ const putExamSeries = async (id, data) => {
     examseriesenddate =? ,
     credits=? WHERE examseriesid = ? ;`;
     const [result] = await pool.query(sql, [
-      examid,
-      examseriesdescription,
-      examseriesstartdate,
-      examseriesenddate,
+      examId,
+      examSeriesDescription,
+      examSeriesStartDate,
+      examSeriesEndDate,
       credits,
       id,
     ]);
@@ -84,7 +90,7 @@ const putExamSeries = async (id, data) => {
 
 const deleteExamSeries = async (data) => {
   const { examSeriesToDelete, editedBy } = data;
-  console.log("exam series to delete", examSeriesToDelete);
+
   try {
     const sql = `DELETE FROM examseries WHERE examseriesid = ?;`;
     const [result] = await pool.query(sql, [examSeriesToDelete]);

@@ -3,12 +3,12 @@ const { passwordSchema } = require("./authSchema");
 const { paginationSchema } = require(".");
 
 const studentNameSchema = z
-  .string("User Name is required")
+  .string("Name is required")
   .max(45, "Name must not exceed 45 characters")
   .trim();
 
 const studentIdNoSchema = z
-  .string("User Name is required")
+  .string("Student Id No is required")
   .max(10, "Student Id no must not exceed 10 characters")
   .trim();
 
@@ -20,17 +20,15 @@ const examSeriesIdSchema = z
   .nullable();
 
 const createStudentSchema = z.object({
-  studentname: studentNameSchema,
-  studentidno: studentIdNoSchema,
-  examseriesid: examSeriesIdSchema,
-  studentidno: studentIdNoSchema,
+  studentName: studentNameSchema,
+  studentIdNo: studentIdNoSchema,
+  examSeriesId: examSeriesIdSchema,
 });
 
 const updateUserSchema = z.object({
-  studentname: studentNameSchema.optional(),
-  studentidno: studentIdNoSchema.optional(),
-  examseriesid: examSeriesIdSchema.optional(),
-  studentidno: studentIdNoSchema.optional(),
+  studentName: studentNameSchema.optional(),
+  studentIdNo: studentIdNoSchema.optional(),
+  examSeriesId: examSeriesIdSchema.optional(),
 });
 
 const idParamsSchema = z.object({

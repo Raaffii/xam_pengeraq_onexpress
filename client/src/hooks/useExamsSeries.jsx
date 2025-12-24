@@ -90,6 +90,7 @@ export const useExamSeries = () => {
     async (id, data) => {
       try {
         setLoading(true);
+
         await examSeriesService.updateExamsSeries(id, data);
         fetchExamSeries();
         return { success: true };

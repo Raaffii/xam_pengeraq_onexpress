@@ -8,7 +8,10 @@ const getExam = async (page, limit, search = "") => {
   const searchValue = `%${search}%`;
 
   const query = `
-    SELECT e.examname, e.examdescription, e.examid
+    SELECT 
+    e.examname as examName, 
+    e.examdescription as examDescription, 
+    e.examid as examId
     FROM exam e 
     WHERE e.examname LIKE ? OR e.examdescription LIKE ?
     LIMIT ? OFFSET ?`;
@@ -55,7 +58,6 @@ const putExam = async (id, data) => {
 
 const deleteExam = async (id) => {
   try {
-    console.log("delete", id);
     const sql = `DELETE FROM exam WHERE examid = ?;`;
     const [result] = await pool.query(sql, [id]);
     return result;

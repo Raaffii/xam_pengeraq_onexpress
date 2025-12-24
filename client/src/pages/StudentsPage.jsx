@@ -51,7 +51,7 @@ const StudentsPage = () => {
   };
 
   const handleStudentEdit = async (formData) => {
-    const result = await updateStudents(selectedStudent.studentid, formData);
+    const result = await updateStudents(selectedStudent.studentId, formData);
     if (result.success) {
       fetchStudents();
     }
@@ -68,7 +68,7 @@ const StudentsPage = () => {
   };
 
   const handleStudentDelete = async (entityData) => {
-    const result = await deleteStudent(entityData.studentid);
+    const result = await deleteStudent(entityData.studentId);
     if (result.success) {
       setParams((prev) => ({ ...prev, page: 1 }));
       fetchStudents({ page: 1 });
@@ -78,17 +78,17 @@ const StudentsPage = () => {
 
   const columns = [
     {
-      accessorKey: "studentidno",
+      accessorKey: "studentIdNo",
       header: <div className='text-left w-full'>ID</div>,
       cellClassName: "text-left",
     },
     {
-      accessorKey: "studentname",
+      accessorKey: "studentName",
       header: <div className='text-left w-full'>Student Name</div>,
       cellClassName: "text-left",
     },
     {
-      accessorKey: "currentexamseries",
+      accessorKey: "examSeriesDescription",
       header: <div className='text-left w-full'>Curent Series</div>,
       cellClassName: "text-left",
     },
@@ -97,25 +97,25 @@ const StudentsPage = () => {
   const fields = [
     {
       label: "",
-      name: "studentid",
+      name: "studentId",
       type: "hidden",
     },
     {
       label: "ID",
-      name: "studentidno",
+      name: "studentIdNo",
       type: "text",
       required: true,
       maxLength: 4,
     },
     {
       label: "Name",
-      name: "studentname",
+      name: "studentName",
       type: "text",
       required: true,
     },
     {
       label: "Exam Series",
-      name: "examseriesid",
+      name: "examSeriesId",
       type: "dropdown",
       required: true,
     },
@@ -139,8 +139,8 @@ const StudentsPage = () => {
     { value: "all", label: "Exam Series" },
     ...(Array.isArray(examSeries)
       ? examSeries.map((series) => ({
-          value: series.examseriesid,
-          label: series.examseriesdescription,
+          value: series.examSeriesId,
+          label: series.examSeriesDescription,
         }))
       : []),
   ];
@@ -184,7 +184,7 @@ const StudentsPage = () => {
           fields={fields}
           title='Add New Student'
           dropdowns={{
-            examseriesid: examSeriesOptions,
+            examSeriesId: examSeriesOptions,
           }}
         />
       )}
@@ -198,7 +198,7 @@ const StudentsPage = () => {
           entityData={selectedStudent}
           title='Edit Student'
           dropdowns={{
-            examseriesid: examSeriesOptions,
+            examSeriesId: examSeriesOptions,
           }}
         />
       )}
@@ -210,7 +210,7 @@ const StudentsPage = () => {
           onSubmit={handleStudentDelete}
           entityData={selectedStudent}
           title='Delete Student'
-          confirmationText={`Are you sure you want to delete student "${selectedStudent.studentname}"? This action cannot be undone.`}
+          confirmationText={`Are you sure you want to delete student "${selectedStudent.studentName}"? This action cannot be undone.`}
         />
       )}
     </div>

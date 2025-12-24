@@ -75,12 +75,12 @@ const ExamsPage = () => {
 
   const columns = [
     {
-      accessorKey: "examname",
+      accessorKey: "examName",
       header: <div className='text-left w-full'>Name</div>,
       cellClassName: "text-left",
     },
     {
-      accessorKey: "examdescription",
+      accessorKey: "examDescription",
       header: <div className='text-left w-full'>Description</div>,
       cellClassName: "text-left",
     },
@@ -89,19 +89,19 @@ const ExamsPage = () => {
   const fields = [
     {
       label: "",
-      name: "examid",
+      name: "examId",
       type: "hidden",
     },
     {
       label: "Name",
-      name: "examname",
+      name: "examName",
       type: "text",
       maxLength: 45,
       required: true,
     },
     {
       label: "Description",
-      name: "examdescription",
+      name: "examDescription",
       type: "textarea",
       maxLength: 50,
       required: true,

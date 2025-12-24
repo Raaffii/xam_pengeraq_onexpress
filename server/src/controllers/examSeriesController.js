@@ -63,7 +63,6 @@ const updateExamSeries = async (req, res) => {
 
 const deleteExamSeries = async (req, res) => {
   try {
-    console.log("Cekcekcekcek");
     const { id } = req.params;
 
     const examSeriesData = {
