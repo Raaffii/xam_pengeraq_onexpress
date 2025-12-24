@@ -11,7 +11,7 @@ const getStudent = async (page, limit, search = "") => {
     SELECT s.*, es.examseriesdescription as currentexamseries
     FROM students s 
     LEFT JOIN examseries es ON s.examseriesid=es.examseriesid
-    WHERE studentname LIKE ?
+    WHERE studentname LIKE ? ORDER BY s.createddate DESC
     LIMIT ? OFFSET ?`;
   const [rows] = await pool.query(query, [searchValue, limit, offset]);
 
@@ -24,7 +24,7 @@ const getStudent = async (page, limit, search = "") => {
 
 const postStudent = async (data) => {
   const { studentname, studentidno, examseriesid } = data;
-  console.log("here", data);
+
   try {
     const sql =
       "INSERT INTO students (studentname, studentidno, examseriesid) VALUES (?, ?,?)";

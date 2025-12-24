@@ -26,6 +26,7 @@ const getStudent = async (req, res) => {
 
 const postStudent = async (req, res) => {
   try {
+    console.log("req", req.body);
     const data = await studentService.postStudent(req.body);
     res.status(200).json(data);
   } catch (error) {
@@ -45,8 +46,6 @@ const postStudent = async (req, res) => {
 
 const putStudent = async (req, res) => {
   try {
-    console.log("Cekcek", req.params.id, req.body);
-
     const data = await studentService.putStudent(req.params.id, req.body);
     res.status(200).json(data);
   } catch (error) {
@@ -66,8 +65,6 @@ const putStudent = async (req, res) => {
 
 const deleteStudent = async (req, res) => {
   try {
-    console.log("Cekcek", req.params.id, req.body);
-
     const data = await studentService.deleteStudent(req.params.id);
     res.status(200).json(data);
   } catch (error) {
