@@ -7,6 +7,7 @@ import DashboardPage from "@/pages/DashboardPage";
 import ProfilePage from "@/pages/ProfilePage";
 import StudentsPage from "@/pages/StudentsPage";
 import StudentsDetailPage from "@/components/student/StudentsDetailPage";
+import UsersPage from "@/pages/UsersPage";
 
 const privateRoutes = {
   path: "/",
@@ -21,6 +22,7 @@ const privateRoutes = {
     { path: "profile", element: <ProfilePage /> },
     { path: "students", element: <StudentsPage /> },
     { path: "students/:id", element: <StudentsDetailPage /> },
+    { path: "users", element: <UsersPage /> },
   ],
 };
 

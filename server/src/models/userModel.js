@@ -75,12 +75,18 @@ const UserModel = {
   },
 
   async createUser(userData) {
-    const { userName, emailAddress, hashedPassword, role, enteredBy } =
-      userData;
+    const {
+      userName,
+      emailAddress,
+      hashedPassword,
+      role,
+      enteredBy,
+      studentId,
+    } = userData;
 
     const query = `
-      INSERT INTO users (name, emailaddress, password, role, createdby, createddate)
-      VALUES (?, ?, ?, ?, ?, NOW())
+      INSERT INTO users (name, emailaddress, password, role, createdby, studentid, createddate)
+      VALUES (?, ?, ?, ?, ?, ?,NOW())
     `;
 
     const [result] = await pool.execute(query, [
@@ -89,6 +95,7 @@ const UserModel = {
       hashedPassword,
       role,
       enteredBy || null,
+      studentId || null,
     ]);
 
     return result.insertId;
@@ -103,15 +110,104 @@ const UserModel = {
     return rows[0];
   },
 
-  async updateUser(userid, updateData) {
-    const { editedby } = updateData;
-    const [result] = await pool.query(
-      `UPDATE users 
-     SET editedby = ?, editeddate = NOW()
-     WHERE userid = ?`,
-      [editedby, userid],
-    );
+  async updateUser(updateData) {
+    const {
+      userId,
+      editedBy,
+      userName,
+      emailAddress,
+      role,
+      active,
+      hashedPassword,
+      studentId,
+    } = updateData;
+
+    const fields = [];
+    const params = [];
+
+    if (userName) {
+      fields.push("name = ?");
+      params.push(userName);
+    }
+
+    if (emailAddress) {
+      fields.push("emailaddress = ?");
+      params.push(emailAddress);
+    }
+
+    if (role) {
+      fields.push("role = ?");
+      params.push(role);
+    }
+
+    if (active !== undefined) {
+      fields.push("active = ?");
+      params.push(active);
+    }
+
+    if (hashedPassword) {
+      fields.push("password = ?");
+      params.push(hashedPassword);
+    }
+
+    if (studentId !== undefined) {
+      fields.push("studentid = ?");
+      params.push(studentId);
+    }
+
+    fields.push("editedby = ?");
+    params.push(editedBy);
+
+    fields.push("editeddate = NOW()");
+
+    const sql = `
+      UPDATE users
+      SET ${fields.join(", ")}
+      WHERE userid = ?
+    `;
+
+    params.push(userId);
+
+    const [result] = await pool.execute(sql, params);
     return result.affectedRows > 0;
+  },
+
+  async softDeleteUser(conn, data) {
+    const { userToDelete, editedBy } = data;
+    const sql = `
+      UPDATE users 
+      SET active = false, editedby = ?, editeddate = NOW()
+      WHERE userid = ?
+    `;
+
+    const [result] = await conn.execute(sql, [editedBy, userToDelete]);
+
+    if (result.affectedRows === 0) {
+      throw new Error("User not found");
+    }
+
+    return true;
+  },
+
+  async fetchUserById(userId) {
+    const [rows] = await pool.execute(
+      `SELECT 
+      u.userid AS userId, 
+      u.name AS userName, 
+      u.emailaddress AS emailAddress, 
+      u.role,
+      u.studentid AS studentId,
+      s.studentname AS studentName,
+      u.createddate AS enteredDate,
+      u.editeddate AS editedDate,
+      u.active
+     FROM users u
+     LEFT JOIN students s ON s.studentid = u.studentid
+     WHERE u.userid = ? AND u.active = true`,
+      [userId],
+    );
+
+    return rows[0];
   },
 };
 
