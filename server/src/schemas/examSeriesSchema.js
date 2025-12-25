@@ -8,18 +8,39 @@ const ExamSeriesNameSchema = z
   .trim();
 
 const ExamSeriesDescription = z
-  .string("ExamSeries Id No is required")
-  .max(50, "ExamSeries Id no must not exceed 10 characters")
+  .string("ExamSeries Description No is required")
+  .max(50, "ExamSeries Description no must not exceed 10 characters")
   .trim();
 
+const dateSchema = z.coerce.date({
+  invalid_type_error: "Invalid date",
+});
+
+const creditsSchema = z.coerce
+  .number({ invalid_type_error: "Credits must be a number" })
+  .int("Credits must be an integer");
+
+const examIdSchema = z.coerce
+  .number({
+    invalid_type_error: "Exam ID must be a number",
+  })
+  .int("Exam ID must be an integer")
+  .positive("Exam ID must be greater than 0");
+
 const createExamSeriesSchema = z.object({
-  ExamSeriesName: ExamSeriesNameSchema,
-  ExamSeriesDescription: ExamSeriesDescription,
+  examSeriesDescription: ExamSeriesDescription,
+  examSeriesEndDate: dateSchema,
+  examSeriesStartDate: dateSchema,
+  credits: creditsSchema,
+  examId: examIdSchema,
 });
 
 const updateExamSeriesSchema = z.object({
-  ExamSeriesName: ExamSeriesNameSchema.optional(),
-  ExamSeriesDescription: ExamSeriesDescription.optional(),
+  examSeriesDescription: ExamSeriesDescription.optional(),
+  examSeriesEndDate: dateSchema.optional(),
+  examSeriesStartDate: dateSchema.optional(),
+  credits: creditsSchema.optional(),
+  examId: examIdSchema.optional(),
 });
 
 const idParamsSchema = z.object({
@@ -33,7 +54,7 @@ const idParamsSchema = z.object({
     ),
 });
 
-const fetchExamSeriessQuerySchema = z
+const fetchExamSeriesQuerySchema = z
   .object({
     searchTerm: z.string().max(100, "Search term too long").trim().optional(),
     isActive: z
@@ -59,5 +80,5 @@ module.exports = {
   createExamSeriesSchema,
   updateExamSeriesSchema,
   idParamsSchema,
-  fetchExamSeriessQuerySchema,
+  fetchExamSeriesQuerySchema,
 };

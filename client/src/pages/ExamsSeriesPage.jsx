@@ -63,7 +63,6 @@ const ExamsSeriesPage = () => {
   };
 
   const handleExamSeriesSubmit = async (formData) => {
-    console.log("formdata create", formData);
     const result = await createExamsSeries(formData);
     if (result.success) {
       setParams((prev) => ({ ...prev, page: 1 }));
