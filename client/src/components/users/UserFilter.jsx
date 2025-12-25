@@ -52,7 +52,7 @@ export const UserFilter = ({ onFilterChange, initialFilters = {} }) => {
         value={filters.byRole}
         onValueChange={(value) => handleFilterChange("byRole", value)}
       >
-        <SelectTrigger className="w-[160px] h-10 bg-white border-gray-300">
+        <SelectTrigger className="w-full md:w-[160px] h-12 bg-white border-gray-300">
           <SelectValue placeholder="Filter by role" />
         </SelectTrigger>
 
