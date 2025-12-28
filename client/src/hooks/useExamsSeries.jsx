@@ -157,6 +157,23 @@ export const useExamSeries = () => {
     },
     [params, fetchExamSeries]
   );
+
+  const onFilterChange = useCallback(
+    async (filters) => {
+      const newParams = {
+        ...params,
+        byExam: filters.byExam || null,
+        page: 1,
+      };
+      setParams(newParams);
+      return await fetchExamSeries({
+        byExam: filters.byExam || null,
+        page: 1,
+      });
+    },
+    [params, fetchExamSeries]
+  );
+
   return {
     fetchExamSeries,
     updateExamsSeries,
@@ -166,6 +183,7 @@ export const useExamSeries = () => {
     deleteExamsSeries,
     onSearch,
     setParams,
+    onFilterChange,
     isSubmitting,
     examSeries,
     isLoading,

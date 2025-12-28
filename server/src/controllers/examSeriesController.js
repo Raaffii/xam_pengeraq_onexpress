@@ -2,11 +2,12 @@ const examSeriesService = require("../services/examSeriesService");
 
 const getExamSeries = async (req, res) => {
   try {
-    let { page, limit, searchTerm } = req.query;
+    let { page, limit, searchTerm, byExam } = req.query;
     const result = await examSeriesService.getExamSeries(
       page,
       limit,
-      searchTerm
+      searchTerm,
+      byExam
     );
     res.status(200).json({
       data: result.data,

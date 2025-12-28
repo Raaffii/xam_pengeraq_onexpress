@@ -1,13 +1,31 @@
 const pool = require("../config/db");
 
-const getExamSeries = async (page, limit, searchTerm = "") => {
+const getExamSeries = async (page, limit, searchTerm = "", byExam) => {
   page = Number(page) || 1;
   limit = Number(limit) || 10;
-  const offset = (page - 1) * limit;
 
-  const searchValue = `%${searchTerm}%`;
+  const conditions = [];
+  const params = [];
 
-  const query = `
+  //where
+  if (searchTerm) {
+    conditions.push(
+      "(LOWER(es.examseriesdescription) LIKE ? OR LOWER(e.examname) LIKE ? )"
+    );
+    const searchValue = `%${searchTerm}%`;
+    params.push(searchValue, searchValue);
+  }
+
+  if (byExam) {
+    conditions.push("LOWER(es.examid)=?");
+    params.push(byExam);
+  }
+
+  const whereClause =
+    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+  // base query
+  let query = `
     SELECT 
     es.examseriesid as examSeriesId,
     es.examseriesdescription as examSeriesDescription,
@@ -18,22 +36,22 @@ const getExamSeries = async (page, limit, searchTerm = "") => {
     e.examname as examName 
     FROM examseries es
     LEFT JOIN exam e ON es.examid = e.examid   
-    WHERE es.examseriesdescription LIKE ?
-    OR e.examname LIKE ? 
+   ${whereClause}
     ORDER BY es.createddate DESC
-    LIMIT ? OFFSET ? `;
-  const [rows] = await pool.query(query, [
-    searchValue,
-    searchValue,
-    limit,
-    offset,
-  ]);
+    `;
 
-  const countQuery = `SELECT COUNT(*) AS total FROM examseries es WHERE es.examseriesdescription LIKE ?`;
-  const [countResult] = await pool.query(countQuery, [
-    searchValue,
-    searchValue,
-  ]);
+  const queryParams = [...params];
+
+  if (page && limit) {
+    const offset = (page - 1) * limit;
+    query += `LIMIT ? OFFSET ?`;
+    queryParams.push(limit, offset);
+  }
+
+  const [rows] = await pool.query(query, queryParams);
+
+  const countQuery = `SELECT COUNT(*) AS total FROM examseries es ${whereClause}`;
+  const [countResult] = await pool.query(countQuery, params);
 
   const total = countResult[0].total;
 
