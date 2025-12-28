@@ -5,6 +5,7 @@ const {
   postStudent,
   putStudent,
   deleteStudent,
+  getStudentById,
 } = require("../controllers/studentController");
 
 const {
@@ -26,6 +27,7 @@ const router = express.Router();
 router.use(authenticateToken);
 
 router.get("/", validateQuery(fetchStudentsQuerySchema), getStudent);
+router.get("/:id", validateQuery(fetchStudentsQuerySchema), getStudentById);
 router.post("/", validateBody(createStudentSchema), postStudent);
 router.put(
   "/:id",

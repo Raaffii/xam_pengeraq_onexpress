@@ -43,14 +43,19 @@ export default function SearchableDropdown({
 
   useEffect(() => {
     const handleOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(e.target)
+      ) {
         setIsOpen(false);
         setSearchTerm("");
       }
     };
 
-    document.addEventListener("mousedown", handleOutside);
-    return () => document.removeEventListener("mousedown", handleOutside);
+    document.addEventListener("click", handleOutside);
+    return () => document.removeEventListener("click", handleOutside);
   }, []);
 
   const selectedOption = options.find((o) => o.value === value);
@@ -61,102 +66,111 @@ export default function SearchableDropdown({
     setSearchTerm("");
   };
 
-  const dropdown = isOpen && !disabled && (
-    <div
-      ref={dropdownRef}
-      style={dropdownPosition}
-      className='
-        fixed
-        z-[90]
-        pointer-events-auto
+  return (
+    <div className={`relative ${className}`}>
+      {label && (
+        <label className='block text-sm font-medium mb-1'>
+          {label} {required && <span className='text-red-500'>*</span>}
+        </label>
+      )}
+
+      {/* BUTTON */}
+      <button
+        ref={buttonRef}
+        type='button'
+        disabled={disabled}
+        onClick={() => setIsOpen((p) => !p)}
+        className='
+      w-full
+      relative
+      border-2
+      border-gray-300
+      rounded-lg
+      py-2.5
+      pl-3
+      pr-10
+      text-left
+      bg-white
+      focus:ring-2
+      focus:ring-gray-500
+    '>
+        <span className={selectedOption ? "" : "text-gray-400"}>
+          {selectedOption?.label || placeholder}
+        </span>
+        <ChevronDown className='absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+      </button>
+
+      {/* DROPDOWN */}
+      {isOpen && !disabled && (
+        <div
+          ref={dropdownRef}
+          className='
+        absolute
+        z-50
+        mt-1
+        w-full
         bg-white
         border
-        border-gray-400
+        border-gray-300
         rounded-lg
-        shadow-2xl
-        max-h-80
+        shadow-lg
         overflow-hidden
       '>
-      {/* SEARCH */}
-      <div className='px-3 py-2 border-b bg-white sticky top-0 z-10'>
-        <div className='relative'>
-          <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
-          <input
-            autoFocus
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder='Search...'
-            className='w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-          />
-        </div>
-      </div>
+          {/* SEARCH */}
+          <div className='px-3 py-2 border-b bg-white sticky top-0'>
+            <div className='relative'>
+              <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+              <input
+                autoFocus
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder='Search...'
+                className='
+              w-full
+              pl-9
+              pr-3
+              py-2
+              border
+              rounded-md
+              text-sm
+              focus:outline-none
+              focus:ring-2
+              focus:ring-blue-500
+            '
+              />
+            </div>
+          </div>
 
-      {/* OPTIONS */}
-      <div className='max-h-64 overflow-auto'>
-        {filteredOptions.map((option, index) => (
-          <div
-            key={option.value}
-            onClick={() => handleSelect(option)}
-            onMouseEnter={() => setHighlightedIndex(index)}
-            className={`
+          {/* OPTIONS */}
+          <div className='max-h-64 overflow-auto'>
+            {filteredOptions.map((option, index) => (
+              <div
+                key={option.value}
+                onClick={() => handleSelect(option)}
+                onMouseEnter={() => setHighlightedIndex(index)}
+                className={`
               cursor-pointer
-              px-4 py-2 text-sm
+              px-4 py-2
+              text-sm
               ${
                 index === highlightedIndex
                   ? "bg-blue-50 text-blue-900"
                   : "hover:bg-gray-50"
               }
             `}>
-            {option.label}
-          </div>
-        ))}
+                {option.label}
+              </div>
+            ))}
 
-        {filteredOptions.length === 0 && (
-          <div className='px-4 py-6 text-sm text-gray-500 text-center'>
-            No results
+            {filteredOptions.length === 0 && (
+              <div className='px-4 py-6 text-sm text-gray-500 text-center'>
+                No results
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
-  );
-
-  return (
-    <>
-      <div className={`relative ${className} `}>
-        {label && (
-          <label className='block text-sm font-medium mb-1 '>
-            {label} {required && <span className='text-red-500'>*</span>}
-          </label>
-        )}
-
-        <button
-          ref={buttonRef}
-          type='button'
-          disabled={disabled}
-          onClick={() => setIsOpen((p) => !p)}
-          className='
-            w-full
-            relative
-            border-2
-            border-gray-300
-            rounded-lg
-            py-2.5
-            pl-3
-            pr-10
-            text-left
-            bg-white
-            focus:ring-2
-            focus:ring-gray-500
-          '>
-          <span className={selectedOption ? "" : "text-gray-400"}>
-            {selectedOption?.label || placeholder}
-          </span>
-          <ChevronDown className='absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
-        </button>
-      </div>
-
-      {typeof window !== "undefined" && createPortal(dropdown, document.body)}
-    </>
   );
 }
 

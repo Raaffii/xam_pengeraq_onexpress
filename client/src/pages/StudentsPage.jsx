@@ -1,7 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import PageHeader from "@/components/common/PageHeader";
 
-import { Input } from "@/components/ui/input";
 import { DataTable } from "@/components/table";
 import Add_modal from "@/components/modals/Add_modal";
 import Edit_modal from "@/components/modals/Edit_modal";
@@ -15,7 +14,7 @@ const StudentsPage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const typingTimeoutRef = useRef(null);
+
   const {
     createStudents,
     fetchStudents,
@@ -79,17 +78,17 @@ const StudentsPage = () => {
   const columns = [
     {
       accessorKey: "studentIdNo",
-      header: <div className="text-left w-full">ID</div>,
+      header: <div className='text-left w-full'>ID</div>,
       cellClassName: "text-left",
     },
     {
       accessorKey: "studentName",
-      header: <div className="text-left w-full">Student Name</div>,
+      header: <div className='text-left w-full'>Student Name</div>,
       cellClassName: "text-left",
     },
     {
       accessorKey: "examSeriesDescription",
-      header: <div className="text-left w-full">Curent Series</div>,
+      header: <div className='text-left w-full'>Curent Series</div>,
       cellClassName: "text-left",
     },
   ];
@@ -121,20 +120,6 @@ const StudentsPage = () => {
     },
   ];
 
-  const handleSearch = (e) => {
-    const search = e.target.value;
-    const words = search.length;
-
-    if (words >= 3 || words === 0) {
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-      }
-      typingTimeoutRef.current = setTimeout(() => {
-        onSearch(search);
-      }, 1000);
-    }
-  };
-
   const examSeriesOptions = [
     { value: "all", label: "Exam Series" },
     ...(Array.isArray(examSeries)
@@ -146,29 +131,34 @@ const StudentsPage = () => {
   ];
 
   return (
-    <div className="min-h-screen ">
+    <div className='min-h-screen '>
       <PageHeader
-        title="Students"
-        subtitle="Manage student records and exam series assignments"
+        title='Students'
+        subtitle='Manage student records and exam series assignments'
         primaryAction={{
           label: "Add Student",
           onClick: () => setIsModalOpen(true),
         }}
-      />
-
+        showSearch={true}
+        searchPlaceholder='Search by name'
+        onSearch={onSearch}
+        searchMaxLength={50}>
+        {" "}
+      </PageHeader>
+      {/* 
       <Input
-        type="search"
+        type='search'
         placeholder={"Search..."}
-        className="pl-8 w-full bg-background h-10 my-5"
+        className='pl-8 w-full bg-background h-10 my-5'
         maxLength={50}
         onChange={handleSearch}
-      />
+      /> */}
 
       <DataTable
         data={students}
         columns={columns}
-        detailPage="students"
-        idAccessor="studentid"
+        detailPage='students'
+        idAccessor='studentId'
         onEdit={openEditModal}
         onDelete={openDeleteModal}
         onPageChange={onPageChange}
@@ -182,7 +172,7 @@ const StudentsPage = () => {
           setOpen={setIsModalOpen}
           onSubmit={handleStudentSubmit}
           fields={fields}
-          title="Add New Student"
+          title='Add New Student'
           dropdowns={{
             examSeriesId: examSeriesOptions,
           }}
@@ -196,7 +186,7 @@ const StudentsPage = () => {
           onSubmit={handleStudentEdit}
           fields={fields}
           entityData={selectedStudent}
-          title="Edit Student"
+          title='Edit Student'
           dropdowns={{
             examSeriesId: examSeriesOptions,
           }}
@@ -209,7 +199,7 @@ const StudentsPage = () => {
           setOpen={setIsDeleteModalOpen}
           onSubmit={handleStudentDelete}
           entityData={selectedStudent}
-          title="Delete Student"
+          title='Delete Student'
           confirmationText={`Are you sure you want to delete student "${selectedStudent.studentName}"? This action cannot be undone.`}
         />
       )}

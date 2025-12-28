@@ -41,7 +41,7 @@ export const useStudents = () => {
             pageSize: 10,
             totalPages: 1,
             totalItems: 0,
-          },
+          }
         );
 
         return { success: true, data: data };
@@ -56,8 +56,30 @@ export const useStudents = () => {
         setIsLoading(false);
       }
     },
-    [params, formatStudentrData],
+    [params, formatStudentrData]
   );
+
+  const getStudentById = useCallback(async (studentId) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await studentService.getStudentsById(studentId);
+
+      setStudents(response.data);
+
+      return { success: true, data: response.data };
+    } catch (err) {
+      console.error("Error fetching Student:", err);
+
+      setError(err.message);
+      setStudents([]);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const createStudents = useCallback(async (data) => {
     let toastId;
@@ -127,22 +149,23 @@ export const useStudents = () => {
   }, []);
 
   const onSearch = useCallback(
-    async (search) => {
-      const newParams = { ...params, search };
+    async (searchTerm) => {
+      const newParams = { ...params, searchTerm };
       setParams(newParams);
 
-      return await fetchStudents({ search, page: 1 });
+      return await fetchStudents({ searchTerm, page: 1 });
     },
-    [fetchStudents, setParams, params],
+    [fetchStudents, setParams, params]
   );
 
   const onPageChange = useCallback(
     async (page) => {
       const newParams = { ...params, page };
+
       setParams(newParams);
       return await fetchStudents({ page });
     },
-    [params, fetchStudents],
+    [params, fetchStudents]
   );
 
   const onPageSizeChange = useCallback(
@@ -151,7 +174,7 @@ export const useStudents = () => {
       setParams(newParams);
       return await fetchStudents({ limit, page: 1 });
     },
-    [params, fetchStudents],
+    [params, fetchStudents]
   );
   return {
     fetchStudents,
@@ -160,6 +183,7 @@ export const useStudents = () => {
     onPageSizeChange,
     createStudents,
     deleteStudent,
+    getStudentById,
     onSearch,
     isSubmitting,
     students,
