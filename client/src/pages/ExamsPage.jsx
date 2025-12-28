@@ -1,7 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import PageHeader from "@/components/common/PageHeader";
 
-import { Input } from "@/components/ui/input";
 import { DataTable } from "@/components/table";
 import Add_modal from "@/components/modals/Add_modal";
 import Edit_modal from "@/components/modals/Edit_modal";
@@ -14,7 +13,7 @@ const ExamsPage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedSExam, setSelectedExam] = useState(null);
-  const typingTimeoutRef = useRef(null);
+
   const {
     createExams,
     fetchExams,
@@ -56,6 +55,7 @@ const ExamsPage = () => {
 
   const handleExamSubmit = async (formData) => {
     const result = await createExams(formData);
+
     if (result.success) {
       setParams((prev) => ({ ...prev, page: 1 }));
       fetchExams({ page: 1 });
@@ -107,20 +107,6 @@ const ExamsPage = () => {
     },
   ];
 
-  const handleSearch = (e) => {
-    const search = e.target.value;
-    const words = search.length;
-
-    if (words >= 3 || words === 0) {
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-      }
-      typingTimeoutRef.current = setTimeout(() => {
-        onSearch(search);
-      }, 1000);
-    }
-  };
-
   return (
     <div className='min-h-screen '>
       <PageHeader
@@ -130,14 +116,10 @@ const ExamsPage = () => {
           label: "Add Exam",
           onClick: () => setIsModalOpen(true),
         }}
-      />
-
-      <Input
-        type='search'
-        placeholder={"Search..."}
-        className='pl-8 w-full bg-background h-10 my-5'
-        maxLength={50}
-        onChange={handleSearch}
+        showSearch={true}
+        searchPlaceholder='Search by exam name'
+        onSearch={onSearch}
+        searchMaxLength={50}
       />
 
       <DataTable
@@ -158,7 +140,7 @@ const ExamsPage = () => {
           setOpen={setIsModalOpen}
           onSubmit={handleExamSubmit}
           fields={fields}
-          title='Add New Student'
+          title='Add New Exam'
         />
       )}
 

@@ -131,11 +131,11 @@ export const useExamSeries = () => {
   }, []);
 
   const onSearch = useCallback(
-    async (search) => {
-      const newParams = { ...params, search };
+    async (searchTerm) => {
+      const newParams = { ...params, searchTerm };
       setParams(newParams);
 
-      return await fetchExamSeries({ search, page: 1 });
+      return await fetchExamSeries({ searchTerm, page: 1 });
     },
     [fetchExamSeries, setParams, params]
   );

@@ -179,14 +179,10 @@ const ExamsSeriesPage = () => {
           label: "Add Student",
           onClick: () => setIsModalOpen(true),
         }}
-      />
-
-      <Input
-        type='search'
-        placeholder={"Search..."}
-        className='pl-8 w-full bg-background h-10 my-5'
-        maxLength={50}
-        onChange={handleSearch}
+        showSearch={true}
+        searchPlaceholder='Search by Exam Series Name'
+        onSearch={onSearch}
+        searchMaxLength={50}
       />
 
       <DataTable

@@ -1,11 +1,11 @@
 const pool = require("../config/db");
 
-const getExamSeries = async (page, limit, search = "") => {
+const getExamSeries = async (page, limit, searchTerm = "") => {
   page = Number(page) || 1;
   limit = Number(limit) || 10;
   const offset = (page - 1) * limit;
 
-  const searchValue = `%${search}%`;
+  const searchValue = `%${searchTerm}%`;
 
   const query = `
     SELECT 
@@ -17,11 +17,17 @@ const getExamSeries = async (page, limit, search = "") => {
     es.examid as examId,
     e.examname as examName 
     FROM examseries es
-    LEFT JOIN exam e ON es.examid =e.examid   
-    WHERE es.examseriesdescription LIKE ? 
+    LEFT JOIN exam e ON es.examid = e.examid   
+    WHERE es.examseriesdescription LIKE ?
+    OR e.examname LIKE ? 
     ORDER BY es.createddate DESC
     LIMIT ? OFFSET ? `;
-  const [rows] = await pool.query(query, [searchValue, limit, offset]);
+  const [rows] = await pool.query(query, [
+    searchValue,
+    searchValue,
+    limit,
+    offset,
+  ]);
 
   const countQuery = `SELECT COUNT(*) AS total FROM examseries es WHERE es.examseriesdescription LIKE ?`;
   const [countResult] = await pool.query(countQuery, [

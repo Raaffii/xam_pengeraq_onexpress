@@ -1,8 +1,8 @@
 const Exam = require("../models/examModel");
 
-const getExam = async (page, limit, search) => {
+const getExam = async (page, limit, searchTerm) => {
   try {
-    const result = await Exam.getExam(page, limit, search);
+    const result = await Exam.getExam(page, limit, searchTerm);
     return result;
   } catch (error) {
     console.error("Service error:", error);

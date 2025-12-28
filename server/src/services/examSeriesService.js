@@ -1,8 +1,8 @@
 const ExamSeries = require("../models/examSeriesModel");
 
-const getExamSeries = async (page, limit, search) => {
+const getExamSeries = async (page, limit, searchTerm) => {
   try {
-    const result = await ExamSeries.getExamSeries(page, limit, search);
+    const result = await ExamSeries.getExamSeries(page, limit, searchTerm);
     return result;
   } catch (error) {
     console.error("Service error:", error);

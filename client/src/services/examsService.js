@@ -27,6 +27,7 @@ export const examsService = {
 
   insertExams: async (data) => {
     // const margedData = { data1, data2 };
+
     try {
       const response = await api.post(BASE_URL, data);
       return response.data;
