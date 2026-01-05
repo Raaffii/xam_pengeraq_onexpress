@@ -33,6 +33,7 @@ export const useExamSeries = () => {
         const apiParams = {
           ...finalParams,
         };
+
         const response = await examSeriesService.getExamSeries(apiParams);
         const data = formaExamSeriesData(response.data);
 
@@ -48,6 +49,34 @@ export const useExamSeries = () => {
         //   alert("cek");
 
         return { success: true, data: data };
+      } catch (err) {
+        console.error("Error fetching users:", err);
+
+        setError(err.message);
+        setExamSeries([]);
+
+        return { success: false, error: err.message };
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [params, formaExamSeriesData]
+  );
+
+  const fetchExamSeriesByid = useCallback(
+    async (examSeriesId) => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response = await examSeriesService.getExamSeriesById(
+          examSeriesId
+        );
+
+        setExamSeries(response.data);
+        //   alert("cek");
+
+        return { success: true, data: response.data };
       } catch (err) {
         console.error("Error fetching users:", err);
 
@@ -131,11 +160,11 @@ export const useExamSeries = () => {
   }, []);
 
   const onSearch = useCallback(
-    async (search) => {
-      const newParams = { ...params, search };
+    async (searchTerm) => {
+      const newParams = { ...params, searchTerm };
       setParams(newParams);
 
-      return await fetchExamSeries({ search, page: 1 });
+      return await fetchExamSeries({ searchTerm, page: 1 });
     },
     [fetchExamSeries, setParams, params]
   );
@@ -157,6 +186,23 @@ export const useExamSeries = () => {
     },
     [params, fetchExamSeries]
   );
+
+  const onFilterChange = useCallback(
+    async (filters) => {
+      const newParams = {
+        ...params,
+        byExam: filters.byExam || null,
+        page: 1,
+      };
+      setParams(newParams);
+      return await fetchExamSeries({
+        byExam: filters.byExam || null,
+        page: 1,
+      });
+    },
+    [params, fetchExamSeries]
+  );
+
   return {
     fetchExamSeries,
     updateExamsSeries,
@@ -166,6 +212,8 @@ export const useExamSeries = () => {
     deleteExamsSeries,
     onSearch,
     setParams,
+    onFilterChange,
+    fetchExamSeriesByid,
     isSubmitting,
     examSeries,
     isLoading,

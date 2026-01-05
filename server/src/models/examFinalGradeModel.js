@@ -218,6 +218,25 @@ const ExamFinalGradeModel = {
     const [result] = await conn.execute(query, [seriesId]);
     return result.affectedRows;
   },
+
+  async examGradeByExamSeriesId(examSeriesId) {
+    const query = `
+      SELECT 
+        efg.examfinalgradeseq AS examFinalGradeSeq,
+        efg.finalpercent AS finalPercent,
+        efg.overallGrade AS overallGrade,
+        efg.overallgradepoint AS overallGradePoint,
+        efg.overallrank AS overallRank,
+        efg.active
+      FROM examfinalgrade efg
+      WHERE efg.examseriesid = ?
+        AND efg.active = 1
+      ORDER BY efg.examfinalgradeid ASC
+    `;
+
+    const [rows] = await pool.execute(query, [examSeriesId]);
+    return rows;
+  },
 };
 
 module.exports = ExamFinalGradeModel;

@@ -1,11 +1,11 @@
 const pool = require("../config/db");
 
-const getExam = async (page, limit, search = "") => {
+const getExam = async (page, limit, searchTerm = "") => {
   page = Number(page) || 1;
   limit = Number(limit) || 10;
   const offset = (page - 1) * limit;
 
-  const searchValue = `%${search}%`;
+  const searchValue = `%${searchTerm}%`;
 
   const query = `
     SELECT 
@@ -31,6 +31,13 @@ const getExam = async (page, limit, search = "") => {
   const total = countResult[0].total;
 
   return { data: rows, total };
+};
+
+const getExamById = async (examId) => {
+  const sql = `SELECT * FROM exam WHERE examid = ?`;
+  const [result] = await pool.query(sql, [examId]);
+
+  return result[0];
 };
 
 const postExam = async (data) => {
@@ -66,4 +73,4 @@ const deleteExam = async (id) => {
     throw err;
   }
 };
-module.exports = { getExam, postExam, putExam, deleteExam };
+module.exports = { getExam, postExam, putExam, deleteExam, getExamById };

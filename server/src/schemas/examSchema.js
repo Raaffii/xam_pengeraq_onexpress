@@ -13,13 +13,13 @@ const ExamDescription = z
   .trim();
 
 const createExamSchema = z.object({
-  ExamName: ExamNameSchema,
-  ExamDescription: ExamDescription,
+  examName: ExamNameSchema,
+  examDescription: ExamDescription,
 });
 
 const updateExamSchema = z.object({
-  ExamName: ExamNameSchema.optional(),
-  ExamDescription: ExamDescription.optional(),
+  examName: ExamNameSchema.optional(),
+  examDescription: ExamDescription.optional(),
 });
 
 const idParamsSchema = z.object({

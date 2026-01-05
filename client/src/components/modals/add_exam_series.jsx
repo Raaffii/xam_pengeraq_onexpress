@@ -10,7 +10,7 @@ import {
   Checkbox,
 } from "@/components/custom";
 
-export default function Add_modal({
+export default function Add_exam_series({
   open,
   setOpen,
   onSubmit,
@@ -18,7 +18,7 @@ export default function Add_modal({
   dropdowns,
   title = "Add New Data",
   validateForm,
-  optionalForm,
+  optionalDropDown = true,
 }) {
   const initialFormData = fields.reduce(
     (acc, field) => ({
@@ -137,27 +137,44 @@ export default function Add_modal({
                 rows={field.rows || 4}
                 resize={field.resize || "vertical"}
               />
-            ) : field.type === "optional" ? (
+            ) : field.type === "optionalSelection" && optionalDropDown ? (
               <>
-                <Checkbox
-                  onChange={() => setOptionalCheck(!optionalCheck)}
-                  checked={optionalCheck}
-                />
-                {optionalCheck && (
-                  <SearchableDropdown
-                    id={field.name}
-                    name={field.name}
-                    value={formData[field.name]}
-                    onChange={(e) =>
-                      handleInputChange({
-                        target: { name: field.name, value: e.target.value },
-                      })
-                    }
-                    options={dropdowns[field.name]}
-                    required={true}
-                    placeholder={`Select ${field.label}`}
-                  />
-                )}
+                <div className='space-y-3'>
+                  <div className='flex items-start gap-3'>
+                    <Checkbox
+                      checked={optionalCheck}
+                      onChange={() => setOptionalCheck((p) => !p)}
+                      disabled={optionalDropDown ? false : true}
+                    />
+
+                    <div>
+                      <p className='text-sm font-medium text-gray-900'>
+                        Import Subject from Existing Exam Series{" "}
+                      </p>
+                      <p className='text-xs text-gray-500'>
+                        Showing exam series from Mock Examination 25/02 only
+                      </p>
+                    </div>
+                  </div>
+
+                  {optionalCheck && (
+                    <div className='pl-7'>
+                      <SearchableDropdown
+                        id={field.name}
+                        name={field.name}
+                        value={formData[field.name]}
+                        onChange={(e) =>
+                          handleInputChange({
+                            target: { name: field.name, value: e.target.value },
+                          })
+                        }
+                        options={dropdowns[field.name]}
+                        required
+                        placeholder={`Select ${field.label}`}
+                      />
+                    </div>
+                  )}
+                </div>
               </>
             ) : (
               <Input
@@ -178,10 +195,11 @@ export default function Add_modal({
   );
 }
 
-Add_modal.propTypes = {
+Add_exam_series.propTypes = {
   open: PropTypes.bool.isRequired,
   setOpen: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  optionalDropDown: PropTypes.bool,
   fields: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,

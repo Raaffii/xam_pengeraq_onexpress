@@ -1,13 +1,13 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import PageHeader from "@/components/common/PageHeader";
 
-import { Input } from "@/components/ui/input";
 import { DataTable } from "@/components/table";
-import Add_modal from "@/components/modals/Add_modal";
+import Add_exam_series from "@/components/modals/add_exam_series";
 import Edit_modal from "@/components/modals/Edit_modal";
 import Delete_modal from "@/components/modals/Delete_modal";
 import { useExams } from "@/hooks/useExams";
 import { useExamSeries } from "@/hooks/useExamsSeries";
+import { ExamSeriesFilter } from "@/components/examseries/ExamSeriesFilter";
 
 const ExamsSeriesPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,7 +15,6 @@ const ExamsSeriesPage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedSExam, setSelectedExam] = useState(null);
-  const typingTimeoutRef = useRef(null);
 
   const { fetchExams, exams } = useExams();
 
@@ -26,10 +25,12 @@ const ExamsSeriesPage = () => {
     deleteExamsSeries,
     examSeries,
     pagination,
+    onFilterChange,
     setParams,
     onSearch,
     onPageChange,
     onPageSizeChange,
+    params,
   } = useExamSeries();
 
   useEffect(() => {
@@ -51,7 +52,7 @@ const ExamsSeriesPage = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleStudentEdit = async (formData) => {
+  const handleExamSeriesEdit = async (formData) => {
     const result = await updateExamsSeries(
       selectedSExam.examSeriesId,
       formData
@@ -63,7 +64,6 @@ const ExamsSeriesPage = () => {
   };
 
   const handleExamSeriesSubmit = async (formData) => {
-    console.log("formdata create", formData);
     const result = await createExamsSeries(formData);
     if (result.success) {
       setParams((prev) => ({ ...prev, page: 1 }));
@@ -72,7 +72,7 @@ const ExamsSeriesPage = () => {
     return result.success;
   };
 
-  const handleStudentDelete = async (entityData) => {
+  const handleExamSeriesDelete = async (entityData) => {
     const result = await deleteExamsSeries(entityData.examSeriesId);
     if (result.success) {
       setParams((prev) => ({ ...prev, page: 1 }));
@@ -147,20 +147,6 @@ const ExamsSeriesPage = () => {
     },
   ];
 
-  const handleSearch = (e) => {
-    const search = e.target.value;
-    const words = search.length;
-
-    if (words >= 3 || words === 0) {
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-      }
-      typingTimeoutRef.current = setTimeout(() => {
-        onSearch(search);
-      }, 1000);
-    }
-  };
-
   const examOptions = [
     { value: "all", label: "Exam Series" },
     ...(Array.isArray(examSeries)
@@ -175,26 +161,31 @@ const ExamsSeriesPage = () => {
     <div className='min-h-screen '>
       <PageHeader
         title='Exams'
-        subtitle='Manage student records and exam item assignments'
+        subtitle='Manage exams series records and exam item assignments'
         primaryAction={{
-          label: "Add Student",
+          label: "Add Exam Series",
           onClick: () => setIsModalOpen(true),
         }}
-      />
-
-      <Input
-        type='search'
-        placeholder={"Search..."}
-        className='pl-8 w-full bg-background h-10 my-5'
-        maxLength={50}
-        onChange={handleSearch}
-      />
+        showSearch={true}
+        searchPlaceholder='Search by Exam Series Name'
+        onSearch={onSearch}
+        searchMaxLength={50}>
+        <ExamSeriesFilter
+          data={exams}
+          valueKey='examId'
+          labelKey='examName'
+          filterKey='byExam'
+          placeholder='Filter by exam'
+          initialFilters={{ byExam: params.byExam }}
+          onFilterChange={onFilterChange}
+        />
+      </PageHeader>
 
       <DataTable
         data={examSeries}
         columns={columns}
-        detailPage='exams'
-        idAccessor='examid'
+        detailPage='series'
+        idAccessor='examSeriesId'
         onEdit={openEditModal}
         onDelete={openDeleteModal}
         onPageChange={onPageChange}
@@ -203,7 +194,7 @@ const ExamsSeriesPage = () => {
       />
 
       {isModalOpen && (
-        <Add_modal
+        <Add_exam_series
           open={isModalOpen}
           setOpen={setIsModalOpen}
           onSubmit={handleExamSeriesSubmit}
@@ -212,6 +203,7 @@ const ExamsSeriesPage = () => {
           dropdowns={{
             examId: examOptions,
           }}
+          optionalDropDown={false}
         />
       )}
 
@@ -219,7 +211,7 @@ const ExamsSeriesPage = () => {
         <Edit_modal
           open={isEditModalOpen}
           setOpen={setIsEditModalOpen}
-          onSubmit={handleStudentEdit}
+          onSubmit={handleExamSeriesEdit}
           fields={fields}
           entityData={selectedSExam}
           title='Edit Exam Series'
@@ -233,7 +225,7 @@ const ExamsSeriesPage = () => {
         <Delete_modal
           open={isDeleteModalOpen}
           setOpen={setIsDeleteModalOpen}
-          onSubmit={handleStudentDelete}
+          onSubmit={handleExamSeriesDelete}
           entityData={selectedSExam}
           title='Delete Student'
           confirmationText={`Are you sure you want to delete student "${selectedSExam.examname}"? This action cannot be undone.`}

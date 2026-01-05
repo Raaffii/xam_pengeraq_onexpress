@@ -1,11 +1,11 @@
 const pool = require("../config/db");
 
-const getStudent = async (page, limit, search = "") => {
+const getStudent = async (page, limit, searchTerm = "") => {
   page = Number(page) || 1;
   limit = Number(limit) || 10;
   const offset = (page - 1) * limit;
 
-  const searchValue = `%${search}%`;
+  const searchValue = `%${searchTerm}%`;
 
   const query = `
     SELECT 
@@ -25,6 +25,20 @@ const getStudent = async (page, limit, search = "") => {
   const total = countResult[0].total;
 
   return { data: rows, total };
+};
+
+const getStudentById = async (studentId) => {
+  const query = `
+    SELECT 
+    s.studentid as studentId,
+    s.studentname as studentName,
+    s.studentidno as studentIdNo,
+    s.examseriesid as examSeriesId
+    FROM students s 
+    WHERE s.studentid = ?`;
+  const [rows] = await pool.query(query, [studentId]);
+
+  return { data: rows[0] };
 };
 
 const postStudent = async (data) => {
@@ -70,4 +84,10 @@ const deleteStudent = async (id) => {
     throw err;
   }
 };
-module.exports = { getStudent, postStudent, putStudent, deleteStudent };
+module.exports = {
+  getStudent,
+  postStudent,
+  putStudent,
+  deleteStudent,
+  getStudentById,
+};

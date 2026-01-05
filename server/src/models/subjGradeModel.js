@@ -322,6 +322,29 @@ const SubjGradeModel = {
     return rows;
   },
 
+  async findGradesByExamSeriesId(examSeriesId) {
+    const query = `
+      SELECT 
+        sg.subjgradeid AS gradeId,
+        sg.examseriesid AS seriesId,
+        sg.examsubjid AS subjId,
+        sg.subjgradeseq AS gradeSeq,
+        sg.subjmin AS minScore,
+        sg.subjmax AS maxScore,
+        sg.subjgrade AS grade,
+        sg.subjgpa AS gpa,
+        sg.subjresult AS result,
+        sg.active
+      FROM subjgrade sg
+      WHERE sg.examseriesid = ?
+        AND sg.active = 1
+      ORDER BY sg.subjgradeid ASC
+    `;
+
+    const [rows] = await pool.execute(query, [examSeriesId]);
+    return rows;
+  },
+
   async findSubjectsWithoutGrades() {
     const query = `
       SELECT 

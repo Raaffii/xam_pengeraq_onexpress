@@ -1,13 +1,36 @@
 const pool = require("../config/db");
 
-const getExamSeries = async (page, limit, search = "") => {
+const getExamSeries = async (page, limit, searchTerm = "", byExam, examId) => {
   page = Number(page) || 1;
   limit = Number(limit) || 10;
-  const offset = (page - 1) * limit;
 
-  const searchValue = `%${search}%`;
+  const conditions = [];
+  const params = [];
 
-  const query = `
+  //where
+  if (searchTerm) {
+    conditions.push(
+      "(LOWER(es.examseriesdescription) LIKE ? OR LOWER(e.examname) LIKE ? )"
+    );
+    const searchValue = `%${searchTerm}%`;
+    params.push(searchValue, searchValue);
+  }
+
+  if (byExam) {
+    conditions.push("LOWER(es.examid)=?");
+    params.push(byExam);
+  }
+
+  if (examId) {
+    conditions.push("es.examseriesid=?");
+    params.push(examId);
+  }
+
+  const whereClause =
+    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+  // base query
+  let query = `
     SELECT 
     es.examseriesid as examSeriesId,
     es.examseriesdescription as examSeriesDescription,
@@ -17,21 +40,34 @@ const getExamSeries = async (page, limit, search = "") => {
     es.examid as examId,
     e.examname as examName 
     FROM examseries es
-    LEFT JOIN exam e ON es.examid =e.examid   
-    WHERE es.examseriesdescription LIKE ? 
+    LEFT JOIN exam e ON es.examid = e.examid   
+   ${whereClause}
     ORDER BY es.createddate DESC
-    LIMIT ? OFFSET ? `;
-  const [rows] = await pool.query(query, [searchValue, limit, offset]);
+    `;
 
-  const countQuery = `SELECT COUNT(*) AS total FROM examseries es WHERE es.examseriesdescription LIKE ?`;
-  const [countResult] = await pool.query(countQuery, [
-    searchValue,
-    searchValue,
-  ]);
+  const queryParams = [...params];
+
+  if (page && limit) {
+    const offset = (page - 1) * limit;
+    query += `LIMIT ? OFFSET ?`;
+    queryParams.push(limit, offset);
+  }
+
+  const [rows] = await pool.query(query, queryParams);
+
+  const countQuery = `SELECT COUNT(*) AS total FROM examseries es ${whereClause}`;
+  const [countResult] = await pool.query(countQuery, params);
 
   const total = countResult[0].total;
 
   return { data: rows, total };
+};
+
+const getExamSeriesById = async (examSeriesId) => {
+  const sql = `SELECT * FROM examseries WHERE examseriesid=?`;
+  const [result] = await pool.query(sql, [examSeriesId]);
+
+  return { data: result };
 };
 
 const postExamSeries = async (data) => {
@@ -53,7 +89,7 @@ const postExamSeries = async (data) => {
       examSeriesEndDate,
       credits,
     ]);
-    return result;
+    return result.insertId;
   } catch (err) {
     throw err;
   }
@@ -105,4 +141,5 @@ module.exports = {
   postExamSeries,
   putExamSeries,
   deleteExamSeries,
+  getExamSeriesById,
 };

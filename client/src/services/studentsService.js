@@ -14,6 +14,17 @@ export const studentService = {
       handleServiceError(error, "Failed to fetch student");
     }
   },
+
+  getStudentsById: async (studentId) => {
+    // const margedData = { data1, data2 };
+    try {
+      const response = await api.get(`${BASE_URL}/${studentId}`);
+      return response.data;
+    } catch (error) {
+      handleServiceError(error, "Failed to fetch student");
+    }
+  },
+
   updateStudent: async (id, data) => {
     // const margedData = { data1, data2 };
 

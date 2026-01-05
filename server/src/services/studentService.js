@@ -1,8 +1,19 @@
 const Students = require("../models/studentModel");
 
-const getStudent = async (page, limit, search) => {
+const getStudent = async (page, limit, searchTerm) => {
   try {
-    const result = await Students.getStudent(page, limit, search);
+    const result = await Students.getStudent(page, limit, searchTerm);
+    return result;
+  } catch (error) {
+    console.error("Service error:", error);
+    throw new Error("Failed to register customer");
+  }
+};
+
+const getStudentById = async (studentId) => {
+  try {
+    const result = await Students.getStudentById(studentId);
+
     return result;
   } catch (error) {
     console.error("Service error:", error);
@@ -45,4 +56,5 @@ module.exports = {
   postStudent,
   putStudent,
   deleteStudent,
+  getStudentById,
 };

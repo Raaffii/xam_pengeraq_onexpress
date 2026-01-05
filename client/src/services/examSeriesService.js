@@ -16,6 +16,16 @@ export const examSeriesService = {
       handleServiceError(error, "Failed to fetch users");
     }
   },
+
+  getExamSeriesById: async (examSeriesId) => {
+    try {
+      const response = await api.get(`${BASE_URL}/${examSeriesId}`);
+      return response.data;
+    } catch (error) {
+      handleServiceError(error, "Failed to fetch users");
+    }
+  },
+
   insertExamSeries: async (data) => {
     try {
       const response = await api.post(BASE_URL, data);

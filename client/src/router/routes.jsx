@@ -7,11 +7,11 @@ import DashboardPage from "@/pages/DashboardPage";
 import ProfilePage from "@/pages/ProfilePage";
 import StudentsPage from "@/pages/StudentsPage";
 import StudentsDetailPage from "@/components/student/StudentsDetailPage";
-
 import ExamsPage from "@/pages/ExamsPage";
 import ExamsSeriesPage from "@/pages/ExamsSeriesPage";
-
 import UsersPage from "@/pages/UsersPage";
+import ExamSeriesDetailPage from "@/components/examseries/ExamSeriesDetailPage";
+import ExamDetailPage from "@/components/exam/ExamDetailPage";
 
 const privateRoutes = {
   path: "/",
@@ -25,7 +25,9 @@ const privateRoutes = {
     { path: "dashboard", element: <DashboardPage /> },
     { path: "profile", element: <ProfilePage /> },
     { path: "exams", element: <ExamsPage /> },
+    { path: "exams/:id", element: <ExamDetailPage /> },
     { path: "series", element: <ExamsSeriesPage /> },
+    { path: "series/:id", element: <ExamSeriesDetailPage /> },
     { path: "students", element: <StudentsPage /> },
     { path: "students/:id", element: <StudentsDetailPage /> },
     { path: "users", element: <UsersPage /> },

@@ -59,6 +59,25 @@ export const useExams = () => {
     [params, formatExamsData]
   );
 
+  const fetchExamsById = useCallback(async (examId) => {
+    try {
+      const response = await examsService.getExamsById(examId);
+
+      setExams(response.data);
+
+      return { success: true, data: response.data };
+    } catch (err) {
+      console.error("Error fetching exams:", err);
+
+      setError(err.message);
+      setExams([]);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const createExams = useCallback(async (data) => {
     let toastId;
     try {
@@ -127,11 +146,11 @@ export const useExams = () => {
   }, []);
 
   const onSearch = useCallback(
-    async (search) => {
-      const newParams = { ...params, search };
+    async (searchTerm) => {
+      const newParams = { ...params, searchTerm };
       setParams(newParams);
 
-      return await fetchExams({ search, page: 1 });
+      return await fetchExams({ searchTerm, page: 1 });
     },
     [fetchExams, setParams, params]
   );
@@ -162,6 +181,7 @@ export const useExams = () => {
     deleteExams,
     onSearch,
     setParams,
+    fetchExamsById,
     isSubmitting,
     exams,
     isLoading,
