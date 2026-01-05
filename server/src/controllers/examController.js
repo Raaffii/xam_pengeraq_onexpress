@@ -25,6 +25,26 @@ const getExam = async (req, res) => {
   }
 };
 
+const getExamById = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const result = await examService.getExamById(id);
+
+    res.status(200).json({
+      data: result,
+    });
+  } catch (error) {
+    console.error("get expaloc error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "get expaloc failed",
+      error: error.message,
+    });
+  }
+};
+
 const postExam = async (req, res) => {
   try {
     const data = await examService.postExam(req.body);
@@ -87,4 +107,5 @@ module.exports = {
   postExam,
   putExam,
   deleteExam,
+  getExamById,
 };

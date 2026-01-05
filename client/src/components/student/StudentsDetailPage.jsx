@@ -4,6 +4,7 @@ import { useStudents } from "@/hooks/useStudents";
 import { useExamsResult } from "@/hooks/useExamResult";
 import { DataTable } from "@/components/table";
 import PageHeader from "../common/PageHeader";
+import Add_exams_grades from "../modals/add_exam_grades";
 // import Add_exams_grades from "../modals/add_exam_grades";
 
 export default function StudentsDetailPage() {
@@ -126,32 +127,10 @@ export default function StudentsDetailPage() {
           onSizeChange={onPageSizeChange}
           pagination={pagination}
         />
-        {/* 
+
         {isAddModalOpen && (
-          <Add_exams_grades
-            open={isAddModalOpen}
-            setOpen={setIsAddModalOpen}
-            studentId={id}
-            selectedStudentData={students}
-            selectedSeriesData={
-              students.examSeriesId && examsResult.length > 0
-                ? examsResult.find(
-                    (series) => series.examseriesid === students.examSeriesId
-                  ) || examsResult[0]
-                : examsResult.length > 0
-                ? examsResult[0]
-                : {}
-            }
-            examSeriesOptions={examsResult.map((series) => ({
-              value: series.examseriesid,
-              label: series.examseriesdescription,
-            }))}
-            onGradeAdded={() => {
-              loadExamResults(selectedSeries);
-              setCurrentPage(1);
-            }}
-          />
-        )} */}
+          <Add_exams_grades open={isAddModalOpen} setOpen={setIsAddModalOpen} />
+        )}
       </div>
     </div>
   );

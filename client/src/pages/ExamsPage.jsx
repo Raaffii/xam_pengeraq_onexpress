@@ -111,7 +111,7 @@ const ExamsPage = () => {
     <div className='min-h-screen '>
       <PageHeader
         title='Exams'
-        subtitle='Manage student records and exam series assignments'
+        subtitle='Manage exams records and exam series assignments'
         primaryAction={{
           label: "Add Exam",
           onClick: () => setIsModalOpen(true),

@@ -5,6 +5,7 @@ const {
   createExamSeries,
   updateExamSeries,
   deleteExamSeries,
+  getExamSeriesById,
 } = require("../controllers/examSeriesController");
 
 const {
@@ -25,6 +26,11 @@ const router = express.Router();
 router.use(authenticateToken);
 
 router.get("/", validateQuery(fetchExamSeriesQuerySchema), getExamSeries);
+router.get(
+  "/:id",
+  validateQuery(fetchExamSeriesQuerySchema),
+  getExamSeriesById
+);
 router.post("/", validateBody(createExamSeriesSchema), createExamSeries);
 router.put(
   "/:id",

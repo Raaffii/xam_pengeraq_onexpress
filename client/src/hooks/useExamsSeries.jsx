@@ -33,6 +33,7 @@ export const useExamSeries = () => {
         const apiParams = {
           ...finalParams,
         };
+
         const response = await examSeriesService.getExamSeries(apiParams);
         const data = formaExamSeriesData(response.data);
 
@@ -48,6 +49,34 @@ export const useExamSeries = () => {
         //   alert("cek");
 
         return { success: true, data: data };
+      } catch (err) {
+        console.error("Error fetching users:", err);
+
+        setError(err.message);
+        setExamSeries([]);
+
+        return { success: false, error: err.message };
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [params, formaExamSeriesData]
+  );
+
+  const fetchExamSeriesByid = useCallback(
+    async (examSeriesId) => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response = await examSeriesService.getExamSeriesById(
+          examSeriesId
+        );
+
+        setExamSeries(response.data);
+        //   alert("cek");
+
+        return { success: true, data: response.data };
       } catch (err) {
         console.error("Error fetching users:", err);
 
@@ -184,6 +213,7 @@ export const useExamSeries = () => {
     onSearch,
     setParams,
     onFilterChange,
+    fetchExamSeriesByid,
     isSubmitting,
     examSeries,
     isLoading,

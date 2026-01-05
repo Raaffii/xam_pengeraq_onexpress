@@ -44,7 +44,6 @@ const getStudentById = async (req, res) => {
 
 const postStudent = async (req, res) => {
   try {
-    console.log("req", req.body);
     const data = await studentService.postStudent(req.body);
     res.status(200).json(data);
   } catch (error) {

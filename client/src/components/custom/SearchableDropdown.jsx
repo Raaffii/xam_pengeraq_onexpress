@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
-import { createPortal } from "react-dom";
+
 import { ChevronDown, Search } from "lucide-react";
 
 export default function SearchableDropdown({
@@ -18,6 +18,8 @@ export default function SearchableDropdown({
   const [filteredOptions, setFilteredOptions] = useState(options);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [dropdownPosition, setDropdownPosition] = useState({});
+  const [openUp, setOpenUp] = useState(false);
+
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
 
@@ -66,6 +68,17 @@ export default function SearchableDropdown({
     setSearchTerm("");
   };
 
+  const handleToggle = () => {
+    if (!buttonRef.current) return;
+
+    const rect = buttonRef.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const dropdownHeight = 260; // kira-kira tinggi dropdown
+
+    setOpenUp(spaceBelow < dropdownHeight);
+    setIsOpen((p) => !p);
+  };
+
   return (
     <div className={`relative ${className}`}>
       {label && (
@@ -79,7 +92,7 @@ export default function SearchableDropdown({
         ref={buttonRef}
         type='button'
         disabled={disabled}
-        onClick={() => setIsOpen((p) => !p)}
+        onClick={handleToggle}
         className='
       w-full
       relative
@@ -104,18 +117,18 @@ export default function SearchableDropdown({
       {isOpen && !disabled && (
         <div
           ref={dropdownRef}
-          className='
-        absolute
-        z-50
-        mt-1
-        w-full
-        bg-white
-        border
-        border-gray-300
-        rounded-lg
-        shadow-lg
-        overflow-hidden
-      '>
+          className={`
+          absolute
+          z-50
+          w-full
+    bg-white
+    border
+    border-gray-300
+    rounded-lg
+    shadow-lg
+    overflow-hidden
+    ${openUp ? "bottom-full mb-1" : "top-full mt-1"}
+  `}>
           {/* SEARCH */}
           <div className='px-3 py-2 border-b bg-white sticky top-0'>
             <div className='relative'>

@@ -3,12 +3,14 @@ const authRoute = require("./authRoutes");
 const profileRoute = require("./profileRoutes");
 const studentRoute = require("./studentRoute");
 const examSeriesRoute = require("./examSeriesRoute");
-
 const examRoute = require("./examRoute");
+
 const examResultRoute = require("./examResultRoute");
+
 const userRoute = require("./userRoutes");
 const examGradeRoute = require("./examGradeRoutes");
 const subjectRoute = require("./subjectRoutes");
+const subjGradeRoute = require("./subjGradeRoutes");
 
 const Router = express.Router();
 
@@ -22,6 +24,7 @@ Router.use("/exam", examRoute);
 Router.use("/examresult", examResultRoute);
 Router.use("/users", userRoute);
 Router.use("/examgrades", examGradeRoute);
-Router.use("/subjects", subjectRoute);
+Router.use("/subject", subjectRoute);
+Router.use("/subject", subjGradeRoute);
 
 module.exports = Router;

@@ -33,6 +33,13 @@ const getExam = async (page, limit, searchTerm = "") => {
   return { data: rows, total };
 };
 
+const getExamById = async (examId) => {
+  const sql = `SELECT * FROM exam WHERE examid = ?`;
+  const [result] = await pool.query(sql, [examId]);
+
+  return result[0];
+};
+
 const postExam = async (data) => {
   const { examName, examDescription } = data;
 
@@ -66,4 +73,4 @@ const deleteExam = async (id) => {
     throw err;
   }
 };
-module.exports = { getExam, postExam, putExam, deleteExam };
+module.exports = { getExam, postExam, putExam, deleteExam, getExamById };

@@ -6,7 +6,7 @@ const getExamResult = async (page, limit, search = "", studentId) => {
   const offset = (page - 1) * limit;
 
   const searchValue = `%${search}%`;
-  console.log("sutdent", studentId);
+
   const query = `
     SELECT 
     er.marks as marks,
@@ -26,7 +26,7 @@ const getExamResult = async (page, limit, search = "", studentId) => {
   const countQuery = `SELECT COUNT(*) AS total FROM examresults er WHERE er.studentid = ? ORDER BY er.createddate DESC`;
   const [countResult] = await pool.query(countQuery, [studentId]);
   const total = countResult[0].total;
-  console.log("ro", rows);
+
   return { data: rows, total };
 };
 

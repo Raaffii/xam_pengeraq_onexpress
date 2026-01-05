@@ -16,7 +16,7 @@ const dateSchema = z.coerce.date({
   invalid_type_error: "Invalid date",
 });
 
-const creditsSchema = z.coerce
+const numberScheme = z.coerce
   .number({ invalid_type_error: "Credits must be a number" })
   .int("Credits must be an integer");
 
@@ -31,7 +31,8 @@ const createExamSeriesSchema = z.object({
   examSeriesDescription: ExamSeriesDescription,
   examSeriesEndDate: dateSchema,
   examSeriesStartDate: dateSchema,
-  credits: creditsSchema,
+  credits: numberScheme,
+  importExamSeries: numberScheme,
   examId: examIdSchema,
 });
 
@@ -39,7 +40,7 @@ const updateExamSeriesSchema = z.object({
   examSeriesDescription: ExamSeriesDescription.optional(),
   examSeriesEndDate: dateSchema.optional(),
   examSeriesStartDate: dateSchema.optional(),
-  credits: creditsSchema.optional(),
+  credits: numberScheme.optional(),
   examId: examIdSchema.optional(),
 });
 

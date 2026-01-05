@@ -5,6 +5,7 @@ const {
   postExam,
   putExam,
   deleteExam,
+  getExamById,
 } = require("../controllers/examController");
 
 const {
@@ -26,6 +27,7 @@ const router = express.Router();
 router.use(authenticateToken);
 
 router.get("/", validateQuery(fetchExamsQuerySchema), getExam);
+router.get("/:id", validateQuery(fetchExamsQuerySchema), getExamById);
 router.post("/", validateBody(createExamSchema), postExam);
 router.put(
   "/:id",

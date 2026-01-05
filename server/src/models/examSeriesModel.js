@@ -1,6 +1,6 @@
 const pool = require("../config/db");
 
-const getExamSeries = async (page, limit, searchTerm = "", byExam) => {
+const getExamSeries = async (page, limit, searchTerm = "", byExam, examId) => {
   page = Number(page) || 1;
   limit = Number(limit) || 10;
 
@@ -19,6 +19,11 @@ const getExamSeries = async (page, limit, searchTerm = "", byExam) => {
   if (byExam) {
     conditions.push("LOWER(es.examid)=?");
     params.push(byExam);
+  }
+
+  if (examId) {
+    conditions.push("es.examseriesid=?");
+    params.push(examId);
   }
 
   const whereClause =
@@ -58,6 +63,13 @@ const getExamSeries = async (page, limit, searchTerm = "", byExam) => {
   return { data: rows, total };
 };
 
+const getExamSeriesById = async (examSeriesId) => {
+  const sql = `SELECT * FROM examseries WHERE examseriesid=?`;
+  const [result] = await pool.query(sql, [examSeriesId]);
+
+  return { data: result };
+};
+
 const postExamSeries = async (data) => {
   const {
     examId,
@@ -77,7 +89,7 @@ const postExamSeries = async (data) => {
       examSeriesEndDate,
       credits,
     ]);
-    return result;
+    return result.insertId;
   } catch (err) {
     throw err;
   }
@@ -129,4 +141,5 @@ module.exports = {
   postExamSeries,
   putExamSeries,
   deleteExamSeries,
+  getExamSeriesById,
 };

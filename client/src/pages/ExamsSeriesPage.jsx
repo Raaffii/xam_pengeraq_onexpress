@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import PageHeader from "@/components/common/PageHeader";
 
 import { DataTable } from "@/components/table";
-import Add_modal from "@/components/modals/Add_modal";
+import Add_exam_series from "@/components/modals/add_exam_series";
 import Edit_modal from "@/components/modals/Edit_modal";
 import Delete_modal from "@/components/modals/Delete_modal";
 import { useExams } from "@/hooks/useExams";
@@ -52,7 +52,7 @@ const ExamsSeriesPage = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleStudentEdit = async (formData) => {
+  const handleExamSeriesEdit = async (formData) => {
     const result = await updateExamsSeries(
       selectedSExam.examSeriesId,
       formData
@@ -72,7 +72,7 @@ const ExamsSeriesPage = () => {
     return result.success;
   };
 
-  const handleStudentDelete = async (entityData) => {
+  const handleExamSeriesDelete = async (entityData) => {
     const result = await deleteExamsSeries(entityData.examSeriesId);
     if (result.success) {
       setParams((prev) => ({ ...prev, page: 1 }));
@@ -161,9 +161,9 @@ const ExamsSeriesPage = () => {
     <div className='min-h-screen '>
       <PageHeader
         title='Exams'
-        subtitle='Manage student records and exam item assignments'
+        subtitle='Manage exams series records and exam item assignments'
         primaryAction={{
-          label: "Add Student",
+          label: "Add Exam Series",
           onClick: () => setIsModalOpen(true),
         }}
         showSearch={true}
@@ -184,8 +184,8 @@ const ExamsSeriesPage = () => {
       <DataTable
         data={examSeries}
         columns={columns}
-        detailPage='exams'
-        idAccessor='examid'
+        detailPage='series'
+        idAccessor='examSeriesId'
         onEdit={openEditModal}
         onDelete={openDeleteModal}
         onPageChange={onPageChange}
@@ -194,7 +194,7 @@ const ExamsSeriesPage = () => {
       />
 
       {isModalOpen && (
-        <Add_modal
+        <Add_exam_series
           open={isModalOpen}
           setOpen={setIsModalOpen}
           onSubmit={handleExamSeriesSubmit}
@@ -203,6 +203,7 @@ const ExamsSeriesPage = () => {
           dropdowns={{
             examId: examOptions,
           }}
+          optionalDropDown={false}
         />
       )}
 
@@ -210,7 +211,7 @@ const ExamsSeriesPage = () => {
         <Edit_modal
           open={isEditModalOpen}
           setOpen={setIsEditModalOpen}
-          onSubmit={handleStudentEdit}
+          onSubmit={handleExamSeriesEdit}
           fields={fields}
           entityData={selectedSExam}
           title='Edit Exam Series'
@@ -224,7 +225,7 @@ const ExamsSeriesPage = () => {
         <Delete_modal
           open={isDeleteModalOpen}
           setOpen={setIsDeleteModalOpen}
-          onSubmit={handleStudentDelete}
+          onSubmit={handleExamSeriesDelete}
           entityData={selectedSExam}
           title='Delete Student'
           confirmationText={`Are you sure you want to delete student "${selectedSExam.examname}"? This action cannot be undone.`}
