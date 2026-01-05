@@ -80,11 +80,11 @@ const SubjGradeModel = {
    * Bulk insert subject grades (used when creating a new subject)
    */
   async bulkInsert(conn, data) {
-    const { examsubjid, examseriesid, grades } = data;
+    const { examSubjId, examSeriesId, grades } = data;
 
     const values = grades.map((grade) => [
-      examseriesid || null,
-      examsubjid,
+      examSeriesId || null,
+      examSubjId,
       grade.subjgradeseq,
       grade.subjmin,
       grade.subjmax,
