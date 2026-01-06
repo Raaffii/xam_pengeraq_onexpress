@@ -27,6 +27,37 @@ const getSubjectGrades = async (req, res) => {
   }
 };
 
+const newGrade = async (req, res) => {
+  try {
+    const gradeData = req.body;
+
+    const newGrade = await subjGradeService.newGrade(gradeData);
+
+    res.status(200).json({
+      data: newGrade,
+      message: "Grade added successfully",
+    });
+  } catch (error) {
+    console.error("Add grade error:", error.message);
+
+    if (error.message === "Grade not found") {
+      return res.status(404).json({ message: error.message });
+    }
+
+    if (
+      error.message.includes("overlap") ||
+      error.message.includes("Minimum score")
+    ) {
+      return res.status(400).json({ message: error.message });
+    }
+
+    res.status(500).json({
+      message: "Failed to add grade",
+      error: error.message,
+    });
+  }
+};
+
 const updateGrade = async (req, res) => {
   try {
     const { gradeId } = req.params;
@@ -190,6 +221,7 @@ const checkSubjectsWithoutGrades = async (req, res) => {
 
 module.exports = {
   getSubjectGrades,
+  newGrade,
   updateGrade,
   deleteGrade,
   getGradeForScore,

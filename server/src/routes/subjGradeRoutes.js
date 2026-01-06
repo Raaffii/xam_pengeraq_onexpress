@@ -4,6 +4,7 @@ const { authenticateToken } = require("../middlewares/authMiddleware");
 const {
   validateMultiple,
   validateParams,
+  validateBody,
 } = require("../middlewares/validateSchema");
 const {
   getSubjectGrades,
@@ -13,11 +14,13 @@ const {
   checkDuplicateGrades,
   cleanDuplicateGrades,
   checkSubjectsWithoutGrades,
+  newGrade,
 } = require("../controllers/subjGradeController");
 const {
   subjIdParamsSchema,
   updateGradeSchema,
   getGradeForScoreParamsSchema,
+  gradeSchema,
 } = require("../schemas/subjGradeSchema");
 const { gradeIdParamsSchema } = require("../schemas/examGradeSchema");
 
@@ -39,6 +42,8 @@ router.get(
   validateParams(getGradeForScoreParamsSchema),
   getGradeForScore,
 );
+
+router.post("/grades", validateBody(gradeSchema), newGrade);
 
 router.put(
   "/grades/:gradeId",

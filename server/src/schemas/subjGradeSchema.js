@@ -56,6 +56,10 @@ const getSubjectGradesQuerySchema = z.object({
 });
 
 const gradeSchema = z.object({
+  subjId: z
+    .number("Subject ID is required")
+    .int()
+    .positive("Series ID must be positive"),
   gradeSeq: z
     .number("Grade sequence is required")
     .int("Grade sequence must be an integer")

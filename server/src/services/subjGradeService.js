@@ -19,6 +19,47 @@ const subjGradeService = {
     };
   },
 
+  async newGrade(data) {
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      if (data.seriesId) {
+        const seriesQuery = `
+          SELECT examseriesid 
+          FROM examseries
+          WHERE active = 1
+        `;
+        const [seriesResult] = await conn.execute(seriesQuery, [data.seriesId]);
+
+        if (seriesResult.length === 0) {
+          throw new Error("Exam series not found or inactive");
+        }
+      }
+      if (data.subjId) {
+        const subjQuery = `
+          SELECT examsubjid 
+          FROM examsubj
+          WHERE active = 1
+        `;
+        const [subjResult] = await conn.execute(subjQuery, [data.subjId]);
+
+        if (subjResult.length === 0) {
+          throw new Error("Exam subject not found or inactive");
+        }
+      }
+
+      const gradeId = await SubjGradeModel.insert(conn, data);
+
+      await conn.commit();
+      return { ...data, gradeId };
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
+  },
+
   async updateGrade(gradeId, data) {
     const conn = await pool.getConnection();
     try {

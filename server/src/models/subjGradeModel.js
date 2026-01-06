@@ -76,6 +76,27 @@ const SubjGradeModel = {
     return rows.length > 0 ? rows[0] : null;
   },
 
+  async insert(conn, data) {
+    const query = `
+      INSERT INTO subjgrade 
+      (examseriesid, examsubjid, subjgradeseq, subjmin, subjmax, subjgrade, subjgpa, subjresult, active)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+    `;
+
+    const [result] = await conn.execute(query, [
+      data.seriesId,
+      data.subjId,
+      data.gradeSeq,
+      data.subjMin,
+      data.subjMax,
+      data.subjGrade,
+      data.subjGpa,
+      data.subjResult,
+    ]);
+
+    return result.insertId;
+  },
+
   /**
    * Bulk insert subject grades (used when creating a new subject)
    */
@@ -237,8 +258,8 @@ const SubjGradeModel = {
       WHERE examsubjid = ?
         AND active = 1
         AND (
-          (subjmin <= ? AND subjmax >= ?)
-          OR (subjmin <= ? AND subjmax >= ?)
+          (subjmin <= ? AND subjmax > ?)
+          OR (subjmin <= ? AND subjmax > ?)
           OR (subjmin >= ? AND subjmax <= ?)
         )
     `;
