@@ -112,18 +112,18 @@ const updateGradeSchema = z
       .optional(),
     subjMin: z
       .string()
-      .regex(/^\d+\.\d{2}$/, "Minimum score must be in format XX.XX")
+      .regex(/^\d+\.\d{1}$/, "Minimum score must be in format XX.X")
       .refine(
         (val) => parseFloat(val) >= 0 && parseFloat(val) <= 100,
-        "Minimum score must be between 0.00 and 100.00",
+        "Minimum score must be between 0.0 and 100.0",
       )
       .optional(),
     subjMax: z
       .string()
-      .regex(/^\d+\.\d{2}$/, "Maximum score must be in format XX.XX")
+      .regex(/^\d+\.\d{1}$/, "Maximum score must be in format XX.X")
       .refine(
         (val) => parseFloat(val) >= 0 && parseFloat(val) <= 100,
-        "Maximum score must be between 0.00 and 100.00",
+        "Maximum score must be between 0.0 and 100.0",
       )
       .optional(),
     subjGrade: z

@@ -80,16 +80,16 @@ export const SubjectGradeModal = ({
       changes.gradeSeq = parseInt(formData.gradeSeq);
     }
     if (parseFloat(formData.subjMin) !== parseFloat(originalData.subjMin)) {
-      changes.subjMin = parseFloat(formData.subjMin);
+      changes.subjMin = formData.subjMin;
     }
     if (parseFloat(formData.subjMax) !== parseFloat(originalData.subjMax)) {
-      changes.subjMax = parseFloat(formData.subjMax);
+      changes.subjMax = formData.subjMax;
     }
     if (formData.subjGrade !== originalData.subjGrade) {
       changes.subjGrade = formData.subjGrade;
     }
     if (parseFloat(formData.subjGpa) !== parseFloat(originalData.subjGpa)) {
-      changes.subjGpa = parseFloat(formData.subjGpa);
+      changes.subjGpa = formData.subjGpa;
     }
     if (formData.subjResult !== originalData.subjResult) {
       changes.subjResult = formData.subjResult;
@@ -236,7 +236,7 @@ export const SubjectGradeModal = ({
                 error={errors.subjMin}
                 disabled={isSubmitting}
                 inputClassName="pl-10 bg-gray-50"
-                decimalPlaces={2}
+                decimalPlaces={1}
               />
               <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
                 <ArrowDown className="w-5 h-5" />
@@ -257,7 +257,7 @@ export const SubjectGradeModal = ({
                 error={errors.subjMax}
                 disabled={isSubmitting}
                 inputClassName="pl-10 bg-gray-50"
-                decimalPlaces={2}
+                decimalPlaces={1}
               />
               <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
                 <ArrowUp className="w-5 h-5" />
