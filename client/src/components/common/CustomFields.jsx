@@ -28,24 +28,34 @@ export const InputField = ({
   dir,
   validate,
   name,
+  step,
+  decimalPlaces = 2,
   ...props
 }) => {
   const handleChange = (e) => {
     let newValue = e.target.value;
 
     if (type === "number") {
-      newValue = newValue.replace(/\D/g, "");
+      if (step && parseFloat(step) < 1) {
+        newValue = newValue.replace(/[^\d.]/g, "");
+
+        const parts = newValue.split(".");
+        if (parts.length > 2) {
+          newValue = parts[0] + "." + parts.slice(1).join("");
+        }
+
+        if (parts.length === 2 && parts[1].length > decimalPlaces) {
+          newValue = parts[0] + "." + parts[1].slice(0, decimalPlaces);
+        }
+      } else {
+        newValue = newValue.replace(/\D/g, "");
+      }
 
       if (maxLength && newValue.length > maxLength) {
         newValue = newValue.slice(0, maxLength);
       }
 
       if (error && onError) onError(null);
-
-      // if (validate) {
-      //   const validationError = validate(newValue);
-      //   if (validationError && onError) onError(validationError);
-      // }
 
       const syntheticEvent = {
         ...e,
@@ -62,16 +72,28 @@ export const InputField = ({
 
     if (error && onError) onError(null);
 
-    // if (validate) {
-    //   const validationError = validate(newValue);
-    //   if (validationError && onError) onError(validationError);
-    // }
-
     onChange?.(e);
   };
 
   const handleBlur = (e) => {
-    const newValue = e.target.value;
+    let newValue = e.target.value;
+
+    if (type === "number" && step && parseFloat(step) < 1 && newValue) {
+      const num = parseFloat(newValue);
+      if (!isNaN(num)) {
+        newValue = num.toFixed(decimalPlaces);
+
+        const syntheticEvent = {
+          ...e,
+          target: {
+            ...e.target,
+            value: newValue,
+            name: name || e.target.name,
+          },
+        };
+        onChange?.(syntheticEvent);
+      }
+    }
 
     if (isRequired && !newValue.trim() && onError) {
       onError(`${label} is required`);
@@ -82,8 +104,18 @@ export const InputField = ({
   };
 
   const inputType = type === "number" ? "text" : type;
-  const inputMode = type === "number" ? "numeric" : undefined;
-  const pattern = type === "number" ? "[0-9]*" : undefined;
+  const inputMode =
+    type === "number"
+      ? step && parseFloat(step) < 1
+        ? "decimal"
+        : "numeric"
+      : undefined;
+  const pattern =
+    type === "number"
+      ? step && parseFloat(step) < 1
+        ? "[0-9]*\\.?[0-9]*"
+        : "[0-9]*"
+      : undefined;
 
   return (
     <div className={`space-y-2 ${className}`}>
@@ -275,26 +307,22 @@ export const SearchableDropdown = ({
   searchPlaceholder = "Search...",
   emptyMessage = "No results found",
   icon: Icon = Search,
-  defaultOption = null, // { value, label } for the initial selected option
-  minSearchLength = 2, // Minimum characters before searching
+  defaultOption = null,
+  minSearchLength = 2,
 }) => {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const searchTimeoutRef = useRef(null);
 
-  // Merge default option with current options to preserve initial selection
   const mergedOptions = useMemo(() => {
     if (!defaultOption || !value) return options;
 
-    // Check if the current value exists in options
     const existsInOptions = options.some((opt) => opt.value === value);
 
-    // If value exists in options or defaultOption doesn't match value, just return options
     if (existsInOptions || defaultOption.value !== value) {
       return options;
     }
 
-    // Otherwise, prepend the defaultOption to maintain it in the list
     return [defaultOption, ...options];
   }, [options, defaultOption, value]);
 
@@ -325,7 +353,15 @@ export const SearchableDropdown = ({
   };
 
   const handleSelect = (selectedValue) => {
-    onChange(selectedValue === value ? null : selectedValue);
+    const selectedOption = mergedOptions.find(
+      (opt) => opt.value === selectedValue,
+    );
+
+    onChange(
+      selectedValue === value ? null : selectedValue,
+      selectedValue === value ? null : selectedOption?.label,
+    );
+
     setOpen(false);
     setSearchTerm("");
 
@@ -336,7 +372,7 @@ export const SearchableDropdown = ({
 
   const handleClear = (e) => {
     e.stopPropagation();
-    onChange(null);
+    onChange(null, null);
     setSearchTerm("");
 
     if (searchTimeoutRef.current) {

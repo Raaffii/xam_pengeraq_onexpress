@@ -21,12 +21,12 @@ export const SubjectModal = ({
   onSeriesSearch,
   isLoadingSeries = false,
 }) => {
-  console.log(initialValues);
   const [formData, setFormData] = useState({
     subjCode: "",
     subjDesc: "",
-    subjCredit: "",
+    subjCredit: 0,
     seriesId: null,
+    seriesDesc: "",
     ...initialValues,
   });
   const [originalData, setOriginalData] = useState({});
@@ -47,8 +47,9 @@ export const SubjectModal = ({
     const resetData = {
       subjCode: "",
       subjDesc: "",
-      subjCredit: "",
+      subjCredit: 0,
       seriesId: null,
+      seriesDesc: "",
       ...initialValues,
     };
 
@@ -69,7 +70,12 @@ export const SubjectModal = ({
   }, [initialValues.seriesId, initialValues.seriesDesc]);
 
   const getChangedData = () => {
-    if (mode === "create") return formData;
+    const formatData = (data) => ({
+      ...data,
+      subjCredit: parseInt(data.subjCredit),
+    });
+
+    if (mode === "create") return formatData(formData);
 
     const changes = {};
 
@@ -80,10 +86,11 @@ export const SubjectModal = ({
       changes.subjDesc = formData.subjDesc;
     }
     if (formData.subjCredit !== originalData.subjCredit) {
-      changes.subjCredit = formData.subjCredit;
+      changes.subjCredit = parseInt(formData.subjCredit);
     }
     if (formData.seriesId !== originalData.seriesId) {
       changes.seriesId = formData.seriesId;
+      changes.seriesDesc = formData.seriesDesc;
     }
 
     if (initialValues.subjId) {
@@ -132,8 +139,12 @@ export const SubjectModal = ({
     onSubmit(dataToSubmit);
   };
 
-  const handleSeriesChange = (value) => {
-    setFormData((prev) => ({ ...prev, seriesId: value }));
+  const handleSeriesChange = (value, label) => {
+    setFormData((prev) => ({
+      ...prev,
+      seriesId: value,
+      seriesDesc: label || "",
+    }));
     if (errors.seriesId) {
       setErrors((prev) => ({ ...prev, seriesId: null }));
     }
@@ -202,6 +213,7 @@ export const SubjectModal = ({
           <div className="relative">
             <InputField
               id="subjCredit"
+              type="number"
               name="subjCredit"
               label="Subject Credit"
               value={formData.subjCredit}

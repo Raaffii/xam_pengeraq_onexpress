@@ -44,6 +44,15 @@ export const subjectService = {
     }
   },
 
+  insertSubjGrade: async (data) => {
+    try {
+      const response = await api.post(`${BASE_URL}/grades`, data);
+      return response.data;
+    } catch (error) {
+      handleServiceError(error, "Failed to create subject grade");
+    }
+  },
+
   putSubj: async (subjectId, data) => {
     try {
       const response = await api.put(`${BASE_URL}/${subjectId}`, data);

@@ -97,7 +97,7 @@ const ExamSubjectPage = () => {
     return {
       subjCode: "",
       subjDesc: "",
-      subjCredit: "",
+      subjCredit: 0,
       seriesId: null,
     };
   }, [modalMode, selectedSubj]);

@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 
 export const useExamSubject = () => {
   const [examSubj, setExamSubj] = useState([]);
-  const [examSubjDetail, setExamSubjDetail] = useState(null);
+  const [examSubjDetail, setExamSubjDetail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,6 +61,31 @@ export const useExamSubject = () => {
     },
     [params, formatExamSubjData],
   );
+
+  const fetchSubjectById = useCallback(async (subjId) => {
+    if (!subjId) {
+      return;
+    }
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await subjectService.getSubjGrades(subjId);
+
+      setExamSubjDetail(response.data);
+
+      return { success: true, data: response.data };
+    } catch (err) {
+      console.error("Error fetching examSubj:", err);
+
+      setError(err.message);
+      setExamSubj([]);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const newExamSubj = useCallback(async (examSubjData) => {
     let toastId;
@@ -123,6 +148,80 @@ export const useExamSubject = () => {
     } catch (err) {
       console.error("Error deleting examSubj:", err);
       toast.error(err.message || "Failed to delete subject", {
+        id: toastId,
+      });
+      setError(err.message);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, []);
+
+  const newSubjGrade = useCallback(async (examSubjData) => {
+    let toastId;
+    try {
+      setIsSubmitting(true);
+      setError(null);
+      toastId = toast.loading("Creating new grade...");
+      const response = await subjectService.insertSubjGrade(examSubjData);
+      toast.success("Subject Grade added successfully!", { id: toastId });
+
+      return { success: true, data: response.data };
+    } catch (err) {
+      console.error("Error creating examSubjGrade:", err);
+      toast.error(err.message || "Failed to create Subject Grade", {
+        id: toastId,
+      });
+      setError(err.message);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, []);
+
+  const updateSubjGrade = useCallback(async (gradeId, examSubjData) => {
+    if (!gradeId) return;
+    let toastId;
+    try {
+      setIsSubmitting(true);
+      setError(null);
+      toastId = toast.loading("Updating grade details...");
+      const response = await subjectService.putSubjectGrade(
+        gradeId,
+        examSubjData,
+      );
+      toast.success("Subject Grade updated successfully", { id: toastId });
+
+      return { success: true, data: response.data };
+    } catch (err) {
+      console.error("Error updating Subject Grade:", err);
+      toast.error(err.message || "Failed to update subject grade", {
+        id: toastId,
+      });
+      setError(err.message);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, []);
+
+  const removeSubjGrade = useCallback(async (gradeId) => {
+    if (!gradeId) return;
+    let toastId;
+    try {
+      setIsSubmitting(true);
+      setError(null);
+      toastId = toast.loading("Deleting subject grade...");
+      const response = await subjectService.removeSubjGrade(gradeId);
+      toast.success("Subject Grade deleted successfully", { id: toastId });
+
+      return { success: true, data: response };
+    } catch (err) {
+      console.error("Error deleting examSubjGrade:", err);
+      toast.error(err.message || "Failed to delete subject grade", {
         id: toastId,
       });
       setError(err.message);
@@ -212,5 +311,9 @@ export const useExamSubject = () => {
     setExamSubjDetail,
     setExamSubj,
     updateDetails,
+    fetchSubjectById,
+    newSubjGrade,
+    updateSubjGrade,
+    removeSubjGrade,
   };
 };
