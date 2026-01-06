@@ -7,6 +7,7 @@ import { Edit } from "lucide-react";
 import { SubjectGradeModal, SubjectModal } from ".";
 import { useExamSeries } from "@/hooks/useExamsSeries";
 import Delete_modal from "../modals/Delete_modal";
+import { DetailsInfoCard } from "../common";
 
 export const ExamSubjectGradePage = () => {
   const hasFetchedData = useRef(false);
@@ -64,6 +65,32 @@ export const ExamSubjectGradePage = () => {
       subjResult: "",
     };
   }, [modalMode, selectedGrade]);
+
+  const subjectDetailFields = useMemo(
+    () => [
+      {
+        label: "Subject ID",
+        value: examSubjDetail.subjId,
+      },
+      {
+        label: "Subject Code",
+        value: examSubjDetail.subjCode,
+      },
+      {
+        label: "Description",
+        value: examSubjDetail.subjDesc,
+      },
+      {
+        label: "Exam Series",
+        value: examSubjDetail.seriesDesc,
+      },
+      {
+        label: "Earned Credit",
+        value: examSubjDetail.subjCredit,
+      },
+    ],
+    [examSubjDetail],
+  );
 
   const columns = [
     {
@@ -171,66 +198,14 @@ export const ExamSubjectGradePage = () => {
           },
         ]}
       />
-      {/* DetailsCard */}
-      <div className="bg-white overflow-hidden shadow-md ring-1 ring-gray-200 rounded-md border border-gray-100 mb-6">
-        <div className="px-6 py-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Subject Details
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Subject ID
-              </label>
-              <div className="bg-gray-50 rounded-lg px-4 py-3 border border-gray-200">
-                <span className="text-gray-900 font-medium">
-                  {examSubjDetail.subjId || ""}
-                </span>
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Subject Code
-              </label>
-              <div className="bg-gray-50 rounded-lg px-4 py-3 border border-gray-200">
-                <span className="text-gray-900 font-medium">
-                  {examSubjDetail.subjCode || ""}
-                </span>
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description
-              </label>
-              <div className="bg-gray-50 rounded-lg px-4 py-3 border border-gray-200">
-                <span className="text-gray-900 font-medium">
-                  {examSubjDetail.subjDesc || ""}
-                </span>
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Exam Series
-              </label>
-              <div className="bg-gray-50 rounded-lg px-4 py-3 border border-gray-200">
-                <span className="text-gray-900 font-medium">
-                  {examSubjDetail.seriesDesc || ""}
-                </span>
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Earned Credit
-              </label>
-              <div className="bg-gray-50 rounded-lg px-4 py-3 border border-gray-200">
-                <span className="text-gray-900 font-medium">
-                  {examSubjDetail.subjCredit || ""}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+
+      <DetailsInfoCard
+        title="Subject Details"
+        fields={subjectDetailFields}
+        columnSize={3}
+        isLoading={isLoading}
+        className="mb-6"
+      />
 
       <PageHeader
         title={"Subject Grade"}
@@ -243,6 +218,7 @@ export const ExamSubjectGradePage = () => {
           },
         }}
       />
+
       <DataTable
         data={examSubjDetail.grades}
         isLoading={isLoading}

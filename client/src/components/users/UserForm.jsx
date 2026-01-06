@@ -137,7 +137,7 @@ export const UserForm = ({
         setErrors((prev) => ({ ...prev, studentSearch: null }));
 
         const response = await fetchStudents({
-          search: studentSearch,
+          searchTerm: studentSearch,
           page: 1,
           pageSize: 5,
         });
