@@ -11,6 +11,7 @@ const {
   validateBody,
   validateMultiple,
   validateParams,
+  validateQuery,
 } = require("../middlewares/validateSchema");
 const {
   fetchGradesQuerySchema,
