@@ -12,6 +12,8 @@ import ExamsSeriesPage from "@/pages/ExamsSeriesPage";
 import UsersPage from "@/pages/UsersPage";
 import ExamSeriesDetailPage from "@/components/examseries/ExamSeriesDetailPage";
 import ExamDetailPage from "@/components/exam/ExamDetailPage";
+import ExamSubjectPage from "@/pages/ExamSubjectPage";
+import { ExamSubjectGradePage } from "@/components/subjects";
 
 const privateRoutes = {
   path: "/",
@@ -28,6 +30,8 @@ const privateRoutes = {
     { path: "exams/:id", element: <ExamDetailPage /> },
     { path: "series", element: <ExamsSeriesPage /> },
     { path: "series/:id", element: <ExamSeriesDetailPage /> },
+    { path: "subjects", element: <ExamSubjectPage /> },
+    { path: "subjects/:subjectId", element: <ExamSubjectGradePage /> },
     { path: "students", element: <StudentsPage /> },
     { path: "students/:id", element: <StudentsDetailPage /> },
     { path: "users", element: <UsersPage /> },
