@@ -231,7 +231,7 @@ export const SubjectGradeModal = ({
                 label="Minimum Mark"
                 value={formData.subjMin}
                 onChange={handleChange}
-                placeholder="0.00"
+                placeholder="0.0"
                 isRequired
                 error={errors.subjMin}
                 disabled={isSubmitting}
@@ -252,7 +252,7 @@ export const SubjectGradeModal = ({
                 label="Maximum Mark"
                 value={formData.subjMax}
                 onChange={handleChange}
-                placeholder="0.00"
+                placeholder="0.0"
                 isRequired
                 error={errors.subjMax}
                 disabled={isSubmitting}
@@ -311,7 +311,7 @@ export const SubjectGradeModal = ({
               label="Result"
               value={formData.subjResult}
               onChange={handleChange}
-              placeholder="Enter result (e.g., Pass, Fail, Distinction)"
+              placeholder="Enter result (e.g., GAGAL, LULUS, MEMUASKAN)"
               isRequired
               error={errors.subjResult}
               disabled={isSubmitting}
