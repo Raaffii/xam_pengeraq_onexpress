@@ -16,10 +16,10 @@ const {
 } = require("../controllers/subjGradeController");
 const {
   subjIdParamsSchema,
-  getSubjectGradesQuerySchema,
   updateGradeSchema,
   getGradeForScoreParamsSchema,
 } = require("../schemas/subjGradeSchema");
+const { gradeIdParamsSchema } = require("../schemas/examGradeSchema");
 
 router.use(authenticateToken);
 
@@ -29,10 +29,7 @@ router.delete("/grades/clean-duplicates", cleanDuplicateGrades);
 
 router.get(
   "/:subjId/grades",
-  validateMultiple({
-    params: subjIdParamsSchema,
-    query: getSubjectGradesQuerySchema,
-  }),
+  validateParams(subjIdParamsSchema),
   getSubjectGrades,
 );
 
@@ -44,17 +41,17 @@ router.get(
 );
 
 router.put(
-  "/:subjId/grades",
+  "/grades/:gradeId",
   validateMultiple({
-    params: subjIdParamsSchema,
+    params: gradeIdParamsSchema,
     body: updateGradeSchema,
   }),
   updateGrade,
 );
 
 router.delete(
-  "/:subjId/grades",
-  validateParams(subjIdParamsSchema),
+  "/grades/:gradeId",
+  validateParams(gradeIdParamsSchema),
   deleteGrade,
 );
 

@@ -6,45 +6,27 @@ const subjGradeService = {
   /**
    * Get all grades for a subject
    */
-  async getSubjectGrades(subjId, seriesId = null) {
+  async getSubjectGrades(subjId) {
     const subject = await SubjModel.fetchSubjById(subjId);
     if (!subject) {
       throw new Error("Subject not found");
     }
-
-    let grades;
-    if (seriesId) {
-      grades = await SubjGradeModel.findBySubjAndSeries(subjId, seriesId);
-    } else {
-      grades = await SubjGradeModel.findBySubjId(subjId);
-    }
+    const grades = await SubjGradeModel.findBySubjId(subjId);
 
     return {
-      subject,
+      ...subject,
       grades,
     };
   },
 
-  /**
-   * Update a single grade
-   */
-  async updateGrade(subjId, gradeId, data) {
+  async updateGrade(gradeId, data) {
     const conn = await pool.getConnection();
     try {
       await conn.beginTransaction();
 
-      const subject = await SubjModel.fetchSubjById(subjId);
-      if (!subject) {
-        throw new Error("Subject not found");
-      }
-
       const existingGrade = await SubjGradeModel.findById(gradeId);
       if (!existingGrade) {
         throw new Error("Grade not found");
-      }
-
-      if (existingGrade.subjId !== parseInt(subjId)) {
-        throw new Error("Subject mismatch");
       }
 
       if (data.subjMin !== undefined || data.subjMax !== undefined) {
@@ -85,26 +67,14 @@ const subjGradeService = {
     }
   },
 
-  /**
-   * Delete a single grade
-   */
-  async deleteGrade(subjId, gradeId) {
+  async deleteGrade(gradeId) {
     const conn = await pool.getConnection();
     try {
       await conn.beginTransaction();
 
-      const subject = await SubjModel.fetchSubjById(subjId);
-      if (!subject) {
-        throw new Error("Subject not found");
-      }
-
       const grade = await SubjGradeModel.findById(gradeId);
       if (!grade) {
         throw new Error("Grade not found");
-      }
-
-      if (grade.subjId !== parseInt(subjId)) {
-        throw new Error("Subject mismatch");
       }
 
       await SubjGradeModel.deleteById(conn, gradeId);
@@ -118,9 +88,6 @@ const subjGradeService = {
     }
   },
 
-  /**
-   * Get grade for a specific score
-   */
   async getGradeForScore(subjId, score) {
     const subject = await SubjModel.fetchSubjById(subjId);
     if (!subject) {
