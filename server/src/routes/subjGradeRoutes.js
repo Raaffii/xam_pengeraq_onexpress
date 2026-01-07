@@ -4,6 +4,7 @@ const { authenticateToken } = require("../middlewares/authMiddleware");
 const {
   validateMultiple,
   validateParams,
+  validateBody,
 } = require("../middlewares/validateSchema");
 const {
   getSubjectGrades,
@@ -13,13 +14,16 @@ const {
   checkDuplicateGrades,
   cleanDuplicateGrades,
   checkSubjectsWithoutGrades,
+  newGrade,
 } = require("../controllers/subjGradeController");
 const {
   subjIdParamsSchema,
-  getSubjectGradesQuerySchema,
   updateGradeSchema,
   getGradeForScoreParamsSchema,
+  gradeSchema,
+  getGradeForScoreQuerySchema,
 } = require("../schemas/subjGradeSchema");
+const { gradeIdParamsSchema } = require("../schemas/examGradeSchema");
 
 router.use(authenticateToken);
 
@@ -29,32 +33,34 @@ router.delete("/grades/clean-duplicates", cleanDuplicateGrades);
 
 router.get(
   "/:subjId/grades",
-  validateMultiple({
-    params: subjIdParamsSchema,
-    query: getSubjectGradesQuerySchema,
-  }),
+  validateParams(subjIdParamsSchema),
   getSubjectGrades,
 );
 
 // Get grade for a specific score
 router.get(
   "/:subjId/grades/byScore/:score",
-  validateParams(getGradeForScoreParamsSchema),
+  validateMultiple({
+    params: getGradeForScoreParamsSchema,
+    query: getGradeForScoreQuerySchema,
+  }),
   getGradeForScore,
 );
 
+router.post("/grades", validateBody(gradeSchema), newGrade);
+
 router.put(
-  "/:subjId/grades",
+  "/grades/:gradeId",
   validateMultiple({
-    params: subjIdParamsSchema,
+    params: gradeIdParamsSchema,
     body: updateGradeSchema,
   }),
   updateGrade,
 );
 
 router.delete(
-  "/:subjId/grades",
-  validateParams(subjIdParamsSchema),
+  "/grades/:gradeId",
+  validateParams(gradeIdParamsSchema),
   deleteGrade,
 );
 

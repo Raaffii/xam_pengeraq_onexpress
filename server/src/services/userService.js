@@ -64,6 +64,7 @@ const userService = {
         throw new Error("User not found");
       }
       await UserModel.softDeleteUser(conn, data);
+      await conn.commit();
     } catch (error) {
       await conn.rollback();
       throw error;

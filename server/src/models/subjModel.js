@@ -100,37 +100,6 @@ const SubjModel = {
     return result.insertId;
   },
 
-  async insertSubjGrade(conn, data) {
-    const { examsubjid, examseriesid, grades } = data;
-
-    const values = grades.map((grade) => [
-      examseriesid || null,
-      examsubjid,
-      grade.subjgradeseq,
-      grade.subjmin,
-      grade.subjmax,
-      grade.subjgrade,
-      grade.subjgpa,
-      grade.subjresult,
-      grade.active ? 1 : 0,
-    ]);
-
-    const placeholders = grades
-      .map(() => "(?, ?, ?, ?, ?, ?, ?, ?, ?)")
-      .join(", ");
-
-    const query = `
-      INSERT INTO subjgrade 
-      (examseriesid, examsubjid, subjgradeseq, subjmin, subjmax, subjgrade, subjgpa, subjresult, active)
-      VALUES ${placeholders}
-    `;
-
-    const flatValues = values.flat();
-
-    await conn.execute(query, flatValues);
-    return true;
-  },
-
   async putSubj(conn, updateData) {
     const {
       subjId,

@@ -11,11 +11,11 @@ const SubjGradeModel = {
         sg.examseriesid AS seriesId,
         sg.examsubjid AS subjId,
         sg.subjgradeseq AS gradeSeq,
-        sg.subjmin AS minScore,
-        sg.subjmax AS maxScore,
-        sg.subjgrade AS grade,
-        sg.subjgpa AS gpa,
-        sg.subjresult AS result,
+        sg.subjmin AS subjMin,
+        sg.subjmax AS subjMax,
+        sg.subjgrade AS subjGrade,
+        sg.subjgpa AS subjGpa,
+        sg.subjresult AS subjResult,
         sg.active
       FROM subjgrade sg
       WHERE sg.examsubjid = ?
@@ -36,11 +36,11 @@ const SubjGradeModel = {
         sg.examseriesid AS seriesId,
         sg.examsubjid AS subjId,
         sg.subjgradeseq AS gradeSeq,
-        sg.subjmin AS minScore,
-        sg.subjmax AS maxScore,
-        sg.subjgrade AS grade,
-        sg.subjgpa AS gpa,
-        sg.subjresult AS result,
+        sg.subjmin AS subjMin,
+        sg.subjmax AS subjMax,
+        sg.subjgrade AS subjGrade,
+        sg.subjgpa AS subjGpa,
+        sg.subjresult AS subjResult,
         sg.active
       FROM subjgrade sg
       WHERE sg.examsubjid = ? 
@@ -62,11 +62,11 @@ const SubjGradeModel = {
         sg.examseriesid AS seriesId,
         sg.examsubjid AS subjId,
         sg.subjgradeseq AS gradeSeq,
-        sg.subjmin AS minScore,
-        sg.subjmax AS maxScore,
-        sg.subjgrade AS grade,
-        sg.subjgpa AS gpa,
-        sg.subjresult AS result,
+        sg.subjmin AS subjMin,
+        sg.subjmax AS subjMax,
+        sg.subjgrade AS subjGrade,
+        sg.subjgpa AS subjGpa,
+        sg.subjresult AS subjResult,
         sg.active
       FROM subjgrade sg
       WHERE sg.subjgradeid = ?
@@ -76,15 +76,36 @@ const SubjGradeModel = {
     return rows.length > 0 ? rows[0] : null;
   },
 
+  async insert(conn, data) {
+    const query = `
+      INSERT INTO subjgrade 
+      (examseriesid, examsubjid, subjgradeseq, subjmin, subjmax, subjgrade, subjgpa, subjresult, active)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+    `;
+
+    const [result] = await conn.execute(query, [
+      data.seriesId,
+      data.subjId,
+      data.gradeSeq,
+      data.subjMin,
+      data.subjMax,
+      data.subjGrade,
+      data.subjGpa,
+      data.subjResult,
+    ]);
+
+    return result.insertId;
+  },
+
   /**
    * Bulk insert subject grades (used when creating a new subject)
    */
   async bulkInsert(conn, data) {
-    const { examsubjid, examseriesid, grades } = data;
+    const { examSubjId, examSeriesId, grades } = data;
 
     const values = grades.map((grade) => [
-      examseriesid || null,
-      examsubjid,
+      examSeriesId || null,
+      examSubjId,
       grade.subjgradeseq,
       grade.subjmin,
       grade.subjmax,
@@ -219,11 +240,13 @@ const SubjGradeModel = {
       FROM subjgrade sg
       WHERE sg.examsubjid = ?
         AND sg.active = 1
-        AND ? BETWEEN sg.subjmin AND sg.subjmax
+        AND ? >= sg.subjmin 
+        AND ? <= sg.subjmax
+      ORDER BY sg.subjmin DESC
       LIMIT 1
     `;
 
-    const [rows] = await pool.execute(query, [subjId, score]);
+    const [rows] = await pool.execute(query, [subjId, score, score]);
     return rows.length > 0 ? rows[0] : null;
   },
 
@@ -237,8 +260,8 @@ const SubjGradeModel = {
       WHERE examsubjid = ?
         AND active = 1
         AND (
-          (subjmin <= ? AND subjmax >= ?)
-          OR (subjmin <= ? AND subjmax >= ?)
+          (subjmin <= ? AND subjmax > ?)
+          OR (subjmin <= ? AND subjmax > ?)
           OR (subjmin >= ? AND subjmax <= ?)
         )
     `;

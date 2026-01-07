@@ -6,52 +6,75 @@ const subjGradeService = {
   /**
    * Get all grades for a subject
    */
-  async getSubjectGrades(subjId, seriesId = null) {
+  async getSubjectGrades(subjId) {
     const subject = await SubjModel.fetchSubjById(subjId);
     if (!subject) {
       throw new Error("Subject not found");
     }
-
-    let grades;
-    if (seriesId) {
-      grades = await SubjGradeModel.findBySubjAndSeries(subjId, seriesId);
-    } else {
-      grades = await SubjGradeModel.findBySubjId(subjId);
-    }
+    const grades = await SubjGradeModel.findBySubjId(subjId);
 
     return {
-      subject,
+      ...subject,
       grades,
     };
   },
 
-  /**
-   * Update a single grade
-   */
-  async updateGrade(subjId, gradeId, data) {
+  async newGrade(data) {
     const conn = await pool.getConnection();
     try {
       await conn.beginTransaction();
+      if (data.seriesId) {
+        const seriesQuery = `
+          SELECT examseriesid 
+          FROM examseries
+          WHERE active = 1
+        `;
+        const [seriesResult] = await conn.execute(seriesQuery, [data.seriesId]);
 
-      const subject = await SubjModel.fetchSubjById(subjId);
-      if (!subject) {
-        throw new Error("Subject not found");
+        if (seriesResult.length === 0) {
+          throw new Error("Exam series not found or inactive");
+        }
       }
+      if (data.subjId) {
+        const subjQuery = `
+          SELECT examsubjid 
+          FROM examsubj
+          WHERE active = 1
+        `;
+        const [subjResult] = await conn.execute(subjQuery, [data.subjId]);
+
+        if (subjResult.length === 0) {
+          throw new Error("Exam subject not found or inactive");
+        }
+      }
+
+      const gradeId = await SubjGradeModel.insert(conn, data);
+
+      await conn.commit();
+      return { ...data, gradeId };
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
+  },
+
+  async updateGrade(gradeId, data) {
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
 
       const existingGrade = await SubjGradeModel.findById(gradeId);
       if (!existingGrade) {
         throw new Error("Grade not found");
       }
 
-      if (existingGrade.subjId !== parseInt(subjId)) {
-        throw new Error("Subject mismatch");
-      }
-
       if (data.subjMin !== undefined || data.subjMax !== undefined) {
         const minScore =
-          data.subjMin !== undefined ? data.subjMin : existingGrade.minScore;
+          data.subjMin !== undefined ? data.subjMin : existingGrade.subjMin;
         const maxScore =
-          data.subjMax !== undefined ? data.subjMax : existingGrade.maxScore;
+          data.subjMax !== undefined ? data.subjMax : existingGrade.subjMax;
 
         if (parseFloat(minScore) >= parseFloat(maxScore)) {
           throw new Error("Minimum score must be less than maximum score");
@@ -85,26 +108,14 @@ const subjGradeService = {
     }
   },
 
-  /**
-   * Delete a single grade
-   */
-  async deleteGrade(subjId, gradeId) {
+  async deleteGrade(gradeId) {
     const conn = await pool.getConnection();
     try {
       await conn.beginTransaction();
 
-      const subject = await SubjModel.fetchSubjById(subjId);
-      if (!subject) {
-        throw new Error("Subject not found");
-      }
-
       const grade = await SubjGradeModel.findById(gradeId);
       if (!grade) {
         throw new Error("Grade not found");
-      }
-
-      if (grade.subjId !== parseInt(subjId)) {
-        throw new Error("Subject mismatch");
       }
 
       await SubjGradeModel.deleteById(conn, gradeId);
@@ -118,10 +129,7 @@ const subjGradeService = {
     }
   },
 
-  /**
-   * Get grade for a specific score
-   */
-  async getGradeForScore(subjId, score) {
+  async getGradeForScore(subjId, score, isRetake = false) {
     const subject = await SubjModel.fetchSubjById(subjId);
     if (!subject) {
       throw new Error("Subject not found");
@@ -131,13 +139,21 @@ const subjGradeService = {
       throw new Error("Score must be between 0 and 100");
     }
 
-    const grade = await SubjGradeModel.getGradeForScore(subjId, score);
+    let effectiveScore = score;
+    if (isRetake && score > 50) {
+      effectiveScore = 50;
+    }
+
+    const grade = await SubjGradeModel.getGradeForScore(subjId, effectiveScore);
     if (!grade) {
       throw new Error("No grade found for this score");
     }
 
     return {
-      score,
+      originalScore: score,
+      effectiveScore: effectiveScore,
+      isRetake: isRetake,
+      isCapped: isRetake && score > 50,
       ...grade,
     };
   },

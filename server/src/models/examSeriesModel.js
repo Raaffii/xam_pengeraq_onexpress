@@ -3,32 +3,25 @@ const pool = require("../config/db");
 const getExamSeries = async (page, limit, searchTerm = "", byExam, examId) => {
   page = Number(page) || 1;
   limit = Number(limit) || 10;
-
   const conditions = [];
   const params = [];
-
-  //where
   if (searchTerm) {
     conditions.push(
-      "(LOWER(es.examseriesdescription) LIKE ? OR LOWER(e.examname) LIKE ? )"
+      "(LOWER(es.examseriesdescription) LIKE ? OR LOWER(e.examname) LIKE ? )",
     );
     const searchValue = `%${searchTerm}%`;
     params.push(searchValue, searchValue);
   }
-
   if (byExam) {
     conditions.push("LOWER(es.examid)=?");
     params.push(byExam);
   }
-
   if (examId) {
     conditions.push("es.examseriesid=?");
     params.push(examId);
   }
-
   const whereClause =
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
-
   // base query
   let query = `
     SELECT 
@@ -44,22 +37,21 @@ const getExamSeries = async (page, limit, searchTerm = "", byExam, examId) => {
    ${whereClause}
     ORDER BY es.createddate DESC
     `;
-
   const queryParams = [...params];
-
   if (page && limit) {
     const offset = (page - 1) * limit;
     query += `LIMIT ? OFFSET ?`;
-    queryParams.push(limit, offset);
+    queryParams.push(String(limit), String(offset));
   }
-
-  const [rows] = await pool.query(query, queryParams);
-
-  const countQuery = `SELECT COUNT(*) AS total FROM examseries es ${whereClause}`;
-  const [countResult] = await pool.query(countQuery, params);
-
+  const [rows] = await pool.execute(query, queryParams);
+  const countQuery = `
+    SELECT COUNT(*) AS total 
+    FROM examseries es
+    LEFT JOIN exam e ON es.examid = e.examid
+    ${whereClause}
+  `;
+  const [countResult] = await pool.execute(countQuery, params);
   const total = countResult[0].total;
-
   return { data: rows, total };
 };
 

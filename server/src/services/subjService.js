@@ -1,4 +1,5 @@
 const SubjModel = require("../models/subjModel");
+const SubjGradeModel = require("../models/subjGradeModel");
 const pool = require("../config/db");
 const { defaultExamFinalGrades } = require("../utils/data");
 
@@ -52,9 +53,9 @@ const subjService = {
       });
 
       // Insert default subject grades
-      await SubjModel.insertSubjGrade(conn, {
-        examsubjid: subjId,
-        examseriesid: data.seriesId || null,
+      await SubjGradeModel.bulkInsert(conn, {
+        examSubjId: subjId,
+        examSeriesId: data.seriesId || null,
         grades: defaultExamFinalGrades,
       });
 

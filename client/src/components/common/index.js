@@ -4,3 +4,4 @@ export * from "./ActionMenu";
 export * from "./StatusBadge";
 export * from "./FormModal";
 export * from "./TruncatedText";
+export * from "./DetailsInfoCard";
