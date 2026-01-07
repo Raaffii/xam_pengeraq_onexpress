@@ -37,7 +37,7 @@ const createRateLimiter = ({
 
 const publicLimiter = createRateLimiter({
   windowMs: 1 * 60 * 1000,
-  limit: 30,
+  limit: 30000,
   message: "Too many requests. Please wait a moment and try again",
   keyPrefix: "public",
 });

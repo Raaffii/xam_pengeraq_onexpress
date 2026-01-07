@@ -122,9 +122,30 @@ const deleteSubj = async (req, res) => {
   }
 };
 
+const getSubjectsByExamSeriesId = async (req, res) => {
+  try {
+    const examSeriesId = req.params.examSeriesId;
+
+    const result = await subjService.getSubByExamSeries(examSeriesId);
+
+    const response = {
+      data: result.examSubj,
+    };
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Fetch examSubj error:", error.message);
+    res.status(500).json({
+      message: "Failed to fetch exam subject",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getSubjects,
   postSubj,
   putSubj,
   deleteSubj,
+  getSubjectsByExamSeriesId,
 };

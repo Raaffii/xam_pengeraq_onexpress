@@ -4,13 +4,23 @@ import { useStudents } from "@/hooks/useStudents";
 import { useExamsResult } from "@/hooks/useExamResult";
 import { DataTable } from "@/components/table";
 import PageHeader from "../common/PageHeader";
-import Add_exams_grades from "../modals/add_exam_grades";
+import AddExamsGrades from "../modals/addExamGrades";
+import EditExamsGrades from "../modals/editExamGrades";
+import TableHeader from "../common/TableHeader";
+import { useStudentsExamSeries } from "@/hooks/useStudentsExamSeries";
+import Delete_modal from "../modals/Delete_modal";
 // import Add_exams_grades from "../modals/add_exam_grades";
 
 export default function StudentsDetailPage() {
   const { id } = useParams();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedSeries, setSelectedSeries] = useState("all");
+  const [selectedExamsResult, setSelectedExamsResult] = useState();
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const { fetchStudentExamSeriesById, studentsExamSeries } =
+    useStudentsExamSeries();
   const { getStudentById, students } = useStudents();
   const {
     fetchExamsResult,
@@ -18,25 +28,69 @@ export default function StudentsDetailPage() {
     onPageChange,
     onPageSizeChange,
     pagination,
+    onSearch,
+    onFilterChange,
+    deleteExamResult,
   } = useExamsResult();
 
   useEffect(() => {
     const fetchData = async () => {
-      const student = await getStudentById(id);
+      try {
+        const student = await getStudentById(id);
 
-      await fetchExamsResult({ studentId: student.data.studentId });
+        if (!student?.data?.studentId) return;
+        // setParams({ studentId: id });
+        await fetchStudentExamSeriesById(id);
+        await fetchExamsResult({ studentId: student.data.studentId });
+      } catch (error) {
+        console.error("Failed to fetch student data:", error);
+      }
     };
 
-    fetchData();
-  }, [getStudentById, id, fetchExamsResult]);
+    if (id) {
+      fetchData();
+    }
+  }, [id, getStudentById, fetchStudentExamSeriesById, fetchExamsResult]);
 
   const loadExamResults = async (examseriesid = null) => {
-    const params = { studentid: id };
+    const params = { studentId: id };
     if (examseriesid && examseriesid !== "all") {
-      params.examseriesid = examseriesid;
+      params.byExamSeriesId = examseriesid;
     }
-    await fetchExamsResult(params);
+
+    await onFilterChange(params);
   };
+
+  const handleSeriesChange = async (value) => {
+    setSelectedSeries(value);
+
+    await loadExamResults(value);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchKeyword(e.target.value);
+    onSearch(e.target.value);
+  };
+
+  const openEditModal = (examsResult) => {
+    setIsEditModalOpen(true);
+    setSelectedExamsResult(examsResult);
+  };
+
+  const openDeleteModal = (examsResult) => {
+    setIsDeleteModalOpen(true);
+    setSelectedExamsResult(examsResult);
+  };
+
+  const handleExamResultDelete = async () => {
+    await deleteExamResult(selectedExamsResult.examResultsId);
+    setIsDeleteModalOpen(false);
+  };
+
+  const openAddModal = () => {
+    setIsAddModalOpen(true);
+  };
+
   const columns = [
     {
       accessorKey: "subjCode",
@@ -83,9 +137,10 @@ export default function StudentsDetailPage() {
           subtitle={`Student ID: ${students.studentIdNo || ""}`}
           primaryAction={{
             label: "Add Grades",
-            onClick: () => setIsAddModalOpen(true),
+            onClick: openAddModal,
           }}
         />
+
         <div className=''>
           <div className='bg-white overflow-hidden shadow-sm ring-1 ring-gray-200 rounded-sm border border-gray-100 mb-6'>
             <div className='px-6 py-6'>
@@ -118,18 +173,74 @@ export default function StudentsDetailPage() {
           </div>
         </div>
 
+        <TableHeader
+          search={{
+            enabled: true,
+            placeholder: "Search exam results...",
+            value: searchKeyword,
+            onChange: handleSearchChange,
+          }}
+          filters={[
+            {
+              id: "examSeries",
+              label: "Exam Series",
+              type: "dropdown",
+              value: selectedSeries,
+              onChange: handleSeriesChange,
+              options: [
+                { value: "all", label: "All Exam Series" },
+                ...studentsExamSeries.map((item) => ({
+                  value: item.examSeriesId,
+                  label: item.examSeriesDescription,
+                })),
+              ],
+              hideAllOption: true,
+            },
+          ]}
+        />
+
         {/* cecleclelc */}
         <DataTable
           data={examsResult}
           columns={columns}
-          idAccessor='studentId'
+          idAccessor='examResultsId'
+          onEdit={openEditModal}
+          onDelete={openDeleteModal}
           onPageChange={onPageChange}
           onSizeChange={onPageSizeChange}
           pagination={pagination}
         />
 
         {isAddModalOpen && (
-          <Add_exams_grades open={isAddModalOpen} setOpen={setIsAddModalOpen} />
+          <AddExamsGrades
+            open={isAddModalOpen}
+            setOpen={setIsAddModalOpen}
+            student={students}
+            fetchExamsResult={fetchExamsResult}
+            selectedExamsResult={selectedExamsResult}
+          />
+        )}
+
+        {isEditModalOpen && (
+          <EditExamsGrades
+            open={isEditModalOpen}
+            setOpen={setIsEditModalOpen}
+            student={students}
+            fetchExamsResult={fetchExamsResult}
+            selectedExamsResult={selectedExamsResult}
+            selectedEdit={selectedExamsResult}
+          />
+        )}
+
+        {isDeleteModalOpen && selectedExamsResult && (
+          <Delete_modal
+            open={isDeleteModalOpen}
+            setOpen={setIsDeleteModalOpen}
+            onSubmit={handleExamResultDelete}
+            entityData={selectedExamsResult}
+            title='Delete Exam Result'
+            confirmationText={`Are you sure you want to delete exam result "${selectedExamsResult.subjDesc}"? This action cannot be undone.`}
+          />
         )}
       </div>
     </div>

@@ -20,6 +20,7 @@ export const useExamsResult = () => {
     return rawExams.map((item) => ({
       ...item,
       id: item.userId,
+      retake: item.retake ? "Yes" : "No",
     }));
   }, []);
 
@@ -33,9 +34,10 @@ export const useExamsResult = () => {
         const apiParams = {
           ...finalParams,
         };
+
         const response = await examResultService.getExamResult(
           apiParams,
-          overrideParams.studentId
+          overrideParams.studentId || params.studentId
         );
         const data = formatExamsData(response.data);
         setPagination(
@@ -60,6 +62,99 @@ export const useExamsResult = () => {
       }
     },
     [params, formatExamsData]
+  );
+
+  const postExamResult = useCallback(async (data) => {
+    let toastId;
+    try {
+      setIsSubmitting(true);
+      setError(null);
+      toastId = toast.loading("Creating new exam result...");
+
+      const response = await examResultService.postExamResult(data);
+      toast.success("Exam Result added successfully!", { id: toastId });
+
+      return { success: true, data: response.data };
+    } catch (err) {
+      console.error("Error creating exam result:", err);
+      toast.error(err.message || "Failed to create exam result", {
+        id: toastId,
+      });
+      setError(err.message);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, []);
+
+  const putExamResult = useCallback(async (examResultsId, data) => {
+    let toastId;
+    try {
+      setIsSubmitting(true);
+      setError(null);
+      toastId = toast.loading("Creating new exam result...");
+
+      const response = await examResultService.putExamResult(
+        examResultsId,
+        data
+      );
+      toast.success("Exam Result added successfully!", { id: toastId });
+
+      return { success: true, data: response.data };
+    } catch (err) {
+      console.error("Error creating exam result:", err);
+      toast.error(err.message || "Failed to create exam result", {
+        id: toastId,
+      });
+      setError(err.message);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, []);
+
+  const deleteExamResult = useCallback(async (examResultsId) => {
+    let toastId;
+    try {
+      setIsSubmitting(true);
+      setError(null);
+      toastId = toast.loading("Deleting new exam result...");
+      console.log("exa", examResultsId);
+      const response = await examResultService.deleteExamResult(examResultsId);
+      toast.success("Exam Result delete successfully!", { id: toastId });
+      setExamsResult((prev) =>
+        prev.filter((item) => item.examResultsId !== examResultsId)
+      );
+      return { success: true, data: response.data };
+    } catch (err) {
+      console.error("Error creating exam result:", err);
+      toast.error(err.message || "Failed to create exam result", {
+        id: toastId,
+      });
+      setError(err.message);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, []);
+
+  const onFilterChange = useCallback(
+    async (filters) => {
+      const newParams = {
+        ...params,
+        byExamSeriesId: filters.byExamSeriesId || null,
+        page: 1,
+      };
+      setParams(newParams);
+      return await fetchExamsResult({
+        byExamSeriesId: filters.byExamSeriesId || null,
+        page: 1,
+      });
+    },
+    [params, fetchExamsResult]
   );
 
   const onSearch = useCallback(
@@ -89,12 +184,17 @@ export const useExamsResult = () => {
     },
     [params, fetchExamsResult]
   );
+
   return {
     fetchExamsResult,
     onPageChange,
     onPageSizeChange,
     onSearch,
     setParams,
+    postExamResult,
+    onFilterChange,
+    deleteExamResult,
+    putExamResult,
     isSubmitting,
     examsResult,
     isLoading,

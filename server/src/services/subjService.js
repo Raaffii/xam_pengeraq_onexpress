@@ -7,6 +7,10 @@ const subjService = {
     return await SubjModel.findAll(options);
   },
 
+  async getSubByExamSeries(examSeriesId) {
+    return await SubjModel.findByExamSeriesId(examSeriesId);
+  },
+
   async newSubj(data) {
     const conn = await pool.getConnection();
     try {

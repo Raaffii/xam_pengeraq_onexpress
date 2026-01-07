@@ -69,6 +69,18 @@ const SubjModel = {
     };
   },
 
+  async findByExamSeriesId(examSeriesId) {
+    const query = `
+    SELECT 
+    es.examsubjid as examSubjId,
+    es.subjdesc as subjDesc
+    FROM examsubj es 
+    WHERE es.examseriesid = ?`;
+    const [rows] = await pool.query(query, [Number(examSeriesId)]);
+
+    return { examSubj: rows };
+  },
+
   async createSubject(conn, data) {
     const { subjCode, subjDesc, subjCredit, enteredBy, examseriesId } = data;
 

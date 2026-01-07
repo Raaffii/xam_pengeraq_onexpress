@@ -14,11 +14,11 @@ const getStudent = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("get expaloc error:", error);
+    console.error("get student error:", error);
 
     res.status(500).json({
       success: false,
-      message: "get expaloc failed",
+      message: "get student failed",
       error: error.message,
     });
   }
@@ -32,11 +32,11 @@ const getStudentById = async (req, res) => {
       data: result.data,
     });
   } catch (error) {
-    console.error("get expaloc error:", error);
+    console.error("get student error:", error);
 
     res.status(500).json({
       success: false,
-      message: "get expaloc failed",
+      message: "get student failed",
       error: error.message,
     });
   }
@@ -55,7 +55,7 @@ const postStudent = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      message: "get expaloc failed",
+      message: "add student failed",
       error: error.message,
     });
   }
@@ -74,7 +74,7 @@ const putStudent = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      message: "get expaloc failed",
+      message: "edit student failed",
       error: error.message,
     });
   }
@@ -93,7 +93,7 @@ const deleteStudent = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      message: "get expaloc failed",
+      message: "delete student failed",
       error: error.message,
     });
   }

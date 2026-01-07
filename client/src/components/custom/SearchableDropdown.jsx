@@ -12,6 +12,7 @@ export default function SearchableDropdown({
   className = "",
   disabled = false,
   required = false,
+  name,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -63,7 +64,12 @@ export default function SearchableDropdown({
   const selectedOption = options.find((o) => o.value === value);
 
   const handleSelect = (option) => {
-    onChange({ target: { value: option.value } });
+    onChange({
+      target: {
+        name,
+        value: option.value,
+      },
+    });
     setIsOpen(false);
     setSearchTerm("");
   };
@@ -134,6 +140,7 @@ export default function SearchableDropdown({
             <div className='relative'>
               <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
               <input
+                name={name}
                 autoFocus
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}

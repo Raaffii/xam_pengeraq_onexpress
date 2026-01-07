@@ -16,4 +16,32 @@ export const examResultService = {
       handleServiceError(error, "Failed to fetch users");
     }
   },
+  postExamResult: async (data) => {
+    try {
+      const response = await api.post(BASE_URL, data);
+      return response.data;
+    } catch (error) {
+      handleServiceError(error, "Failed to create exam result");
+    }
+  },
+
+  putExamResult: async (id, data) => {
+    console.log("dadada", id, data);
+    try {
+      const response = await api.put(`${BASE_URL}/${id}`, data);
+      return response.data;
+    } catch (error) {
+      handleServiceError(error, "Failed to update student");
+    }
+  },
+
+  deleteExamResult: async (id) => {
+    try {
+      console.log("id", id);
+      const response = await api.delete(`${BASE_URL}/${id}`);
+      return response.data;
+    } catch (error) {
+      handleServiceError(error, "Failed to update student");
+    }
+  },
 };
