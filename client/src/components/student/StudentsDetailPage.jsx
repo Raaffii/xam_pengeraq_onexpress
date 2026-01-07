@@ -126,6 +126,21 @@ export default function StudentsDetailPage() {
       accessorKey: "retake",
       header: <div className='text-left w-full'>Retake</div>,
       cellClassName: "text-left",
+      render: (row) => {
+        const isRetake = row.retake === "Yes";
+
+        return (
+          <span
+            className={`px-2 py-0.5 text-xs font-medium rounded-full border
+        ${
+          isRetake
+            ? "bg-red-100 text-red-700 border-red-200"
+            : "bg-green-100 text-green-700 border-green-200"
+        }`}>
+            {isRetake ? "Yes" : "No"}
+          </span>
+        );
+      },
     },
   ];
 

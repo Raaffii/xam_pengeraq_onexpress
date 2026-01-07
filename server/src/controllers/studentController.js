@@ -44,7 +44,8 @@ const getStudentById = async (req, res) => {
 
 const postStudent = async (req, res) => {
   try {
-    const data = await studentService.postStudent(req.body);
+    const { userId } = req.user;
+    const data = await studentService.postStudent(req.body, userId);
     res.status(200).json(data);
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {
@@ -63,7 +64,12 @@ const postStudent = async (req, res) => {
 
 const putStudent = async (req, res) => {
   try {
-    const data = await studentService.putStudent(req.params.id, req.body);
+    const { userId } = req.user;
+    const data = await studentService.putStudent(
+      req.params.id,
+      req.body,
+      userId
+    );
     res.status(200).json(data);
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {

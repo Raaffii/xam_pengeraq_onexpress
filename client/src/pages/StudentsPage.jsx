@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import PageHeader from "@/components/common/PageHeader";
 
 import { DataTable } from "@/components/table";
-import Add_modal from "@/components/modals/Add_modal";
-import Edit_modal from "@/components/modals/Edit_modal";
+
 import Delete_modal from "@/components/modals/Delete_modal";
 import { useStudents } from "@/hooks/useStudents";
-import { useExamSeries } from "@/hooks/useExamsSeries";
+
+import AddStudent from "@/components/student/AddStudent";
+import EditStudent from "@/components/student/EditStudent";
 
 const StudentsPage = () => {
+  const hasFetchedData = useRef(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -28,16 +30,15 @@ const StudentsPage = () => {
     onPageSizeChange,
   } = useStudents();
 
-  const { fetchExamSeries, examSeries } = useExamSeries();
-
   useEffect(() => {
+    if (hasFetchedData.current) return;
+    hasFetchedData.current = true;
     const fetchData = async () => {
       await fetchStudents();
-      await fetchExamSeries();
     };
 
     fetchData();
-  }, [fetchExamSeries, fetchStudents]);
+  }, [fetchStudents]);
 
   const openEditModal = (student) => {
     setSelectedStudent(student);
@@ -90,6 +91,18 @@ const StudentsPage = () => {
       accessorKey: "examSeriesDescription",
       header: <div className='text-left w-full'>Curent Series</div>,
       cellClassName: "text-left",
+      render: (row) => (
+        <div className='flex flex-wrap gap-1'>
+          {row.examSeries?.map((item) => (
+            <span
+              key={item.examSeriesId}
+              className='px-2 py-0.5 text-xs rounded-full
+                   bg-blue-50 text-blue-700 border border-blue-200'>
+              {item.examSeriesDescription}
+            </span>
+          ))}
+        </div>
+      ),
     },
   ];
 
@@ -120,16 +133,6 @@ const StudentsPage = () => {
     },
   ];
 
-  const examSeriesOptions = [
-    { value: "all", label: "Exam Series" },
-    ...(Array.isArray(examSeries)
-      ? examSeries.map((series) => ({
-          value: series.examSeriesId,
-          label: series.examSeriesDescription,
-        }))
-      : []),
-  ];
-
   return (
     <div className='min-h-screen '>
       <PageHeader
@@ -145,14 +148,6 @@ const StudentsPage = () => {
         searchMaxLength={50}>
         {" "}
       </PageHeader>
-      {/* 
-      <Input
-        type='search'
-        placeholder={"Search..."}
-        className='pl-8 w-full bg-background h-10 my-5'
-        maxLength={50}
-        onChange={handleSearch}
-      /> */}
 
       <DataTable
         data={students}
@@ -167,29 +162,25 @@ const StudentsPage = () => {
       />
 
       {isModalOpen && (
-        <Add_modal
+        <AddStudent
           open={isModalOpen}
           setOpen={setIsModalOpen}
           onSubmit={handleStudentSubmit}
           fields={fields}
           title='Add New Student'
-          dropdowns={{
-            examSeriesId: examSeriesOptions,
-          }}
+          fetchStudents={fetchStudents}
         />
       )}
 
       {isEditModalOpen && selectedStudent && (
-        <Edit_modal
+        <EditStudent
           open={isEditModalOpen}
           setOpen={setIsEditModalOpen}
           onSubmit={handleStudentEdit}
           fields={fields}
           entityData={selectedStudent}
           title='Edit Student'
-          dropdowns={{
-            examSeriesId: examSeriesOptions,
-          }}
+          fetchStudents={fetchStudents}
         />
       )}
 

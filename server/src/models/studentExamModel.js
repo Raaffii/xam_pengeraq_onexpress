@@ -39,15 +39,38 @@ const getStudentExamById = async (studentId) => {
   return { data: rows };
 };
 
-const postStudentExamSeries = async (examSeriesId, studentId) => {
-  const sql =
-    "INSERT INTO studentexamseries (studentid, examseriesid) VALUES (?, ?)";
-  const [result] = await pool.query(sql, [studentId, examSeriesId]);
-  return result;
+const postStudentExamSeries = async (conn, examSeries, studentId, userId) => {
+  try {
+    const sql =
+      "INSERT INTO studentexamseries (studentid, examseriesid, createdby, createddate) VALUES ?";
+
+    const values = examSeries.map((seriesId) => [
+      studentId,
+      seriesId,
+      userId,
+      new Date(),
+    ]);
+
+    const [result] = await conn.query(sql, [values]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const deleteByStudentId = async (conn, id) => {
+  try {
+    const sql = `DELETE FROM studentexamseries WHERE studentid = ?;`;
+    const [result] = await conn.query(sql, [id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
 };
 
 module.exports = {
   getStudentExam,
   getStudentExamById,
   postStudentExamSeries,
+  deleteByStudentId,
 };

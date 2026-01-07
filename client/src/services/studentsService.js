@@ -27,7 +27,6 @@ export const studentService = {
 
   updateStudent: async (id, data) => {
     // const margedData = { data1, data2 };
-
     try {
       const response = await api.put(`${BASE_URL}/${id}`, data);
       return response.data;

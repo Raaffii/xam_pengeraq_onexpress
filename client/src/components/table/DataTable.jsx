@@ -99,8 +99,8 @@ export const DataTable = ({
               <Checkbox
                 checked={isAllSelected()}
                 onCheckedChange={handleSelectAll}
-                aria-label="Select all rows"
-                className="data-[state=checked]:bg-blue-500 data-[state=checked]:text-white border-black bg-white"
+                aria-label='Select all rows'
+                className='data-[state=checked]:bg-blue-500 data-[state=checked]:text-white border-black bg-white'
               />
             ),
             accessorKey: "__checkbox",
@@ -111,7 +111,7 @@ export const DataTable = ({
                 checked={isRowSelected(row[rowIdKey])}
                 onCheckedChange={() => handleSelectRow(row[rowIdKey])}
                 aria-label={`Select row ${row[rowIdKey]}`}
-                className="data-[state=checked]:bg-blue-500"
+                className='data-[state=checked]:bg-blue-500'
               />
             ),
           },
@@ -153,7 +153,7 @@ export const DataTable = ({
           currentPage,
           currentPage + 1,
           "...",
-          totalPages,
+          totalPages
         );
       }
     }
@@ -162,7 +162,7 @@ export const DataTable = ({
   };
 
   const LoadingSkeleton = () => (
-    <div className="h-4 bg-muted rounded animate-pulse" />
+    <div className='h-4 bg-muted rounded animate-pulse' />
   );
 
   const getAlignClass = (align) => {
@@ -178,27 +178,25 @@ export const DataTable = ({
 
   return (
     <div className={`w-full ${className}`}>
-      <div className="rounded-sm border shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+      <div className='rounded-sm border shadow-sm overflow-hidden'>
+        <div className='overflow-x-auto'>
           <Table>
             <TableHeader>
-              <TableRow className="bg-primarygray hover:bg-gray-700">
+              <TableRow className='bg-primarygray hover:bg-gray-700'>
                 {processedColumns.map((column, idx) => (
                   <TableHead
                     key={idx}
                     className={`text-white font-semibold p-4 ${getAlignClass(
-                      column.align,
+                      column.align
                     )} ${column.headerClassName || ""}`}
-                    style={{ width: column.width }}
-                  >
+                    style={{ width: column.width }}>
                     {column.header}
                   </TableHead>
                 ))}
 
                 {showActions && (
                   <TableHead
-                    className={`text-white font-semibold p-4 text-center `}
-                  >
+                    className={`text-white font-semibold p-4 text-center `}>
                     Actions
                   </TableHead>
                 )}
@@ -211,7 +209,7 @@ export const DataTable = ({
                 Array.from({ length: Math.min(pageSize, 5) }).map((_, idx) => (
                   <TableRow key={idx}>
                     {processedColumns.map((_, ci) => (
-                      <TableCell key={ci} className="p-4">
+                      <TableCell key={ci} className='p-4'>
                         <LoadingSkeleton />
                       </TableCell>
                     ))}
@@ -221,8 +219,7 @@ export const DataTable = ({
                 <TableRow>
                   <TableCell
                     colSpan={processedColumns.length}
-                    className="h-24 text-center text-muted-foreground p-4"
-                  >
+                    className='h-24 text-center text-muted-foreground p-4'>
                     No data available
                   </TableCell>
                 </TableRow>
@@ -234,16 +231,16 @@ export const DataTable = ({
                       selectable && isRowSelected(row[rowIdKey])
                         ? "bg-blue-50"
                         : ""
-                    }`}
-                  >
+                    }`}>
                     {processedColumns.map((column, colIdx) => (
                       <TableCell
                         key={colIdx}
                         className={`p-4 ${getAlignClass(column.align)} ${
                           column.cellClassName || ""
-                        }`}
-                      >
-                        {column.cell
+                        }`}>
+                        {column.render
+                          ? column.render(row, rowIdx)
+                          : column.cell
                           ? column.cell(row, rowIdx)
                           : column.accessorKey
                           ? row[column.accessorKey]
@@ -251,50 +248,46 @@ export const DataTable = ({
                       </TableCell>
                     ))}
                     {showActions && (
-                      <td className="px-4 py-4 text-center">
-                        <div className="flex items-center justify-center space-x-2">
+                      <td className='px-4 py-4 text-center'>
+                        <div className='flex items-center justify-center space-x-2'>
                           {detailPage && (
                             <a href={`/${detailPage}/${row[idAccessor]}`}>
                               <button
-                                type="button"
-                                className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-150"
-                                title="View Details"
-                              >
-                                <Info className="h-4 w-4" aria-hidden="true" />
+                                type='button'
+                                className='inline-flex items-center justify-center w-8 h-8 rounded-lg border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-150'
+                                title='View Details'>
+                                <Info className='h-4 w-4' aria-hidden='true' />
                               </button>
                             </a>
                           )}
                           {onEdit && (
                             <button
-                              type="button"
-                              className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-100 hover:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1 transition-all duration-150"
+                              type='button'
+                              className='inline-flex items-center justify-center w-8 h-8 rounded-lg border border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-100 hover:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1 transition-all duration-150'
                               onClick={() => onEdit(row)}
-                              title="Edit"
-                            >
-                              <Pencil className="h-4 w-4" aria-hidden="true" />
+                              title='Edit'>
+                              <Pencil className='h-4 w-4' aria-hidden='true' />
                             </button>
                           )}
                           {onDelete && (
                             <button
-                              type="button"
-                              className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 hover:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-150"
+                              type='button'
+                              className='inline-flex items-center justify-center w-8 h-8 rounded-lg border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 hover:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-150'
                               onClick={() => onDelete(row)}
-                              title="Delete"
-                            >
-                              <Trash2 className="h-4 w-4" aria-hidden="true" />
+                              title='Delete'>
+                              <Trash2 className='h-4 w-4' aria-hidden='true' />
                             </button>
                           )}
                           {additionalActions.map((action, actionIndex) => (
                             <button
                               key={actionIndex}
-                              type="button"
+                              type='button'
                               className={`inline-flex items-center justify-center w-8 h-8 rounded-lg border transition-all duration-150 ${
                                 action.className ||
                                 "border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-1"
                               }`}
                               onClick={() => action.onClick(row)}
-                              title={action.title}
-                            >
+                              title={action.title}>
                               {action.icon}
                             </button>
                           ))}
@@ -311,22 +304,22 @@ export const DataTable = ({
 
       {/** PAGINATION */}
       {showPagination && totalPages > 0 && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 py-4 bg-background border border-t-0 rounded-b-lg">
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-muted-foreground">
+        <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 py-4 bg-background border border-t-0 rounded-b-lg'>
+          <div className='flex items-center gap-4'>
+            <div className='text-sm text-muted-foreground'>
               Showing <b>{startItem}</b> - <b>{endItem}</b> of{" "}
               <b>{totalItems}</b> entries
               {selectable && selectedRows.length > 0 && (
-                <span className="ml-2 text-blue-600">
+                <span className='ml-2 text-blue-600'>
                   ({selectedRows.length} selected)
                 </span>
               )}
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Per page:</span>
+            <div className='flex items-center gap-2'>
+              <span className='text-sm text-muted-foreground'>Per page:</span>
               <Select value={String(pageSize)} onValueChange={handleSizeChange}>
-                <SelectTrigger className="h-8 w-[70px]">
+                <SelectTrigger className='h-8 w-[70px]'>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -340,48 +333,44 @@ export const DataTable = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className='flex items-center gap-2'>
             <Button
-              variant="outline"
-              size="sm"
-              className="h-8 px-3"
+              variant='outline'
+              size='sm'
+              className='h-8 px-3'
               disabled={currentPage === 1}
-              onClick={() => handlePageChange(currentPage - 1)}
-            >
-              <ChevronLeft className="h-4 w-4 mr-1" /> Prev
+              onClick={() => handlePageChange(currentPage - 1)}>
+              <ChevronLeft className='h-4 w-4 mr-1' /> Prev
             </Button>
 
-            <div className="flex items-center gap-1">
+            <div className='flex items-center gap-1'>
               {getPageNumbers().map((page, idx) =>
                 page === "..." ? (
                   <span
                     key={`ellipsis-${idx}`}
-                    className="px-2 text-muted-foreground"
-                  >
+                    className='px-2 text-muted-foreground'>
                     ...
                   </span>
                 ) : (
                   <Button
                     key={`page-${idx}-${page}`}
                     variant={currentPage === page ? "default" : "outline"}
-                    size="sm"
-                    className="h-8 min-w-8 px-2"
-                    onClick={() => handlePageChange(page)}
-                  >
+                    size='sm'
+                    className='h-8 min-w-8 px-2'
+                    onClick={() => handlePageChange(page)}>
                     {page}
                   </Button>
-                ),
+                )
               )}
             </div>
 
             <Button
-              variant="outline"
-              size="sm"
-              className="h-8 px-3"
+              variant='outline'
+              size='sm'
+              className='h-8 px-3'
               disabled={currentPage === totalPages}
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
-              Next <ChevronRight className="h-4 w-4 ml-1" />
+              onClick={() => handlePageChange(currentPage + 1)}>
+              Next <ChevronRight className='h-4 w-4 ml-1' />
             </Button>
           </div>
         </div>

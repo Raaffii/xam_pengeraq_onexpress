@@ -15,7 +15,7 @@ export const useStudents = () => {
   });
   const [params, setParams] = useState({ page: 1, limit: 10 });
 
-  const formatStudentrData = useCallback((rawStudent) => {
+  const formatStudentData = useCallback((rawStudent) => {
     return rawStudent.map((item) => ({
       ...item,
       id: item.studentId,
@@ -32,7 +32,7 @@ export const useStudents = () => {
           ...finalParams,
         };
         const response = await studentService.getStudents(apiParams);
-        const data = formatStudentrData(response.data);
+        const data = formatStudentData(response.data);
 
         setStudents(data);
         setPagination(
@@ -56,7 +56,7 @@ export const useStudents = () => {
         setIsLoading(false);
       }
     },
-    [params, formatStudentrData]
+    [params, formatStudentData]
   );
 
   const getStudentById = useCallback(async (studentId) => {

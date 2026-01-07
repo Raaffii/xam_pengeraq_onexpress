@@ -15,20 +15,18 @@ const studentIdNoSchema = z
 const examSeriesIdSchema = z
   .number()
   .int("Exam Series ID must be an integer")
-  .positive("Exam Series ID must be positive")
-  .optional()
-  .nullable();
+  .positive("Exam Series ID must be positive");
 
 const createStudentSchema = z.object({
   studentName: studentNameSchema,
   studentIdNo: studentIdNoSchema,
-  examSeriesId: examSeriesIdSchema,
+  examSeries: z.array(examSeriesIdSchema),
 });
 
 const updateStudentSchema = z.object({
   studentName: studentNameSchema.optional(),
   studentIdNo: studentIdNoSchema.optional(),
-  examSeriesId: examSeriesIdSchema.optional(),
+  examSeries: z.array(examSeriesIdSchema.optional()),
 });
 
 const idParamsSchema = z.object({

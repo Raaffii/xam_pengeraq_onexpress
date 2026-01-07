@@ -127,7 +127,7 @@ export default function AddExamsGrades({
       await manageMarks(formData.retake, value);
     }
   };
-  console.log("subje", subjectGrade);
+
   return (
     <Modal
       open={open}
