@@ -52,7 +52,7 @@ const postStudent = async (data) => {
       studentIdNo,
       examSeriesId,
     ]);
-    return result;
+    return result.insertId;
   } catch (err) {
     throw err;
   }

@@ -1,4 +1,5 @@
 const Students = require("../models/studentModel");
+const StudentExam = require("../models/studentExamModel");
 
 const getStudent = async (page, limit, searchTerm) => {
   try {
@@ -23,7 +24,11 @@ const getStudentById = async (studentId) => {
 
 const postStudent = async (data) => {
   try {
-    const result = await Students.postStudent(data);
+    const studentId = await Students.postStudent(data);
+    const result = await StudentExam.postStudentExamSeries(
+      data.examSeriesId,
+      studentId
+    );
     return result;
   } catch (error) {
     console.error("Service error:", error);
@@ -34,6 +39,7 @@ const postStudent = async (data) => {
 const putStudent = async (id, data) => {
   try {
     const result = await Students.putStudent(id, data);
+
     return result;
   } catch (error) {
     console.error("Service error:", error);

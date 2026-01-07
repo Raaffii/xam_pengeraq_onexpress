@@ -31,7 +31,7 @@ const updateStudentSchema = z.object({
   examSeriesId: examSeriesIdSchema.optional(),
 });
 
-const idParamsSchema = z.object({
+const studentExamSeriesParamsSchema = z.object({
   id: z
     .string("User ID is required")
     .pipe(
@@ -67,6 +67,6 @@ const fetchStudentsQuerySchema = z
 module.exports = {
   createStudentSchema,
   updateStudentSchema,
-  idParamsSchema,
+  studentExamSeriesParamsSchema,
   fetchStudentsQuerySchema,
 };

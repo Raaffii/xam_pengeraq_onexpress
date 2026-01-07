@@ -39,7 +39,15 @@ const getStudentExamById = async (studentId) => {
   return { data: rows };
 };
 
+const postStudentExamSeries = async (examSeriesId, studentId) => {
+  const sql =
+    "INSERT INTO studentexamseries (studentid, examseriesid) VALUES (?, ?)";
+  const [result] = await pool.query(sql, [studentId, examSeriesId]);
+  return result;
+};
+
 module.exports = {
   getStudentExam,
   getStudentExamById,
+  postStudentExamSeries,
 };

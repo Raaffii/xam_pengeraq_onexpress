@@ -7,7 +7,9 @@ const {
 
 const { validateParams } = require("../middlewares/validateSchema");
 
-const { studentExamSeriesParamsSchema } = require("../schemas/studentSchema");
+const {
+  studentExamSeriesParamsSchema,
+} = require("../schemas/studentExamSeries");
 
 const router = express.Router();
 

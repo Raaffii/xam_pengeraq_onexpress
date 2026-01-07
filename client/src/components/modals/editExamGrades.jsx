@@ -37,15 +37,15 @@ export default function EditExamsGrades({
   const manageMarks = async (retake, marks) => {
     if (!retake) {
       for (const item of subjectGrade.grades) {
-        const min = Number(item.minScore);
-        const max = Number(item.maxScore);
+        const min = Number(item.subjMin);
+        const max = Number(item.subjMax);
 
         if (min <= marks && marks <= max) {
           setFormData((prev) => ({
             ...prev,
-            subjGrade: item.grade,
-            subjGpa: item.gpa,
-            subjResults: item.result,
+            subjGrade: item.subjGrade,
+            subjGpa: item.subjGpa,
+            subjResults: item.subjResult,
           }));
           break;
         }
