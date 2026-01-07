@@ -11,11 +11,11 @@ const SubjGradeModel = {
         sg.examseriesid AS seriesId,
         sg.examsubjid AS subjId,
         sg.subjgradeseq AS gradeSeq,
-        sg.subjmin AS minScore,
-        sg.subjmax AS maxScore,
-        sg.subjgrade AS grade,
-        sg.subjgpa AS gpa,
-        sg.subjresult AS result,
+        sg.subjmin AS subjMin,
+        sg.subjmax AS subjMax,
+        sg.subjgrade AS subjGrade,
+        sg.subjgpa AS subjGpa,
+        sg.subjresult AS subjResult,
         sg.active
       FROM subjgrade sg
       WHERE sg.examsubjid = ?
@@ -36,11 +36,11 @@ const SubjGradeModel = {
         sg.examseriesid AS seriesId,
         sg.examsubjid AS subjId,
         sg.subjgradeseq AS gradeSeq,
-        sg.subjmin AS minScore,
-        sg.subjmax AS maxScore,
-        sg.subjgrade AS grade,
-        sg.subjgpa AS gpa,
-        sg.subjresult AS result,
+        sg.subjmin AS subjMin,
+        sg.subjmax AS subjMax,
+        sg.subjgrade AS subjGrade,
+        sg.subjgpa AS subjGpa,
+        sg.subjresult AS subjResult,
         sg.active
       FROM subjgrade sg
       WHERE sg.examsubjid = ? 
@@ -62,11 +62,11 @@ const SubjGradeModel = {
         sg.examseriesid AS seriesId,
         sg.examsubjid AS subjId,
         sg.subjgradeseq AS gradeSeq,
-        sg.subjmin AS minScore,
-        sg.subjmax AS maxScore,
-        sg.subjgrade AS grade,
-        sg.subjgpa AS gpa,
-        sg.subjresult AS result,
+        sg.subjmin AS subjMin,
+        sg.subjmax AS subjMax,
+        sg.subjgrade AS subjGrade,
+        sg.subjgpa AS subjGpa,
+        sg.subjresult AS subjResult,
         sg.active
       FROM subjgrade sg
       WHERE sg.subjgradeid = ?
@@ -240,11 +240,13 @@ const SubjGradeModel = {
       FROM subjgrade sg
       WHERE sg.examsubjid = ?
         AND sg.active = 1
-        AND ? BETWEEN sg.subjmin AND sg.subjmax
+        AND ? >= sg.subjmin 
+        AND ? <= sg.subjmax
+      ORDER BY sg.subjmin DESC
       LIMIT 1
     `;
 
-    const [rows] = await pool.execute(query, [subjId, score]);
+    const [rows] = await pool.execute(query, [subjId, score, score]);
     return rows.length > 0 ? rows[0] : null;
   },
 

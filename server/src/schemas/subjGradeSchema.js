@@ -41,6 +41,15 @@ const getGradeForScoreParamsSchema = z.object({
     ),
 });
 
+const getGradeForScoreQuerySchema = z.object({
+  isRetake: z
+    .string()
+    .optional()
+    .default("false")
+    .transform((val) => val === "true" || val === "1")
+    .pipe(z.boolean()),
+});
+
 const getSubjectGradesQuerySchema = z.object({
   seriesId: z
     .string()
@@ -55,53 +64,61 @@ const getSubjectGradesQuerySchema = z.object({
     ),
 });
 
-const gradeSchema = z.object({
-  subjId: z
-    .number("Subject ID is required")
-    .int()
-    .positive("Series ID must be positive"),
-  gradeSeq: z
-    .number("Grade sequence is required")
-    .int("Grade sequence must be an integer")
-    .positive("Grade sequence must be positive"),
-  subjMin: z
-    .string("Minimum score is required")
-    .regex(/^\d+\.\d{2}$/, "Minimum score must be in format XX.XX")
-    .refine(
-      (val) => parseFloat(val) >= 0 && parseFloat(val) <= 100,
-      "Minimum score must be between 0.00 and 100.00",
-    ),
-  subjMax: z
-    .string("Maximum score is required")
-    .regex(/^\d+\.\d{2}$/, "Maximum score must be in format XX.XX")
-    .refine(
-      (val) => parseFloat(val) >= 0 && parseFloat(val) <= 100,
-      "Maximum score must be between 0.00 and 100.00",
-    ),
-  subjGrade: z
-    .string("Grade letter is required")
-    .min(1, "Grade letter is required")
-    .max(2, "Grade letter must not exceed 2 characters")
-    .trim(),
-  subjGpa: z
-    .string("GPA is required")
-    .regex(/^\d+\.\d{1}$/, "GPA must be in format X.X")
-    .refine(
-      (val) => parseFloat(val) >= 0 && parseFloat(val) <= 4,
-      "GPA must be between 0.0 and 4.0",
-    ),
-  subjResult: z
-    .string("Result description is required")
-    .min(1, "Result description is required")
-    .max(20, "Result description must not exceed 20 characters")
-    .trim(),
-  seriesId: z
-    .number()
-    .int()
-    .positive("Series ID must be positive")
-    .optional()
-    .nullable(),
-});
+const gradeSchema = z
+  .object({
+    subjId: z
+      .number("Subject ID is required")
+      .int()
+      .positive("Subject ID must be positive"),
+    gradeSeq: z
+      .number("Grade sequence is required")
+      .int("Grade sequence must be an integer")
+      .positive("Grade sequence must be positive"),
+    subjMin: z
+      .string("Minimum score is required")
+      .regex(/^\d+\.\d{1,2}$/, "Minimum score must be in format XX.X or XX.XX")
+      .transform((val) => parseFloat(val).toFixed(2))
+      .refine(
+        (val) => parseFloat(val) >= 0 && parseFloat(val) <= 100,
+        "Minimum score must be between 0.00 and 100.00",
+      ),
+    subjMax: z
+      .string("Maximum score is required")
+      .regex(/^\d+\.\d{1,2}$/, "Maximum score must be in format XX.X or XX.XX")
+      .transform((val) => parseFloat(val).toFixed(2))
+      .refine(
+        (val) => parseFloat(val) >= 0 && parseFloat(val) <= 100,
+        "Maximum score must be between 0.00 and 100.00",
+      ),
+    subjGrade: z
+      .string("Grade letter is required")
+      .min(1, "Grade letter is required")
+      .max(2, "Grade letter must not exceed 2 characters")
+      .trim(),
+    subjGpa: z
+      .string("GPA is required")
+      .regex(/^\d+\.\d{1,2}$/, "GPA must be in format X.X or X.XX")
+      .transform((val) => parseFloat(val).toFixed(2))
+      .refine(
+        (val) => parseFloat(val) >= 0 && parseFloat(val) <= 4,
+        "GPA must be between 0.00 and 4.00",
+      ),
+    subjResult: z
+      .string("Result description is required")
+      .min(1, "Result description is required")
+      .max(20, "Result description must not exceed 20 characters")
+      .trim(),
+    seriesId: z
+      .number()
+      .int()
+      .positive("Series ID must be positive")
+      .optional()
+      .nullable(),
+  })
+  .refine((data) => parseFloat(data.subjMin) < parseFloat(data.subjMax), {
+    message: "Minimum score must be less than maximum score",
+    path: ["subjMin"],
+  });
 
 const updateGradeSchema = z
   .object({
@@ -112,18 +129,20 @@ const updateGradeSchema = z
       .optional(),
     subjMin: z
       .string()
-      .regex(/^\d+\.\d{1}$/, "Minimum score must be in format XX.X")
+      .regex(/^\d+\.\d{1,2}$/, "Minimum score must be in format XX.X or XX.XX")
+      .transform((val) => parseFloat(val).toFixed(2))
       .refine(
         (val) => parseFloat(val) >= 0 && parseFloat(val) <= 100,
-        "Minimum score must be between 0.0 and 100.0",
+        "Minimum score must be between 0.00 and 100.00",
       )
       .optional(),
     subjMax: z
       .string()
-      .regex(/^\d+\.\d{1}$/, "Maximum score must be in format XX.X")
+      .regex(/^\d+\.\d{1,2}$/, "Maximum score must be in format XX.X or XX.XX")
+      .transform((val) => parseFloat(val).toFixed(2))
       .refine(
         (val) => parseFloat(val) >= 0 && parseFloat(val) <= 100,
-        "Maximum score must be between 0.0 and 100.0",
+        "Maximum score must be between 0.00 and 100.00",
       )
       .optional(),
     subjGrade: z
@@ -134,10 +153,11 @@ const updateGradeSchema = z
       .optional(),
     subjGpa: z
       .string()
-      .regex(/^\d+\.\d{1}$/, "GPA must be in format X.X")
+      .regex(/^\d+\.\d{1,2}$/, "GPA must be in format X.X or X.XX")
+      .transform((val) => parseFloat(val).toFixed(2))
       .refine(
         (val) => parseFloat(val) >= 0 && parseFloat(val) <= 4,
-        "GPA must be between 0.0 and 4.0",
+        "GPA must be between 0.00 and 4.00",
       )
       .optional(),
     subjResult: z
@@ -160,7 +180,7 @@ const updateGradeSchema = z
     },
     {
       message: "Minimum score must be less than maximum score",
-      path: ["subjmin"],
+      path: ["subjMin"],
     },
   );
 
@@ -168,6 +188,7 @@ module.exports = {
   subjIdParamsSchema,
   scoreParamsSchema,
   getGradeForScoreParamsSchema,
+  getGradeForScoreQuerySchema,
   getSubjectGradesQuerySchema,
   gradeSchema,
   updateGradeSchema,

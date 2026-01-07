@@ -72,9 +72,9 @@ const subjGradeService = {
 
       if (data.subjMin !== undefined || data.subjMax !== undefined) {
         const minScore =
-          data.subjMin !== undefined ? data.subjMin : existingGrade.minScore;
+          data.subjMin !== undefined ? data.subjMin : existingGrade.subjMin;
         const maxScore =
-          data.subjMax !== undefined ? data.subjMax : existingGrade.maxScore;
+          data.subjMax !== undefined ? data.subjMax : existingGrade.subjMax;
 
         if (parseFloat(minScore) >= parseFloat(maxScore)) {
           throw new Error("Minimum score must be less than maximum score");
@@ -129,7 +129,7 @@ const subjGradeService = {
     }
   },
 
-  async getGradeForScore(subjId, score) {
+  async getGradeForScore(subjId, score, isRetake = false) {
     const subject = await SubjModel.fetchSubjById(subjId);
     if (!subject) {
       throw new Error("Subject not found");
@@ -139,13 +139,21 @@ const subjGradeService = {
       throw new Error("Score must be between 0 and 100");
     }
 
-    const grade = await SubjGradeModel.getGradeForScore(subjId, score);
+    let effectiveScore = score;
+    if (isRetake && score > 50) {
+      effectiveScore = 50;
+    }
+
+    const grade = await SubjGradeModel.getGradeForScore(subjId, effectiveScore);
     if (!grade) {
       throw new Error("No grade found for this score");
     }
 
     return {
-      score,
+      originalScore: score,
+      effectiveScore: effectiveScore,
+      isRetake: isRetake,
+      isCapped: isRetake && score > 50,
       ...grade,
     };
   },

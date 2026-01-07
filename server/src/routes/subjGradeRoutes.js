@@ -21,6 +21,7 @@ const {
   updateGradeSchema,
   getGradeForScoreParamsSchema,
   gradeSchema,
+  getGradeForScoreQuerySchema,
 } = require("../schemas/subjGradeSchema");
 const { gradeIdParamsSchema } = require("../schemas/examGradeSchema");
 
@@ -39,7 +40,10 @@ router.get(
 // Get grade for a specific score
 router.get(
   "/:subjId/grades/byScore/:score",
-  validateParams(getGradeForScoreParamsSchema),
+  validateMultiple({
+    params: getGradeForScoreParamsSchema,
+    query: getGradeForScoreQuerySchema,
+  }),
   getGradeForScore,
 );
 

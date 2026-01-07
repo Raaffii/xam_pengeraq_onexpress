@@ -114,10 +114,12 @@ const deleteGrade = async (req, res) => {
 const getGradeForScore = async (req, res) => {
   try {
     const { subjId, score } = req.params;
+    const { isRetake } = req.query;
 
     const result = await subjGradeService.getGradeForScore(
       subjId,
       parseFloat(score),
+      isRetake || false,
     );
 
     res.status(200).json({
@@ -133,7 +135,10 @@ const getGradeForScore = async (req, res) => {
       return res.status(404).json({ message: error.message });
     }
 
-    if (error.message.includes("Score must be")) {
+    if (
+      error.message.includes("Score must be") ||
+      error.message.includes("Retake score")
+    ) {
       return res.status(400).json({ message: error.message });
     }
 
