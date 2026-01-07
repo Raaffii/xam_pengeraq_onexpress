@@ -46,14 +46,7 @@ export const ExamSubjectGradePage = () => {
 
   const initialFormValues = useMemo(() => {
     if (modalMode === "edit" && selectedGrade) {
-      return {
-        gradeSeq: selectedGrade.gradeSeq,
-        subjMin: selectedGrade.minScore,
-        subjMax: selectedGrade.maxScore,
-        subjGrade: selectedGrade.grade,
-        subjGpa: selectedGrade.gpa,
-        subjResult: selectedGrade.result,
-      };
+      return selectedGrade;
     }
 
     return {
@@ -99,27 +92,27 @@ export const ExamSubjectGradePage = () => {
       align: "center",
     },
     {
-      accessorKey: "grade",
+      accessorKey: "subjGrade",
       header: "Grade",
       align: "center",
     },
     {
-      accessorKey: "minScore",
+      accessorKey: "subjMin",
       header: "Min Marks",
       align: "center",
     },
     {
-      accessorKey: "maxScore",
+      accessorKey: "subjMax",
       header: "Max Mark",
       align: "center",
     },
     {
-      accessorKey: "gpa",
+      accessorKey: "subjGpa",
       header: "GPA",
       align: "center",
     },
     {
-      accessorKey: "result",
+      accessorKey: "subjResult",
       header: "Result",
       align: "center",
     },

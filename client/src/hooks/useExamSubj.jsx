@@ -118,7 +118,7 @@ export const useExamSubject = () => {
       setError(null);
       toastId = toast.loading("Updating subject details...");
       const response = await subjectService.putSubj(examSubjId, examSubjData);
-      toast.success("ExamSubj updated successfully", { id: toastId });
+      toast.success("Exam Subject updated successfully", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {

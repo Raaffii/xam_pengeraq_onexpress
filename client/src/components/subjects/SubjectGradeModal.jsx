@@ -231,12 +231,12 @@ export const SubjectGradeModal = ({
                 label="Minimum Mark"
                 value={formData.subjMin}
                 onChange={handleChange}
-                placeholder="0.0"
+                placeholder="0.00"
                 isRequired
                 error={errors.subjMin}
                 disabled={isSubmitting}
                 inputClassName="pl-10 bg-gray-50"
-                decimalPlaces={1}
+                decimalPlaces={2}
               />
               <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
                 <ArrowDown className="w-5 h-5" />
@@ -252,12 +252,12 @@ export const SubjectGradeModal = ({
                 label="Maximum Mark"
                 value={formData.subjMax}
                 onChange={handleChange}
-                placeholder="0.0"
+                placeholder="0.00"
                 isRequired
                 error={errors.subjMax}
                 disabled={isSubmitting}
                 inputClassName="pl-10 bg-gray-50"
-                decimalPlaces={1}
+                decimalPlaces={2}
               />
               <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
                 <ArrowUp className="w-5 h-5" />
@@ -292,12 +292,12 @@ export const SubjectGradeModal = ({
               label="GPA"
               value={formData.subjGpa}
               onChange={handleChange}
-              placeholder="0.0"
+              placeholder="0.00"
               isRequired
               error={errors.subjGpa}
               disabled={isSubmitting}
               inputClassName="pl-10 bg-gray-50"
-              decimalPlaces={1}
+              decimalPlaces={2}
             />
             <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
               <TrendingUp className="w-5 h-5" />
