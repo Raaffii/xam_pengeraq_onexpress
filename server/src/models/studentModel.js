@@ -5,12 +5,8 @@ const getStudent = async (page, limit, searchTerm = "") => {
   limit = Number(limit) || 10;
   const offset = (page - 1) * limit;
 
-  // ✅ AMAN
   const searchValue = searchTerm ? `%${searchTerm}%` : "%";
 
-  /** ===============================
-   * STEP 1: Ambil studentId (pagination di tabel utama)
-   * =============================== */
   const studentIdQuery = `
     SELECT studentid
     FROM students

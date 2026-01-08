@@ -13,6 +13,7 @@ import UsersPage from "@/pages/UsersPage";
 import ExamSeriesDetailPage from "@/components/examseries/ExamSeriesDetailPage";
 import ExamDetailPage from "@/components/exam/ExamDetailPage";
 import ExamSubjectPage from "@/pages/ExamSubjectPage";
+import SchedulesPages from "@/pages/SchedulePage";
 import { ExamSubjectGradePage } from "@/components/subjects";
 
 const privateRoutes = {
@@ -35,6 +36,7 @@ const privateRoutes = {
     { path: "students", element: <StudentsPage /> },
     { path: "students/:id", element: <StudentsDetailPage /> },
     { path: "users", element: <UsersPage /> },
+    { path: "schedule", element: <SchedulesPages /> },
   ],
 };
 
