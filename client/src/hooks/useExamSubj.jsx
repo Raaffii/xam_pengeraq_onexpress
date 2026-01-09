@@ -275,12 +275,12 @@ export const useExamSubject = () => {
     async (filters) => {
       const newParams = {
         ...params,
-        byRole: filters.byRole || null,
+        bySeries: filters.bySeries || null,
         page: 1,
       };
       setParams(newParams);
       return await fetchSubjects({
-        byRole: filters.byRole || null,
+        bySeries: filters.bySeries || null,
         page: 1,
       });
     },

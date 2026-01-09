@@ -1,4 +1,5 @@
 import PageHeader from "@/components/common/PageHeader";
+import { ExamSeriesFilter } from "@/components/examseries";
 import Delete_modal from "@/components/modals/Delete_modal";
 import { SubjectModal } from "@/components/subjects";
 import { DataTable } from "@/components/table";
@@ -21,6 +22,8 @@ const ExamSubjectPage = () => {
     examSubj,
     newExamSubj,
     updateDetails,
+    onFilterChange,
+    params,
   } = useExamSubject();
   const {
     fetchExamSeries,
@@ -36,6 +39,7 @@ const ExamSubjectPage = () => {
     if (hasFetchedData.current) return;
     hasFetchedData.current = true;
     fetchSubjects({ page: 1 });
+    fetchExamSeries();
   }, [fetchSubjects, fetchExamSeries]);
 
   const columns = [
@@ -102,19 +106,10 @@ const ExamSubjectPage = () => {
     };
   }, [modalMode, selectedSubj]);
 
-  const handleSeriesSearch = async (searchTerm) => {
-    if (seriesLoading) return;
-    await fetchExamSeries({
-      searchTerm: searchTerm,
-      page: 1,
-      limit: 5,
-    });
-  };
-
   const seriesOptions = Array.isArray(examSeries)
     ? examSeries.map((item) => ({
-        value: item.examSeriesId,
-        label: item.examSeriesDescription,
+        value: item.seriesId,
+        label: item.seriesDesc,
       }))
     : [];
 
@@ -135,7 +130,18 @@ const ExamSubjectPage = () => {
             setSelectedSubj(null);
           },
         }}
-      />
+      >
+        <ExamSeriesFilter
+          data={examSeries}
+          valueKey="seriesId"
+          labelKey="seriesDesc"
+          filterKey="bySeries"
+          placeholder="Filter by Series"
+          initialFilters={{ bySeries: params.bySeries }}
+          onFilterChange={onFilterChange}
+          isLoading={seriesLoading}
+        />
+      </PageHeader>
       <DataTable
         data={examSubj}
         isLoading={isLoading}
@@ -164,7 +170,6 @@ const ExamSubjectPage = () => {
         isSubmitting={isSubmitting}
         mode={modalMode}
         examSeriesOptions={seriesOptions}
-        onSeriesSearch={handleSeriesSearch}
         isLoadingSeries={seriesLoading}
       />
 

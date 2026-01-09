@@ -18,7 +18,6 @@ export const SubjectModal = ({
   isSubmitting = false,
   mode = "create",
   examSeriesOptions = [],
-  onSeriesSearch,
   isLoadingSeries = false,
 }) => {
   const [formData, setFormData] = useState({
@@ -236,7 +235,6 @@ export const SubjectModal = ({
             label="Exam Series"
             value={formData.seriesId}
             onChange={handleSeriesChange}
-            onSearch={onSeriesSearch}
             options={examSeriesOptions}
             isLoading={isLoadingSeries}
             disabled={isSubmitting}
@@ -247,7 +245,6 @@ export const SubjectModal = ({
             emptyMessage="No exam series found"
             icon={BookOpen}
             defaultOption={defaultSeriesOption}
-            minSearchLength={2}
           />
 
           {mode === "edit" && !hasChanges && (

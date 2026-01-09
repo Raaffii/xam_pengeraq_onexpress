@@ -1,17 +1,9 @@
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { X } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useExams } from "@/hooks/useExams";
+import { X, Filter } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { SearchableDropdown } from "../common";
 
 export const ExamSeriesFilter = ({
-  //can use to all basicly
   data = [],
   valueKey,
   labelKey,
@@ -19,53 +11,79 @@ export const ExamSeriesFilter = ({
   placeholder = "Select",
   initialFilters = {},
   onFilterChange,
+  isLoading,
 }) => {
-  const [value, setValue] = useState(initialFilters[filterKey] ?? "all");
+  const [value, setValue] = useState(initialFilters[filterKey] ?? null);
 
   useEffect(() => {
     if (initialFilters[filterKey] !== undefined) {
-      setValue(initialFilters[filterKey] ?? "all");
+      setValue(initialFilters[filterKey] ?? null);
     }
   }, [initialFilters, filterKey]);
+
+  const options = useMemo(() => {
+    return Array.isArray(data)
+      ? data.map((item) => ({
+          value: String(item[valueKey]),
+          label: item[labelKey],
+        }))
+      : [];
+  }, [data, valueKey, labelKey]);
 
   const handleChange = (val) => {
     setValue(val);
     onFilterChange({
-      [filterKey]: val === "all" ? null : val,
+      [filterKey]: val === null ? null : val,
     });
   };
 
   const handleClear = () => {
-    setValue("all");
+    setValue(null);
     onFilterChange({ [filterKey]: null });
   };
 
-  const hasActiveFilter = value !== "all";
+  const hasActiveFilter = value !== null;
+
+  const defaultOption = useMemo(() => {
+    if (value && data.length > 0) {
+      const selectedItem = data.find(
+        (item) => String(item[valueKey]) === String(value),
+      );
+      if (selectedItem) {
+        return {
+          value: String(selectedItem[valueKey]),
+          label: selectedItem[labelKey],
+        };
+      }
+    }
+    return null;
+  }, [value, data, valueKey, labelKey]);
 
   return (
-    <div className='flex items-center gap-2'>
-      <Select value={value} onValueChange={handleChange}>
-        <SelectTrigger className='h-10 bg-white border-gray-300'>
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-
-        <SelectContent>
-          <SelectItem value='all'>All</SelectItem>
-
-          {data.map((item) => (
-            <SelectItem key={item[valueKey]} value={String(item[valueKey])}>
-              {item[labelKey]}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <div className="flex items-center gap-2">
+      <div className="w-full md:min-w-[200px] md:w-auto">
+        <SearchableDropdown
+          value={value}
+          onChange={handleChange}
+          options={options}
+          placeholder={placeholder}
+          searchPlaceholder="Search..."
+          emptyMessage="No items found"
+          icon={Filter}
+          defaultOption={defaultOption}
+          minSearchLength={0}
+          className="h-10"
+          isLoading={isLoading}
+        />
+      </div>
 
       {hasActiveFilter && (
         <Button
-          variant='ghost'
+          variant="ghost"
           onClick={handleClear}
-          className='h-10 text-red-600 hover:bg-red-50'>
-          <X className='h-4 w-4 mr-1' />
+          className="h-12 text-red-600 hover:text-red-700 hover:bg-red-50"
+        >
+          <X className="h-4 w-4 mr-1" />
           Clear
         </Button>
       )}

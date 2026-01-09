@@ -13,7 +13,7 @@ export const examSeriesService = {
       });
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch users");
+      handleServiceError(error, "Failed to fetch series");
     }
   },
 
@@ -22,7 +22,7 @@ export const examSeriesService = {
       const response = await api.get(`${BASE_URL}/${examSeriesId}`);
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch users");
+      handleServiceError(error, "Failed to fetch series");
     }
   },
 
@@ -31,7 +31,7 @@ export const examSeriesService = {
       const response = await api.post(BASE_URL, data);
       return response.data;
     } catch (error) {
-      handleServiceError("Error registation", error);
+      handleServiceError(error, "Invalid Server Error");
     }
   },
 
@@ -40,7 +40,7 @@ export const examSeriesService = {
       const response = await api.put(`${BASE_URL}/${id}`, data);
       return response.data;
     } catch (error) {
-      handleServiceError("Error registation", error);
+      handleServiceError(error, "Invalid Server Error");
     }
   },
 
@@ -49,7 +49,7 @@ export const examSeriesService = {
       const response = await api.delete(`${BASE_URL}/${id}`);
       return response.data;
     } catch (error) {
-      handleServiceError("Error registation", error);
+      handleServiceError(error, "Invalid Server Error");
     }
   },
 };

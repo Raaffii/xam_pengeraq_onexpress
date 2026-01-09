@@ -41,8 +41,9 @@ export const ExamSubjectGradePage = () => {
 
     if (subjectId) {
       fetchSubjectById(subjectId);
+      fetchExamSeries();
     }
-  }, [fetchSubjectById, subjectId]);
+  }, [fetchSubjectById, subjectId, fetchExamSeries]);
 
   const initialFormValues = useMemo(() => {
     if (modalMode === "edit" && selectedGrade) {
@@ -59,31 +60,28 @@ export const ExamSubjectGradePage = () => {
     };
   }, [modalMode, selectedGrade]);
 
-  const subjectDetailFields = useMemo(
-    () => [
-      {
-        label: "Subject ID",
-        value: examSubjDetail.subjId,
-      },
-      {
-        label: "Subject Code",
-        value: examSubjDetail.subjCode,
-      },
-      {
-        label: "Description",
-        value: examSubjDetail.subjDesc,
-      },
-      {
-        label: "Exam Series",
-        value: examSubjDetail.seriesDesc,
-      },
-      {
-        label: "Earned Credit",
-        value: examSubjDetail.subjCredit,
-      },
-    ],
-    [examSubjDetail],
-  );
+  const subjectDetailFields = [
+    {
+      label: "Subject ID",
+      value: examSubjDetail.subjId,
+    },
+    {
+      label: "Subject Code",
+      value: examSubjDetail.subjCode,
+    },
+    {
+      label: "Description",
+      value: examSubjDetail.subjDesc,
+    },
+    {
+      label: "Exam Series",
+      value: examSubjDetail.seriesDesc,
+    },
+    {
+      label: "Earned Credit",
+      value: examSubjDetail.subjCredit,
+    },
+  ];
 
   const columns = [
     {
@@ -118,19 +116,10 @@ export const ExamSubjectGradePage = () => {
     },
   ];
 
-  const handleSeriesSearch = async (searchTerm) => {
-    if (seriesLoading) return;
-    await fetchExamSeries({
-      searchTerm: searchTerm,
-      page: 1,
-      limit: 5,
-    });
-  };
-
   const seriesOptions = Array.isArray(examSeries)
     ? examSeries.map((item) => ({
-        value: item.examSeriesId,
-        label: item.examSeriesDescription,
+        value: item.seriesId,
+        label: item.seriesDesc,
       }))
     : [];
 
@@ -238,7 +227,6 @@ export const ExamSubjectGradePage = () => {
           isSubmitting={isSubmitting}
           mode={"edit"}
           examSeriesOptions={seriesOptions}
-          onSeriesSearch={handleSeriesSearch}
           isLoadingSeries={seriesLoading}
         />
       )}
@@ -251,7 +239,6 @@ export const ExamSubjectGradePage = () => {
         isSubmitting={isSubmitting}
         mode={modalMode}
         examSeriesOptions={seriesOptions}
-        onSeriesSearch={handleSeriesSearch}
         isLoadingSeries={seriesLoading}
       />
 

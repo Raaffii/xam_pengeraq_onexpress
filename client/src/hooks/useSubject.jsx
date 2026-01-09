@@ -15,7 +15,7 @@ export const useSubject = () => {
       setError(null);
 
       const response = await subjectService.getSubjectByExamSeriesId(
-        examSeriesId
+        examSeriesId,
       );
 
       setSubject(response.data);
