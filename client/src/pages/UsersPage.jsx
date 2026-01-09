@@ -4,9 +4,10 @@ import { DataTable } from "@/components/table";
 import { UserFilter, UserForm } from "@/components/users";
 import { useUser } from "@/hooks/useUsers";
 import { CheckCircle2Icon, XCircleIcon } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const UsersPage = () => {
+  const hasFetchedData = useRef(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -30,6 +31,8 @@ const UsersPage = () => {
   } = useUser();
 
   useEffect(() => {
+    if (hasFetchedData.current) return;
+    hasFetchedData.current = true;
     fetchUsers();
   }, [fetchUsers]);
 

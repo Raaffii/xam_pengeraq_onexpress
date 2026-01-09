@@ -1,24 +1,18 @@
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { X } from "lucide-react";
+import { Filter, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { SearchableDropdown } from "../common";
 
 export const UserFilter = ({ onFilterChange, initialFilters = {} }) => {
   const [filters, setFilters] = useState({
-    byRole: initialFilters.byRole ?? "all",
+    byRole: initialFilters.byRole,
   });
 
   useEffect(() => {
     if (initialFilters.byRole !== undefined) {
       setFilters((prev) => ({
         ...prev,
-        byRole: initialFilters.byRole ?? "all",
+        byRole: initialFilters.byRole,
       }));
     }
   }, [initialFilters.byRole]);
@@ -31,38 +25,36 @@ export const UserFilter = ({ onFilterChange, initialFilters = {} }) => {
 
     setFilters(newFilters);
     onFilterChange({
-      byRole: newFilters.byRole === "all" ? null : newFilters.byRole,
+      byRole: newFilters.byRole,
     });
   };
 
   const handleClearFilters = () => {
-    const cleared = {
-      byRole: "all",
-    };
-
-    setFilters(cleared);
+    setFilters({ byRole: null });
     onFilterChange({ byRole: null });
   };
 
-  const hasActiveFilters = filters.byRole !== "all";
+  const hasActiveFilters = filters.byRole;
 
   return (
     <div className="flex items-center gap-2">
-      <Select
-        value={filters.byRole}
-        onValueChange={(value) => handleFilterChange("byRole", value)}
-      >
-        <SelectTrigger className="w-full md:w-[160px] h-12 bg-white border-gray-300">
-          <SelectValue placeholder="Filter by role" />
-        </SelectTrigger>
-
-        <SelectContent>
-          <SelectItem value="all">All Roles</SelectItem>
-          <SelectItem value="admin">Admin</SelectItem>
-          <SelectItem value="teacher">Teacher</SelectItem>
-          <SelectItem value="student">Student</SelectItem>
-        </SelectContent>
-      </Select>
+      <div className="w-full md:min-w-[200px] md:w-auto">
+        <SearchableDropdown
+          value={filters.byRole}
+          onChange={(value) => handleFilterChange("byRole", value)}
+          options={[
+            { value: "admin", label: "Admin" },
+            { value: "teacher", label: "Teacher" },
+            { value: "student", label: "Student" },
+          ]}
+          placeholder={"Filter by role"}
+          searchPlaceholder="Search..."
+          emptyMessage="No items found"
+          icon={Filter}
+          minSearchLength={0}
+          className="h-10"
+        />
+      </div>
 
       {hasActiveFilters && (
         <Button
