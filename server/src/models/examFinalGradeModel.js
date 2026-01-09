@@ -222,11 +222,11 @@ const ExamFinalGradeModel = {
   async examGradeByExamSeriesId(examSeriesId) {
     const query = `
       SELECT 
-        efg.examfinalgradeseq AS examFinalGradeSeq,
+        efg.examfinalgradeseq AS gradeSeq,
         efg.finalpercent AS finalPercent,
-        efg.overallGrade AS overallGrade,
-        efg.overallgradepoint AS overallGradePoint,
-        efg.overallrank AS overallRank,
+        efg.overallGrade AS grade,
+        efg.overallgradepoint AS gradePoint,
+        efg.overallrank AS gradeResult,
         efg.active
       FROM examfinalgrade efg
       WHERE efg.examseriesid = ?
