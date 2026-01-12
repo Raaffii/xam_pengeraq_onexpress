@@ -20,7 +20,7 @@ Router.use("/auth", authRoute);
 Router.use("/examseries", examSeriesRoute);
 Router.use("/student", studentRoute);
 Router.use("/profile", profileRoute);
-Router.use("/exam", examRoute);
+Router.use("/exams", examRoute);
 Router.use("/examresult", examResultRoute);
 Router.use("/users", userRoute);
 Router.use("/exam-grades", examGradeRoute);

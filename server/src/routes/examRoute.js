@@ -27,16 +27,13 @@ const router = express.Router();
 router.use(authenticateToken);
 
 router.get("/", validateQuery(fetchExamsQuerySchema), getExam);
-router.get("/:id", validateQuery(fetchExamsQuerySchema), getExamById);
+router.get("/:examId", validateParams(idParamsSchema), getExamById);
 router.post("/", validateBody(createExamSchema), postExam);
 router.put(
-  "/:id",
+  "/:examId",
   validateMultiple({ params: idParamsSchema, body: updateExamSchema }),
-  putExam
+  putExam,
 );
-router.delete("/:id", validateParams(idParamsSchema), deleteExam);
-// router.post("/", authenticateToken, postExpaloc);
-// router.put("/:id", authenticateToken, putExpaloc);
-// router.delete("/:id", authenticateToken, deleteExpaloc);
+router.delete("/:examId", validateParams(idParamsSchema), deleteExam);
 
 module.exports = router;
