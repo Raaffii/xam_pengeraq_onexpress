@@ -142,6 +142,7 @@ const deleteStudent = async (conn, id) => {
     throw err;
   }
 };
+
 module.exports = {
   getStudent,
   postStudent,

@@ -5,9 +5,10 @@ const getExamSeries = async (page, limit, searchTerm = "", byExam, examId) => {
   limit = Number(limit) || 10;
   const conditions = [];
   const params = [];
+
   if (searchTerm) {
     conditions.push(
-      "(LOWER(es.examseriesdescription) LIKE ? OR LOWER(e.examname) LIKE ? )",
+      "(LOWER(es.examseriesdescription) LIKE ? OR LOWER(e.examname) LIKE ? )"
     );
     const searchValue = `%${searchTerm}%`;
     params.push(searchValue, searchValue);

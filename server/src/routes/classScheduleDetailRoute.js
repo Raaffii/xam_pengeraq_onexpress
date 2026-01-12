@@ -1,11 +1,11 @@
 const express = require("express");
 const { authenticateToken } = require("../middlewares/authMiddleware");
 const {
-  getClassSchedule,
+  getClassScheduleDetail,
   postClassSchedule,
   deleteClassSchedule,
   putClassSchedule,
-} = require("../controllers/examScheduleController");
+} = require("../controllers/examScheduleDetailController");
 
 const {
   validateQuery,
@@ -25,13 +25,6 @@ const router = express.Router();
 
 router.use(authenticateToken);
 
-router.get("/", validateQuery(classScheduleQuerySchema), getClassSchedule);
-router.post("/", validateBody(createClassScheduleSchema), postClassSchedule);
-router.put(
-  "/:id",
-  validateMultiple({ params: idParamsSchema, body: updateClassScheduleSchema }),
-  putClassSchedule
-);
-router.delete("/:id", validateParams(idParamsSchema), deleteClassSchedule);
+router.get("/", getClassScheduleDetail); //console.log class schedule detail
 
 module.exports = router;

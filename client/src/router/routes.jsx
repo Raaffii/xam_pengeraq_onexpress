@@ -14,6 +14,8 @@ import ExamSeriesDetailPage from "@/components/examseries/ExamSeriesDetailPage";
 import ExamDetailPage from "@/components/exam/ExamDetailPage";
 import ExamSubjectPage from "@/pages/ExamSubjectPage";
 import SchedulesPages from "@/pages/SchedulePage";
+import CalendarPage from "@/pages/CalendarPage";
+import ScheduleDetailPage from "@/components/schedule/ScheduleDetailPage";
 import { ExamSubjectGradePage } from "@/components/subjects";
 
 const privateRoutes = {
@@ -37,6 +39,8 @@ const privateRoutes = {
     { path: "students/:id", element: <StudentsDetailPage /> },
     { path: "users", element: <UsersPage /> },
     { path: "schedule", element: <SchedulesPages /> },
+    { path: "schedule/:id", element: <ScheduleDetailPage /> },
+    { path: "schedule/calendar", element: <CalendarPage /> },
   ],
 };
 

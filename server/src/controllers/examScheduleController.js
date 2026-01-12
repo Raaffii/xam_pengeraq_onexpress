@@ -1,12 +1,13 @@
-const examScheduleService = require("../services/examScheduleService");
+const classScheduleService = require("../services/examScheduleService");
 
-const getExamSchedule = async (req, res) => {
+const getClassSchedule = async (req, res) => {
   try {
-    let { page, limit, searchTerm } = req.query;
-    const result = await examScheduleService.getExamSchedule(
+    let { page, limit, searchTerm, date } = req.query;
+    const result = await classScheduleService.getClassSchedule(
       page,
       limit,
-      searchTerm
+      searchTerm,
+      date
     );
     res.status(200).json({
       data: result.data,
@@ -23,6 +24,27 @@ const getExamSchedule = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "get student failed",
+      error: error.message,
+    });
+  }
+};
+
+const postClassSchedule = async (req, res) => {
+  try {
+    console.log("cekc", req.body);
+    const { userId } = req.user;
+    const data = await classScheduleService.postClassSchedule(req.body, userId);
+    res.status(200).json(data);
+  } catch (error) {
+    if (error.code === "ER_DUP_ENTRY") {
+      return res.status(400).json({
+        error: true,
+        message: "Duplicate entry",
+      });
+    }
+    res.status(500).json({
+      success: false,
+      message: "add student failed",
       error: error.message,
     });
   }
@@ -46,30 +68,11 @@ const getStudentById = async (req, res) => {
   }
 };
 
-const postStudent = async (req, res) => {
+const putClassSchedule = async (req, res) => {
   try {
     const { userId } = req.user;
-    const data = await studentService.postStudent(req.body, userId);
-    res.status(200).json(data);
-  } catch (error) {
-    if (error.code === "ER_DUP_ENTRY") {
-      return res.status(400).json({
-        error: true,
-        message: "Duplicate entry",
-      });
-    }
-    res.status(500).json({
-      success: false,
-      message: "add student failed",
-      error: error.message,
-    });
-  }
-};
 
-const putStudent = async (req, res) => {
-  try {
-    const { userId } = req.user;
-    const data = await studentService.putStudent(
+    const data = await classScheduleService.putClassSchedule(
       req.params.id,
       req.body,
       userId
@@ -90,9 +93,9 @@ const putStudent = async (req, res) => {
   }
 };
 
-const deleteStudent = async (req, res) => {
+const deleteClassSchedule = async (req, res) => {
   try {
-    const data = await studentService.deleteStudent(req.params.id);
+    const data = await classScheduleService.deleteClassSchedule(req.params.id);
     res.status(200).json(data);
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {
@@ -109,9 +112,9 @@ const deleteStudent = async (req, res) => {
   }
 };
 module.exports = {
-  getExamSchedule,
-  postStudent,
-  putStudent,
-  deleteStudent,
+  getClassSchedule,
+  postClassSchedule,
+  putClassSchedule,
+  deleteClassSchedule,
   getStudentById,
 };
