@@ -182,8 +182,8 @@ export const UserForm = ({
 
   const handleSelectStudent = (student) => {
     const studentData = {
-      studentId: student.studentidno,
-      studentName: student.studentname,
+      studentId: student.studentId,
+      studentName: student.studentName,
     };
 
     setSelectedStudent(studentData);
