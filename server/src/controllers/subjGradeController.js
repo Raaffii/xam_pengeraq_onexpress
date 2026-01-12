@@ -61,7 +61,7 @@ const newGrade = async (req, res) => {
 const updateGrade = async (req, res) => {
   try {
     const { gradeId } = req.params;
-    const gradeData = req.body;
+    const gradeData = { ...req.body, editedBy: req.user.userId };
 
     const updatedGrade = await subjGradeService.updateGrade(gradeId, gradeData);
 

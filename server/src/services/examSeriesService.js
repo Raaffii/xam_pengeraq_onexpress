@@ -1,5 +1,7 @@
 const pool = require("../config/db");
+const ExamFinalGradeModel = require("../models/examFinalGradeModel");
 const ExamSeries = require("../models/examSeriesModel");
+const { defaultExamFinalGrades } = require("../utils/data");
 
 const ExamSeriesService = {
   async getExamSeries(page, pageSize, searchTerm, byExam, examId) {
@@ -15,7 +17,7 @@ const ExamSeriesService = {
   async getExamSeriesById(examSeriesById) {
     const result = await ExamSeries.getSeriesById(examSeriesById);
 
-    if (!result || !result.data || result.data.length === 0) {
+    if (!result) {
       throw new Error("Exam Series not found");
     }
 
@@ -42,6 +44,12 @@ const ExamSeriesService = {
       }
 
       const newSeriesId = await ExamSeries.postSeries(conn, data);
+      if (newSeriesId) {
+        await ExamFinalGradeModel.bulkInsert(conn, {
+          seriesId: newSeriesId,
+          grades: defaultExamFinalGrades,
+        });
+      }
 
       await conn.commit();
 

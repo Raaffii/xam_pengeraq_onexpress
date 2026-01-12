@@ -16,19 +16,19 @@ const ExamFinalGradeModel = {
     }
 
     if (bySeries) {
-      conditions.push("LOWER(fg.examseriesid) = ?");
+      conditions.push("fg.examseriesid = ?");
       params.push(bySeries);
     }
 
     if (byId) {
-      conditions.push("LOWER(fg.examfinalgradeid) = ?");
+      conditions.push("fg.examfinalgradeid = ?");
       params.push(byId);
     }
 
     if (searchTerm) {
       conditions.push("(LOWER(e.examseriesdescription) LIKE ?)");
       const searchPattern = `%${searchTerm.toLowerCase()}%`;
-      params.push(searchPattern, searchPattern);
+      params.push(searchPattern);
     }
 
     const whereClause =
@@ -37,7 +37,7 @@ const ExamFinalGradeModel = {
     const countQuery = `
       SELECT COUNT(*) as total 
       FROM examfinalgrade fg
-      LEFT JOIN examseries e ON eg.examseriesid = fg.examseriesid
+      LEFT JOIN examseries e ON e.examseriesid = fg.examseriesid
       ${whereClause}
     `;
     const [countResult] = await pool.execute(countQuery, params);
@@ -48,15 +48,16 @@ const ExamFinalGradeModel = {
       SELECT 
         fg.examfinalgradeid AS gradeId,
         fg.examseriesid AS seriesId,
-        e.examseriesdescription as AS seriesDesc,
+        e.examseriesdescription AS seriesDesc,
         fg.examfinalgradeseq AS gradeSeq,
         fg.finalpercent AS finalPercent,
+        fg.overallgrade AS grade,
         fg.overallgradepoint AS gradePoint,
-        fg.overallrank AS gradeRank,
+        fg.overallrank AS gradeResult,
         fg.createddate AS enteredDate,
         fg.editeddate AS editedDate
       FROM examfinalgrade fg
-      LEFT JOIN examseries e ON eg.examseriesid = fg.examseriesid
+      LEFT JOIN examseries e ON e.examseriesid = fg.examseriesid
       ${whereClause}
       ORDER BY fg.examseriesid ASC, fg.examfinalgradeseq ASC
     `;
@@ -84,7 +85,7 @@ const ExamFinalGradeModel = {
       SELECT 
         fg.examfinalgradeid AS gradeId,
         fg.examseriesid AS seriesId,
-        eg.examseriesdescription as AS seriesDesc,
+        eg.examseriesdescription AS seriesDesc,
         fg.examfinalgradeseq AS gradeSeq,
         fg.finalpercent AS finalPercent,
         fg.overallgradepoint AS gradePoint,
@@ -120,15 +121,15 @@ const ExamFinalGradeModel = {
   },
 
   async bulkInsert(conn, data) {
-    const { examSeriesId, grades } = data;
+    const { seriesId, grades } = data;
 
     const values = grades.map((grade) => [
-      examSeriesId,
-      grade.examfinalgradeseq || grade.gradeSeq,
-      grade.subjmin || grade.finalPercent,
-      grade.subjgrade || grade.grade,
-      grade.subjgpa || gradePoint,
-      grade.subjresult || grade.gradeResult,
+      seriesId,
+      grade.gradeSeq,
+      grade.finalPercent,
+      grade.grade,
+      grade.gradePoint,
+      grade.gradeResult,
       1,
     ]);
 
@@ -146,34 +147,41 @@ const ExamFinalGradeModel = {
     return result.affectedRows;
   },
 
-  async updateGrade(conn, gradeId, data) {
-    const { gradeSeq, finalPercent, grade, gradePoint, gradeResult, active } =
-      data;
+  async updateGrade(conn, data) {
+    const {
+      gradeId,
+      gradeSeq,
+      finalPercent,
+      grade,
+      gradePoint,
+      gradeResult,
+      active,
+    } = data;
 
     const fields = [];
     const params = [];
 
-    if (gradeSeq !== undefined) {
+    if (gradeSeq) {
       fields.push("examfinalgradeseq = ?");
       params.push(gradeSeq);
     }
 
-    if (finalPercent !== undefined) {
+    if (finalPercent) {
       fields.push("finalpercent = ?");
       params.push(finalPercent);
     }
 
-    if (grade !== undefined) {
+    if (grade) {
       fields.push("overallgrade = ?");
       params.push(grade);
     }
 
-    if (gradePoint !== undefined) {
+    if (gradePoint) {
       fields.push("overallgradepoint = ?");
       params.push(gradePoint);
     }
 
-    if (gradeResult !== undefined) {
+    if (gradeResult) {
       fields.push("overallrank = ?");
       params.push(gradeResult);
     }

@@ -81,7 +81,7 @@ const SeriesModel = {
 
     const [rows] = await pool.execute(query, [examSeriesId]);
 
-    return { data: rows, total: rows.length };
+    return rows.length > 0 ? rows[0] : null;
   },
 
   async postSeries(conn, data) {

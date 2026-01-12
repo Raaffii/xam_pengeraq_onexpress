@@ -23,7 +23,7 @@ Router.use("/profile", profileRoute);
 Router.use("/exam", examRoute);
 Router.use("/examresult", examResultRoute);
 Router.use("/users", userRoute);
-Router.use("/examgrades", examGradeRoute);
+Router.use("/exam-grades", examGradeRoute);
 Router.use("/subject", subjectRoute);
 Router.use("/subject", subjGradeRoute);
 Router.use("/studentexam", studentExamRoute);

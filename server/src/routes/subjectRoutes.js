@@ -24,7 +24,11 @@ const {
 router.use(authenticateToken);
 
 router.get("/", validateQuery(fetchSubjectsQuerySchema), getSubjects);
-router.get("/:examSeriesId", getSubjectsByExamSeriesId); // validate query not yet
+router.get(
+  "/:examSeriesId",
+  validateParams(subjIdParamsSchema),
+  getSubjectsByExamSeriesId,
+);
 router.post("/", validateBody(createSubjectSchema), postSubj);
 router.put(
   "/:subjId",
@@ -32,7 +36,7 @@ router.put(
     params: subjIdParamsSchema,
     body: updateSubjectSchema,
   }),
-  putSubj
+  putSubj,
 );
 router.delete("/:subjId", validateParams(subjIdParamsSchema), deleteSubj);
 

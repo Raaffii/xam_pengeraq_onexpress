@@ -1,4 +1,4 @@
-exports.defaultExamFinalGrades = [
+exports.defaultSubjGrades = [
   {
     subjgradeseq: 1,
     subjmin: "0.00",
@@ -79,5 +79,79 @@ exports.defaultExamFinalGrades = [
     subjgpa: "4.0",
     subjresult: "CEMERLANG",
     active: true,
+  },
+];
+
+exports.defaultExamFinalGrades = [
+  {
+    gradeSeq: 1,
+    finalPercent: "45.00",
+    grade: "F",
+    gradePoint: "0.0",
+    gradeResult: "GAGAL",
+  },
+  {
+    gradeSeq: 2,
+    subjmin: "45.00",
+    finalPercent: "49.99",
+    grade: "D",
+    gradePoint: "1.0",
+    gradeResult: "LULUS",
+  },
+  {
+    gradeSeq: 3,
+    subjmin: "50.00",
+    finalPercent: "54.99",
+    grade: "C",
+    gradePoint: "2.0",
+    gradeResult: "MEMUASKAN",
+  },
+  {
+    gradeSeq: 4,
+    subjmin: "55.00",
+    finalPercent: "59.99",
+    grade: "C+",
+    gradePoint: "2.3",
+    gradeResult: "BAIK",
+  },
+  {
+    gradeSeq: 5,
+    subjmin: "60.00",
+    finalPercent: "64.99",
+    grade: "B-",
+    gradePoint: "2.6",
+    gradeResult: "BAIK",
+  },
+  {
+    gradeSeq: 6,
+    subjmin: "65.00",
+    finalPercent: "69.99",
+    grade: "B",
+    gradePoint: "3.0",
+    gradeResult: "BAIK",
+  },
+  {
+    gradeSeq: 7,
+    subjmin: "70.00",
+    finalPercent: "74.99",
+    grade: "B+",
+    gradePoint: "3.3",
+    gradeResult: "SANGAT BAIK",
+  },
+  {
+    gradeSeq: 8,
+    subjmin: "75.00",
+    finalPercent: "84.99",
+    grade: "A-",
+    gradePoint: "3.6",
+    gradeResult: "CEMERLANG",
+  },
+  {
+    gradeSeq: 9,
+    subjmin: "85.00",
+    finalPercent: "100.00",
+    grade: "A",
+    gradePoint: "4.0",
+    gradeResult: "CEMERLANG",
   },
 ];

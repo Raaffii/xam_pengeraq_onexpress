@@ -19,10 +19,10 @@ const getFinalGrades = async (req, res) => {
 
     if (page && pageSize) {
       response.pagination = {
-        currentPage: result.page,
-        pageSize: result.pageSize,
+        currentPage: page,
+        pageSize: pageSize,
         totalItems: result.total,
-        totalPages: Math.ceil(result.total / result.pageSize),
+        totalPages: Math.ceil(result.total / pageSize),
       };
     }
 
@@ -62,10 +62,7 @@ const postFinalGrade = async (req, res) => {
       ...req.body,
       enteredBy: userId,
     };
-    const grade = await finalGradeService.newGrade({
-      data: formData,
-      message: "Grade created successfully",
-    });
+    const grade = await finalGradeService.newGrade(formData);
     res.status(201).json(grade);
   } catch (error) {
     console.error("createFinalGrade error:", error);

@@ -79,7 +79,7 @@ const finalGradeService = {
         throw new Error("Grade not found");
       }
 
-      await EFG.deleteById(conn, data);
+      await EFG.deleteById(conn, data.gradeToDelete);
 
       await conn.commit();
     } catch (error) {

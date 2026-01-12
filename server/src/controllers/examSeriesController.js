@@ -42,11 +42,7 @@ const getExamSeriesById = async (req, res) => {
     const { seriesId } = req.params;
     const result = await examSeriesService.getExamSeriesById(seriesId);
 
-    const response = {
-      data: result.data,
-    };
-
-    res.status(200).json(response);
+    res.status(200).json(result);
   } catch (error) {
     console.error("get series error:", error);
 
