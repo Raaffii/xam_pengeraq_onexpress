@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 
 export const useExamSeries = () => {
   const [examSeries, setExamSeries] = useState([]);
+  const [seriesDetail, setSeriesDetail] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -72,7 +73,7 @@ export const useExamSeries = () => {
 
       const response = await examSeriesService.getExamSeriesById(examSeriesId);
 
-      setExamSeries(response.data);
+      setSeriesDetail(response.data);
 
       return { success: true, data: response.data };
     } catch (err) {
@@ -210,6 +211,8 @@ export const useExamSeries = () => {
     setParams,
     onFilterChange,
     fetchExamSeriesByid,
+    setSeriesDetail,
+    seriesDetail,
     isSubmitting,
     examSeries,
     isLoading,
