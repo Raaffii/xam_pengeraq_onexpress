@@ -176,10 +176,10 @@ export const useExamSeries = () => {
   );
 
   const onPageSizeChange = useCallback(
-    async (limit) => {
-      const newParams = { ...params, limit, page: 1 };
+    async (pageSize) => {
+      const newParams = { ...params, pageSize, page: 1 };
       setParams(newParams);
-      return await fetchExamSeries({ limit, page: 1 });
+      return await fetchExamSeries({ pageSize, page: 1 });
     },
     [params, fetchExamSeries],
   );

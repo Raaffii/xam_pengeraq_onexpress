@@ -13,7 +13,6 @@ const ExamsSeriesPage = () => {
   const [selectedSeries, setSelectedSeries] = useState(null);
   const [modalMode, setModalMode] = useState("create");
   const [initialFormValues, setInitialFormValues] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { fetchExams, exams, isLoading: examLoad } = useExams();
 
@@ -30,6 +29,7 @@ const ExamsSeriesPage = () => {
     onPageChange,
     onPageSizeChange,
     params,
+    isSubmitting,
   } = useExamSeries();
 
   useEffect(() => {
@@ -69,24 +69,19 @@ const ExamsSeriesPage = () => {
   };
 
   const handleFormSubmit = async (formData) => {
-    setIsSubmitting(true);
-    try {
-      let result;
-      if (modalMode === "create") {
-        result = await createExamsSeries(formData);
-      } else {
-        result = await updateExamsSeries(formData.seriesId, formData);
-      }
-
-      if (result.success) {
-        setIsModalOpen(false);
-        setParams((prev) => ({ ...prev, page: 1 }));
-        await fetchExamSeries({ page: 1 });
-      }
-      return result.success;
-    } finally {
-      setIsSubmitting(false);
+    let result;
+    if (modalMode === "create") {
+      result = await createExamsSeries(formData);
+    } else {
+      result = await updateExamsSeries(formData.seriesId, formData);
     }
+
+    if (result.success) {
+      setIsModalOpen(false);
+      setParams((prev) => ({ ...prev, page: 1 }));
+      await fetchExamSeries({ page: 1 });
+    }
+    return result.success;
   };
 
   const handleExamSeriesDelete = async (entityData) => {

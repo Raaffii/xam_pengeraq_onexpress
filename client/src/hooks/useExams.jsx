@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 
 export const useExams = () => {
   const [exams, setExams] = useState([]);
+  const [examDetails, setExamDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -14,12 +15,12 @@ export const useExams = () => {
     totalPages: 1,
     totalItems: 0,
   });
-  const [params, setParams] = useState({ page: 1, limit: 10 });
+  const [params, setParams] = useState({ page: 1, pageSize: 10 });
 
   const formatExamsData = useCallback((rawExams) => {
     return rawExams.map((item) => ({
       ...item,
-      id: item.userId,
+      id: item.examId,
     }));
   }, []);
 
@@ -41,7 +42,7 @@ export const useExams = () => {
             pageSize: 10,
             totalPages: 1,
             totalItems: 0,
-          }
+          },
         );
         setExams(data);
         return { success: true, data: data };
@@ -56,21 +57,19 @@ export const useExams = () => {
         setIsLoading(false);
       }
     },
-    [params, formatExamsData]
+    [params, formatExamsData],
   );
 
   const fetchExamsById = useCallback(async (examId) => {
     try {
       const response = await examsService.getExamsById(examId);
-
-      setExams(response.data);
+      setExamDetails(response.data);
 
       return { success: true, data: response.data };
     } catch (err) {
       console.error("Error fetching exams:", err);
 
       setError(err.message);
-      setExams([]);
 
       return { success: false, error: err.message };
     } finally {
@@ -95,7 +94,7 @@ export const useExams = () => {
 
       return { success: false, error: err.message };
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   }, []);
 
@@ -120,7 +119,7 @@ export const useExams = () => {
 
       return { success: false, error: err.message };
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   }, []);
 
@@ -131,17 +130,17 @@ export const useExams = () => {
       setError(null);
 
       const response = await examsService.deleteExams(id);
-      toast.success("User deleted successfully");
+      toast.success("Exam deleted successfully");
 
       return { success: true, data: response };
     } catch (err) {
-      console.error("Error deleting user:", err);
+      console.error("Error deleting exam:", err);
       toast.error(err.message);
       setError(err.message);
 
       return { success: false, error: err.message };
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   }, []);
 
@@ -152,7 +151,7 @@ export const useExams = () => {
 
       return await fetchExams({ searchTerm, page: 1 });
     },
-    [fetchExams, setParams, params]
+    [fetchExams, setParams, params],
   );
 
   const onPageChange = useCallback(
@@ -161,16 +160,16 @@ export const useExams = () => {
       setParams(newParams);
       return await fetchExams({ page });
     },
-    [params, fetchExams]
+    [params, fetchExams],
   );
 
   const onPageSizeChange = useCallback(
-    async (limit) => {
-      const newParams = { ...params, limit, page: 1 };
+    async (pageSize) => {
+      const newParams = { ...params, pageSize, page: 1 };
       setParams(newParams);
-      return await fetchExams({ limit, page: 1 });
+      return await fetchExams({ pageSize, page: 1 });
     },
-    [params, fetchExams]
+    [params, fetchExams],
   );
   return {
     fetchExams,
@@ -182,6 +181,8 @@ export const useExams = () => {
     onSearch,
     setParams,
     fetchExamsById,
+    examDetails,
+    setExamDetails,
     isSubmitting,
     exams,
     isLoading,
