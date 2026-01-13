@@ -50,7 +50,7 @@ export const useExamSeries = () => {
 
         return { success: true, data: data };
       } catch (err) {
-        console.error("Error fetching users:", err);
+        console.error("Error fetching Exam Series:", err);
 
         setError(err.message);
         setExamSeries([]);
@@ -77,7 +77,7 @@ export const useExamSeries = () => {
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error fetching users:", err);
+      console.error("Error fetching Exam Series:", err);
 
       setError(err.message);
       setExamSeries([]);
@@ -142,11 +142,11 @@ export const useExamSeries = () => {
       setIsSubmitting(true);
       setError(null);
       const response = await examSeriesService.deleteExamSeries(id);
-      toast.success("User deleted successfully");
+      toast.success("Exam Series deleted successfully");
 
       return { success: true, data: response };
     } catch (err) {
-      console.error("Error deleting user:", err);
+      console.error("Error deleting Exam Series:", err);
       toast.error(err.message);
       setError(err.message);
 
