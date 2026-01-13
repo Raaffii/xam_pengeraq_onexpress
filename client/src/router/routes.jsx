@@ -1,7 +1,5 @@
 import { ProtectedRoute } from "../components/layout/ProtectedRoute";
 import { NotFoundPage } from "../components/ErrorPage";
-import { PublicRoute } from "@/components/layout/PublicRoute";
-import LoginPage from "@/pages/LoginPage";
 import Layout from "@/components/layout/Layout";
 import DashboardPage from "@/pages/DashboardPage";
 import ProfilePage from "@/pages/ProfilePage";
@@ -15,6 +13,7 @@ import ExamDetailPage from "@/components/exam/ExamDetailPage";
 import ExamSubjectPage from "@/pages/ExamSubjectPage";
 import SchedulesPages from "@/pages/SchedulePage";
 import { ExamSubjectGradePage } from "@/components/subjects";
+import { publicRoutes } from "./publicRoutes";
 
 const privateRoutes = {
   path: "/",
@@ -39,17 +38,6 @@ const privateRoutes = {
     { path: "schedule", element: <SchedulesPages /> },
   ],
 };
-
-const publicRoutes = [
-  {
-    path: "/login",
-    element: (
-      <PublicRoute>
-        <LoginPage />
-      </PublicRoute>
-    ),
-  },
-];
 
 export const routes = [
   ...publicRoutes,

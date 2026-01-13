@@ -24,8 +24,8 @@ export const ResetPasswordForm = ({ token }) => {
     if (!password.trim()) {
       return "Password is required";
     }
-    if (password.length < 8) {
-      return "Password must be at least 8 characters";
+    if (password.length < 6) {
+      return "Password must be at least 6 characters";
     }
     return null;
   };
@@ -133,7 +133,7 @@ export const ResetPasswordForm = ({ token }) => {
         <Button
           type="button"
           onClick={() => navigate("/login")}
-          className="w-full h-12 bg-teal-600 hover:bg-teal-700 text-white"
+          className="w-full h-12 text-white"
         >
           Go to login
         </Button>
@@ -227,7 +227,7 @@ export const ResetPasswordForm = ({ token }) => {
         {isSubmitting ? (
           <>
             <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-            Menetapkan Semula...
+            Verifying...
           </>
         ) : (
           "Submit"
@@ -240,7 +240,7 @@ export const ResetPasswordForm = ({ token }) => {
           onClick={() => navigate("/login")}
           className="text-sm hover:underline font-medium"
         >
-          Kembali ke Log Masuk
+          Back to Login
         </button>
       </div>
     </form>

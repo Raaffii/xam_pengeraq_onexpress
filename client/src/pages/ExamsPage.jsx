@@ -123,7 +123,7 @@ const ExamsPage = () => {
         initialValues={initialFormValues}
         onSubmit={handleFormSubmit}
         isSubmitting={isSubmitting}
-        mode={"edit"}
+        mode={modalMode}
       />
 
       {isDeleteModalOpen && selectedExam && (

@@ -61,7 +61,7 @@ export const ForgotPasswordForm = () => {
     let toastId;
 
     try {
-      toastId = toast.loading("Verifying...");
+      toastId = toast.loading("Sending...");
       const response = await forgotPassword({
         emailAddress: formData.emailAddress.trim(),
       });
@@ -91,7 +91,8 @@ export const ForgotPasswordForm = () => {
             <strong>Email has been sended!</strong>
             <p className="mt-2">
               Please open your email for verification. If you don&apos;t
-              received it after a few minutes, Please check your spam email.
+              received it after a few minutes, Please check your spam or junk
+              email.
             </p>
           </AlertDescription>
         </Alert>
@@ -123,7 +124,7 @@ export const ForgotPasswordForm = () => {
           type="email"
           value={formData.emailAddress}
           onChange={handleChange}
-          placeholder="contoh@email.com"
+          placeholder="example@email.com"
           isRequired={true}
           error={errors.emailAddress}
           onError={(error) =>
@@ -146,7 +147,7 @@ export const ForgotPasswordForm = () => {
         {isSubmitting ? (
           <>
             <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-            Menghantar...
+            Sending...
           </>
         ) : (
           "Submit"
@@ -159,7 +160,7 @@ export const ForgotPasswordForm = () => {
           onClick={() => navigate("/login")}
           className="text-sm hover:underline font-medium"
         >
-          Kembali ke Log Masuk
+          Back to Login
         </button>
       </div>
     </form>
