@@ -33,12 +33,18 @@ const getStudent = async (page, limit, searchTerm = "") => {
       s.studentname AS studentName,
       s.studentidno AS studentIdNo,
       se.examseriesid AS examSeriesId,
-      es.examseriesdescription AS examSeriesDescription
+      es.examseriesdescription AS examSeriesDescription,
+      sc.studentclassid AS studentClassId,
+      sc.classschhdid as classSchedule,
+      sc.studentid as classStudent
+
     FROM students s
     LEFT JOIN studentexamseries se
       ON s.studentid = se.studentid
     LEFT JOIN examseries es
       ON se.examseriesid = es.examseriesid
+    LEFT JOIN studentclass sc
+      ON s.studentid = sc.studentid
     WHERE s.studentid IN (?)
     ORDER BY s.createddate DESC
   `;
@@ -54,6 +60,7 @@ const getStudent = async (page, limit, searchTerm = "") => {
         studentName: row.studentName,
         studentIdNo: row.studentIdNo,
         examSeries: [],
+        studentClass: [],
       });
     }
 
@@ -61,6 +68,12 @@ const getStudent = async (page, limit, searchTerm = "") => {
       map.get(row.studentId).examSeries.push({
         examSeriesId: row.examSeriesId,
         examSeriesDescription: row.examSeriesDescription,
+      });
+    }
+    if (row.studentClassId) {
+      map.get(row.studentId).studentClass.push({
+        classSchedule: row.classSchedule,
+        classStudent: row.classStudent,
       });
     }
   });
@@ -75,6 +88,8 @@ const getStudent = async (page, limit, searchTerm = "") => {
 
   const [countResult] = await pool.query(countQuery, [searchValue]);
   const total = countResult[0].total;
+
+  console.log("formated", formattedRows);
 
   return {
     data: formattedRows,

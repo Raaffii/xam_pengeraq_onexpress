@@ -5,9 +5,10 @@ import { useStudentClass } from "@/hooks/useStudentClass";
 import { DataTable } from "../table";
 import { useEffect } from "react";
 import AddStudentClass from "./AddStudenctClass";
-import { useNavigate } from "react-router-dom";
+
 import { useStudents } from "@/hooks/useStudents";
 import { Button } from "../custom";
+import toast from "react-hot-toast";
 
 export default function ScheduleDetailPage() {
   const { id } = useParams();
@@ -15,19 +16,20 @@ export default function ScheduleDetailPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [enrolledMode, setEnrolledMode] = useState(true);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [curentEnroled, setCurentEnroled] = useState([]);
 
-  const { fetchStudentClass, studenctClass, pagination } = useStudentClass();
+  const {
+    fetchStudentClass,
+    assignStudentClass,
+    removeStudentFromClass,
+    studenctClass,
+    pagination,
+  } = useStudentClass();
   const {
     fetchStudents,
     students,
     pagination: paginationStudents,
   } = useStudents();
-
-  const navigate = useNavigate();
-
-  const openAddModal = () => {
-    setIsAddModalOpen(true);
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,6 +40,11 @@ export default function ScheduleDetailPage() {
   }, [fetchStudentClass, id]);
 
   const columns = [
+    {
+      accessorKey: "studentIdNo",
+      header: <div className='text-left w-full'>ID</div>,
+      cellClassName: "text-left",
+    },
     {
       accessorKey: "studentName",
       header: <div className='text-left w-full'>Subject Code</div>,
@@ -62,9 +69,9 @@ export default function ScheduleDetailPage() {
       cellClassName: "text-left",
       render: (row) => (
         <div className='flex flex-wrap gap-1'>
-          {row.examSeries?.map((item) => (
+          {row.examSeries?.map((item, index) => (
             <span
-              key={item.examSeriesId}
+              key={index}
               className='px-2 py-0.5 text-xs rounded-full
                    bg-blue-50 text-blue-700 border border-blue-200'>
               {item.examSeriesDescription}
@@ -81,7 +88,15 @@ export default function ScheduleDetailPage() {
       await fetchStudentClass({ schedule: id });
     } else {
       setEnrolledMode(bool);
-      await fetchStudents();
+      const result = await fetchStudents();
+
+      const array = result.data.flatMap((student) =>
+        student.studentClass.flatMap((sc) =>
+          id == sc.classSchedule ? [sc.classStudent] : []
+        )
+      );
+      setSelectedRows(array);
+      setCurentEnroled(array);
     }
   };
 
@@ -95,6 +110,32 @@ export default function ScheduleDetailPage() {
       onClick: () => changeMode(false),
     },
   ];
+
+  const diffIds = (current = [], selected = []) => {
+    const currentSet = new Set(current);
+    const selectedSet = new Set(selected);
+
+    const toAdd = [...selectedSet].filter((id) => !currentSet.has(id));
+    const toRemove = [...currentSet].filter((id) => !selectedSet.has(id));
+
+    return { toAdd, toRemove };
+  };
+
+  const assignToClass = async () => {
+    const { toAdd, toRemove } = diffIds(curentEnroled, selectedRows);
+
+    if (toAdd.length === 0 && toRemove.length === 0) {
+      toast.error("no change");
+      return;
+    }
+
+    const submitData = {
+      scheduleId: id,
+      addStudents: toAdd,
+      removeStudents: toRemove,
+    };
+    await assignStudentClass(submitData);
+  };
 
   const handleSelectRow = (row) => {
     setSelectedRows((prev) => {
@@ -120,8 +161,9 @@ export default function ScheduleDetailPage() {
           <DataTable
             data={studenctClass}
             columns={columns}
-            idAccessor='examResultsId'
+            idAccessor='studentClassId'
             pagination={pagination}
+            showActions={false}
           />
         ) : (
           <>
@@ -141,7 +183,9 @@ export default function ScheduleDetailPage() {
                   {selectedRows.length} selected
                 </span>
 
-                <Button className='px-4 py-2'>Assign to Class</Button>
+                <Button className='px-4 py-2' onClick={assignToClass}>
+                  Assign to Class
+                </Button>
               </div>
             </div>
 
@@ -150,9 +194,9 @@ export default function ScheduleDetailPage() {
               <DataTable
                 data={students}
                 columns={columnStudent}
-                idAccessor='studentClassId'
+                idAccessor='studentId'
                 pagination={paginationStudents}
-                selectable
+                selectable={true}
                 selectedRows={selectedRows}
                 onSelectRow={handleSelectRow}
                 showActions={false}

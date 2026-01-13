@@ -93,9 +93,9 @@ const StudentsPage = () => {
       cellClassName: "text-left",
       render: (row) => (
         <div className='flex flex-wrap gap-1'>
-          {row.examSeries?.map((item) => (
+          {row.examSeries?.map((item, index) => (
             <span
-              key={item.examSeriesId}
+              key={index}
               className='px-2 py-0.5 text-xs rounded-full
                    bg-blue-50 text-blue-700 border border-blue-200'>
               {item.examSeriesDescription}
@@ -132,6 +132,8 @@ const StudentsPage = () => {
       required: true,
     },
   ];
+
+  console.log("student", students);
 
   return (
     <div className='min-h-screen '>
