@@ -25,6 +25,7 @@ export const GradeModal = ({
   isSubmitting = false,
   mode = "create",
   examOptions = [],
+  optionDisabled = false,
 }) => {
   const [formData, setFormData] = useState({
     seriesId: "",
@@ -304,7 +305,7 @@ export const GradeModal = ({
             value={formData.seriesId}
             onChange={handleExamChange}
             options={examOptions}
-            disabled={isSubmitting}
+            disabled={optionDisabled || isSubmitting}
             error={errors.seriesId}
             isRequired
             placeholder="Select exam series..."

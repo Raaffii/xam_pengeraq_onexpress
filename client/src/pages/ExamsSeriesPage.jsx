@@ -30,6 +30,7 @@ const ExamsSeriesPage = () => {
     onPageSizeChange,
     params,
     isSubmitting,
+    isLoading,
   } = useExamSeries();
 
   useEffect(() => {
@@ -147,7 +148,7 @@ const ExamsSeriesPage = () => {
           valueKey="examId"
           labelKey="examName"
           filterKey="byExam"
-          placeholder="Filter by exam"
+          placeholder="Filter by Exam"
           initialFilters={{ byExam: params.byExam }}
           onFilterChange={onFilterChange}
           isLoading={examLoad}
@@ -164,6 +165,7 @@ const ExamsSeriesPage = () => {
         onPageChange={onPageChange}
         onSizeChange={onPageSizeChange}
         pagination={pagination}
+        isLoading={isLoading}
       />
 
       <SeriesModal

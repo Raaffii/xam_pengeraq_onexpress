@@ -19,6 +19,7 @@ export const SubjectModal = ({
   mode = "create",
   examSeriesOptions = [],
   isLoadingSeries = false,
+  optionDisabled = false,
 }) => {
   const [formData, setFormData] = useState({
     subjCode: "",
@@ -237,7 +238,7 @@ export const SubjectModal = ({
             onChange={handleSeriesChange}
             options={examSeriesOptions}
             isLoading={isLoadingSeries}
-            disabled={isSubmitting}
+            disabled={optionDisabled || isSubmitting}
             error={errors.seriesId}
             isRequired
             placeholder="Select exam series..."

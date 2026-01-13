@@ -228,6 +228,7 @@ export const ExamSubjectGradePage = () => {
           mode={"edit"}
           examSeriesOptions={seriesOptions}
           isLoadingSeries={seriesLoading}
+          optionDisabled={true}
         />
       )}
 

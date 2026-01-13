@@ -45,7 +45,7 @@ export default function SubjectSection({
     if (subjId) {
       fetchSubjectById(subjId);
     } else {
-      setParams(customParams);
+      setParams((prev) => ({ ...prev, ...customParams }));
       fetchSubjects({ page: 1, ...customParams });
     }
   }, [fetchSubjects, fetchSubjectById, subjId, customParams, setParams]);
@@ -110,7 +110,7 @@ export default function SubjectSection({
       subjCode: "",
       subjDesc: "",
       subjCredit: 0,
-      seriesId: seriesId || "",
+      seriesId: parseInt(seriesId) || "",
     };
   }, [modalMode, selectedSubj, seriesId]);
 
@@ -171,6 +171,7 @@ export default function SubjectSection({
         isSubmitting={subjSubmit}
         mode={modalMode}
         examSeriesOptions={examSeriesOptions}
+        optionDisabled={!!seriesId}
       />
       {isDeleteModalOpen && selectedSubj && (
         <Delete_modal

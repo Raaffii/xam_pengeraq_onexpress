@@ -39,7 +39,7 @@ export default function GradeSections({
     if (hasFetchedData.current) return;
     hasFetchedData.current = true;
 
-    setParams(customParams);
+    setParams((prev) => ({ ...prev, ...customParams }));
     fetchExamGrades({ page: 1, ...customParams });
   }, [fetchExamGrades, customParams, setParams]);
 
@@ -116,7 +116,7 @@ export default function GradeSections({
       grade: "",
       gradePoint: "",
       gradeResult: "",
-      seriesId: seriesId || "",
+      seriesId: parseInt(seriesId) || "",
     };
   }, [modalMode, selectedGrade, seriesId]);
 
@@ -176,6 +176,7 @@ export default function GradeSections({
         isSubmitting={isSubmitting}
         mode={modalMode}
         examOptions={examSeriesOptions}
+        optionDisabled={!!seriesId}
       />
       {isDeleteModalOpen && selectedGrade && (
         <Delete_modal

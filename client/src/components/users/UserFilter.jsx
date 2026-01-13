@@ -47,7 +47,7 @@ export const UserFilter = ({ onFilterChange, initialFilters = {} }) => {
             { value: "teacher", label: "Teacher" },
             { value: "student", label: "Student" },
           ]}
-          placeholder={"Filter by role"}
+          placeholder={"Filter by Role"}
           searchPlaceholder="Search..."
           emptyMessage="No items found"
           icon={Filter}
