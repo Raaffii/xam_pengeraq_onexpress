@@ -1,5 +1,5 @@
 import { BookOpen, Calendar, CreditCard, FileText } from "lucide-react";
-import { InputField, SearchableDropdown } from "../common";
+import { InputField, SearchableDropdown, InputRadio } from "../common";
 import { Button } from "../custom";
 import {
   Dialog,
@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { useEffect, useMemo, useState } from "react";
+import { useExamSeries } from "@/hooks/useExamsSeries";
 
 export const SeriesModal = ({
   open = false,
@@ -18,6 +19,7 @@ export const SeriesModal = ({
   isSubmitting = false,
   mode = "create",
   examOptions = [],
+  optionDisabled = false,
 }) => {
   const [formData, setFormData] = useState({
     examId: null,
@@ -30,6 +32,10 @@ export const SeriesModal = ({
   });
   const [originalData, setOriginalData] = useState({});
   const [errors, setErrors] = useState({});
+  const [isImportSeries, setIsImportSeries] = useState("no");
+  const [importSeriesId, setImportSeriesId] = useState(null);
+  const [seriesOptions, setSeriesOptions] = useState([]);
+  const { fetchExamSeries, isLoading } = useExamSeries();
 
   const hasChanges = useMemo(() => {
     if (mode === "create") return true;
@@ -57,7 +63,42 @@ export const SeriesModal = ({
     setFormData(resetData);
     setOriginalData(resetData);
     setErrors({});
+    setIsImportSeries("no");
+    setImportSeriesId(null);
+    setSeriesOptions([]);
   }, [initialValues, open]);
+
+  useEffect(() => {
+    const fetchSeriesForExam = async () => {
+      if (
+        mode === "create" &&
+        isImportSeries === "yes" &&
+        formData.examId &&
+        fetchExamSeries
+      ) {
+        try {
+          const result = await fetchExamSeries({ byExam: formData.examId });
+          if (result.success && result.data) {
+            const options = result.data.map((series) => ({
+              value: series.seriesId,
+              label: series.seriesDesc || `Series ${series.seriesId}`,
+            }));
+            setSeriesOptions(options);
+          } else {
+            setSeriesOptions([]);
+          }
+        } catch (error) {
+          console.error("Error fetching series:", error);
+          setSeriesOptions([]);
+        }
+      } else {
+        setSeriesOptions([]);
+        setImportSeriesId(null);
+      }
+    };
+
+    fetchSeriesForExam();
+  }, [mode, isImportSeries, formData.examId, fetchExamSeries]);
 
   const defaultExamOption = useMemo(() => {
     if (initialValues.examId && initialValues.examName) {
@@ -73,6 +114,11 @@ export const SeriesModal = ({
     const formatData = (data) => ({
       ...data,
       seriesCredit: parseInt(data.seriesCredit),
+      ...(mode === "create" &&
+        isImportSeries === "yes" &&
+        importSeriesId && {
+          importSeriesId: parseInt(importSeriesId),
+        }),
     });
 
     if (mode === "create") return formatData(formData);
@@ -154,6 +200,10 @@ export const SeriesModal = ({
       newErrors.seriesCredit = "Credits must be greater than 0";
     }
 
+    if (mode === "create" && isImportSeries === "yes" && !importSeriesId) {
+      newErrors.importSeriesId = "Please select a series to import";
+    }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -169,10 +219,37 @@ export const SeriesModal = ({
       examId: value,
       examName: label || "",
     }));
+    setImportSeriesId(null);
     if (errors.examId) {
       setErrors((prev) => ({ ...prev, examId: null }));
     }
+    if (errors.importSeriesId) {
+      setErrors((prev) => ({ ...prev, importSeriesId: null }));
+    }
   };
+
+  const handleImportSeriesChange = (value) => {
+    setImportSeriesId(value);
+    if (errors.importSeriesId) {
+      setErrors((prev) => ({ ...prev, importSeriesId: null }));
+    }
+  };
+
+  const handleIsImportSeriesChange = (value) => {
+    setIsImportSeries(value);
+    if (value === "no") {
+      setImportSeriesId(null);
+      setSeriesOptions([]);
+      if (errors.importSeriesId) {
+        setErrors((prev) => ({ ...prev, importSeriesId: null }));
+      }
+    }
+  };
+
+  const importSeriesOptions = [
+    { value: "no", label: "No" },
+    { value: "yes", label: "Yes, import from existing series" },
+  ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -195,7 +272,7 @@ export const SeriesModal = ({
             value={formData.examId}
             onChange={handleExamChange}
             options={examOptions}
-            disabled={isSubmitting}
+            disabled={optionDisabled || isSubmitting}
             error={errors.examId}
             isRequired
             placeholder="Select exam..."
@@ -206,6 +283,45 @@ export const SeriesModal = ({
             minSearchLength={0}
             className="h-12"
           />
+
+          {/* Series Selection - Show when "Yes" is selected and exam is chosen */}
+          {mode === "create" && isImportSeries === "yes" && (
+            <>
+              {!formData.examId ? (
+                <p className="text-sm text-blue-700">
+                  Please select an exam first to see available series for import
+                </p>
+              ) : (
+                <>
+                  <SearchableDropdown
+                    label="Select Series to Import"
+                    value={importSeriesId}
+                    onChange={handleImportSeriesChange}
+                    options={seriesOptions}
+                    disabled={isSubmitting || isLoading}
+                    error={errors.importSeriesId}
+                    isRequired
+                    placeholder={
+                      isLoading
+                        ? "Loading series..."
+                        : "Select a series to import data from..."
+                    }
+                    searchPlaceholder="Search series..."
+                    emptyMessage={
+                      isLoading ? "Loading..." : "No series found for this exam"
+                    }
+                    minSearchLength={0}
+                    className="h-12"
+                    isLoading={isLoading}
+                  />
+                  <p className="text-sm text-blue-700 mt-2">
+                    Importing will copy subjects and grades configuration from
+                    the selected series
+                  </p>
+                </>
+              )}
+            </>
+          )}
 
           {/* Description */}
           <div className="relative">
@@ -229,47 +345,49 @@ export const SeriesModal = ({
             </div>
           </div>
 
-          {/* Start Date */}
-          <div className="relative">
-            <InputField
-              id="seriesStartDate"
-              type="date"
-              name="seriesStartDate"
-              label="Start Date"
-              value={formData.seriesStartDate}
-              onChange={handleChange}
-              isRequired
-              error={errors.seriesStartDate}
-              onError={(error) =>
-                setErrors((prev) => ({ ...prev, seriesStartDate: error }))
-              }
-              disabled={isSubmitting}
-              inputClassName="pl-10 bg-gray-50"
-            />
-            <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
-              <Calendar className="w-5 h-5" />
+          <div className="grid md:grid-cols-2 gap-4">
+            {/* Start Date */}
+            <div className="relative">
+              <InputField
+                id="seriesStartDate"
+                type="date"
+                name="seriesStartDate"
+                label="Start Date"
+                value={formData.seriesStartDate}
+                onChange={handleChange}
+                isRequired
+                error={errors.seriesStartDate}
+                onError={(error) =>
+                  setErrors((prev) => ({ ...prev, seriesStartDate: error }))
+                }
+                disabled={isSubmitting}
+                inputClassName="pl-10 bg-gray-50"
+              />
+              <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
+                <Calendar className="w-5 h-5" />
+              </div>
             </div>
-          </div>
 
-          {/* End Date */}
-          <div className="relative">
-            <InputField
-              id="seriesEndDate"
-              type="date"
-              name="seriesEndDate"
-              label="End Date"
-              value={formData.seriesEndDate}
-              onChange={handleChange}
-              isRequired
-              error={errors.seriesEndDate}
-              onError={(error) =>
-                setErrors((prev) => ({ ...prev, seriesEndDate: error }))
-              }
-              disabled={isSubmitting}
-              inputClassName="pl-10 bg-gray-50"
-            />
-            <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
-              <Calendar className="w-5 h-5" />
+            {/* End Date */}
+            <div className="relative">
+              <InputField
+                id="seriesEndDate"
+                type="date"
+                name="seriesEndDate"
+                label="End Date"
+                value={formData.seriesEndDate}
+                onChange={handleChange}
+                isRequired
+                error={errors.seriesEndDate}
+                onError={(error) =>
+                  setErrors((prev) => ({ ...prev, seriesEndDate: error }))
+                }
+                disabled={isSubmitting}
+                inputClassName="pl-10 bg-gray-50"
+              />
+              <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
+                <Calendar className="w-5 h-5" />
+              </div>
             </div>
           </div>
 
@@ -296,6 +414,18 @@ export const SeriesModal = ({
               <CreditCard className="w-5 h-5" />
             </div>
           </div>
+
+          {/* Import Series Radio */}
+          {mode === "create" && (
+            <InputRadio
+              label="Import from Existing Series?"
+              value={isImportSeries}
+              onChange={handleIsImportSeriesChange}
+              options={importSeriesOptions}
+              disabled={isSubmitting}
+              optionsLayout="horizontal"
+            />
+          )}
 
           {mode === "edit" && !hasChanges && (
             <div className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3">
