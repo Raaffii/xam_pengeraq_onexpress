@@ -147,10 +147,10 @@ export const useExamGrades = () => {
   );
 
   const onPageSizeChange = useCallback(
-    async (limit) => {
-      const newParams = { ...params, limit, page: 1 };
+    async (pageSize) => {
+      const newParams = { ...params, pageSize, page: 1 };
       setParams(newParams);
-      return await fetchExamGrades({ limit, page: 1 });
+      return await fetchExamGrades({ pageSize, page: 1 });
     },
     [params, fetchExamGrades],
   );

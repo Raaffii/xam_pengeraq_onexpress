@@ -153,7 +153,7 @@ export default function ExamDetailPage() {
             label: "Add Exam Series",
             onClick: () => {
               setModalMode("create");
-              setInitialFormValues({});
+              setInitialFormValues({ examId: examDetails?.examId });
               setIsModalOpen(true);
             },
           }}
@@ -221,6 +221,7 @@ export default function ExamDetailPage() {
               label: examDetails?.examName,
             },
           ]}
+          optionDisabled={true}
         />
 
         {isDeleteModalOpen && selectedExam && (
