@@ -31,8 +31,6 @@ const getStudentClass = async (req, res) => {
 
 const assignStudentClass = async (req, res) => {
   try {
-    const { userId } = req.user;
-
     const data = await studentClassService.postStudentClass(req.body);
     res.status(200).json(data);
   } catch (error) {

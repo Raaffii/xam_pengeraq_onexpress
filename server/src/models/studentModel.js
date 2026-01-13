@@ -46,6 +46,7 @@ const getStudent = async (page, limit, searchTerm = "") => {
     LEFT JOIN studentclass sc
       ON s.studentid = sc.studentid
 
+
     WHERE s.studentid IN (?)
     ORDER BY s.createddate DESC
   `;
@@ -91,6 +92,8 @@ const getStudent = async (page, limit, searchTerm = "") => {
 
   const [countResult] = await pool.query(countQuery, [searchValue]);
   const total = countResult[0].total;
+
+  console.log("formated", formattedRows);
 
   return {
     data: formattedRows,

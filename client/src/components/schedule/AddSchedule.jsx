@@ -14,6 +14,7 @@ import { useSubject } from "@/hooks/useSubject";
 import { useTeacher } from "@/hooks/useTeacher";
 import { useClassLocation } from "@/hooks/useClassLocation";
 import { useClassSchedule } from "@/hooks/useClassSchedule";
+import { useExamSubject } from "@/hooks/useExamSubj";
 
 export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
   const [formData, setFormData] = useState({
@@ -29,6 +30,7 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
 
   const { fetchExamSeries, examSeries } = useExamSeries();
   const { fetchSubjectByExamSeriesId, subject } = useSubject();
+  const { fetchSubjects, examSubj } = useExamSubject();
   const { fetchTeacher, teacher } = useTeacher();
   const { fetchClassLocation, classLocation } = useClassLocation();
   const { postClassSchedule, isSubmitting } = useClassSchedule();
@@ -74,8 +76,8 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
     label: item.seriesDesc,
   }));
 
-  const optionsExamSubject = subject?.map((item) => ({
-    value: item.examSubjId,
+  const optionsExamSubject = examSubj?.map((item) => ({
+    value: item.subjId,
     label: item.subjDesc,
   }));
 
@@ -113,7 +115,7 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
     }));
 
     if (name == "examSeriesId") {
-      await fetchSubjectByExamSeriesId(value);
+      await fetchSubjects({ bySeries: value });
     }
   };
 

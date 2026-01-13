@@ -26,6 +26,7 @@ const router = express.Router();
 router.use(authenticateToken);
 
 router.get("/", getStudentClass); //console.log class schedule detail
-router.post("/", assignStudentClass);
+
+router.put("/", assignStudentClass);
 
 module.exports = router;

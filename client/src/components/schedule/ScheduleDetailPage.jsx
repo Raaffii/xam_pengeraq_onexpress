@@ -8,6 +8,7 @@ import AddStudentClass from "./AddStudenctClass";
 
 import { useStudents } from "@/hooks/useStudents";
 import { Button } from "../custom";
+import toast from "react-hot-toast";
 
 export default function ScheduleDetailPage() {
   const { id } = useParams();
@@ -15,9 +16,16 @@ export default function ScheduleDetailPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [enrolledMode, setEnrolledMode] = useState(true);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [curentEnroled, setCurentEnroled] = useState([]);
 
-  const { fetchStudentClass, assignStudentClass, studenctClass, pagination } =
-    useStudentClass();
+  const {
+    fetchStudentClass,
+    assignStudentClass,
+    removeStudentFromClass,
+    studenctClass,
+    pagination,
+  } = useStudentClass();
+
   const {
     fetchStudents,
     students,
@@ -62,9 +70,9 @@ export default function ScheduleDetailPage() {
       cellClassName: "text-left",
       render: (row) => (
         <div className='flex flex-wrap gap-1'>
-          {row.examSeries?.map((item) => (
+          {row.examSeries?.map((item, index) => (
             <span
-              key={item.examSeriesId}
+              key={index}
               className='px-2 py-0.5 text-xs rounded-full
                    bg-blue-50 text-blue-700 border border-blue-200'>
               {item.examSeriesDescription}
@@ -84,16 +92,12 @@ export default function ScheduleDetailPage() {
       const result = await fetchStudents();
 
       const array = result.data.flatMap((student) =>
-        student.studentClass.map((sc) => {
-          if (id == sc.classSchedule) {
-            console.log("push in", sc.classSchedule, sc.classStudent);
-            return sc.classStudent;
-          }
-        })
+        student.studentClass.flatMap((sc) =>
+          id == sc.classSchedule ? [sc.classStudent] : []
+        )
       );
-
-      console.log("array", array);
       setSelectedRows(array);
+      setCurentEnroled(array);
     }
   };
 
@@ -108,11 +112,29 @@ export default function ScheduleDetailPage() {
     },
   ];
 
+  const diffIds = (current = [], selected = []) => {
+    const currentSet = new Set(current);
+    const selectedSet = new Set(selected);
+
+    const toAdd = [...selectedSet].filter((id) => !currentSet.has(id));
+    const toRemove = [...currentSet].filter((id) => !selectedSet.has(id));
+
+    return { toAdd, toRemove };
+  };
+
   const assignToClass = async () => {
-    const submitData = selectedRows.map((item) => ({
+    const { toAdd, toRemove } = diffIds(curentEnroled, selectedRows);
+
+    if (toAdd.length === 0 && toRemove.length === 0) {
+      toast.error("no change");
+      return;
+    }
+
+    const submitData = {
       scheduleId: id,
-      studentId: item,
-    }));
+      addStudents: toAdd,
+      removeStudents: toRemove,
+    };
 
     await assignStudentClass(submitData);
   };
@@ -142,7 +164,7 @@ export default function ScheduleDetailPage() {
           <DataTable
             data={studenctClass}
             columns={columns}
-            idAccessor='examResultsId'
+            idAccessor='studentClassId'
             pagination={pagination}
             showActions={false}
           />
@@ -175,7 +197,7 @@ export default function ScheduleDetailPage() {
               <DataTable
                 data={students}
                 columns={columnStudent}
-                idAccessor='studentClassId'
+                idAccessor='studentId'
                 pagination={paginationStudents}
                 selectable={true}
                 selectedRows={selectedRows}
