@@ -18,7 +18,40 @@ const loginSchema = z.object({
   password: passwordSchema,
 });
 
+const updatePasswordSchema = z
+  .object({
+    currentPassword: passwordSchema,
+    newPassword: passwordSchema,
+    confirmPassword: passwordSchema,
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords must match",
+    path: ["confirmPassword"],
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: "New password must be different from current password",
+    path: ["newPassword"],
+  });
+
+const passwordResetRequestSchema = z.object({
+  emailAddress: emailSchema,
+});
+
+const passwordResetSchema = z
+  .object({
+    token: z.string("Reset token is required"),
+    password: passwordSchema,
+    confirmPassword: passwordSchema,
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords must match",
+    path: ["confirmPassword"],
+  });
+
 module.exports = {
   loginSchema,
   passwordSchema,
+  updatePasswordSchema,
+  passwordResetRequestSchema,
+  passwordResetSchema,
 };
