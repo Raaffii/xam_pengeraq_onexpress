@@ -203,6 +203,34 @@ const SubjModel = {
     const [rows] = await pool.execute(query, [subjId]);
     return rows.length > 0 ? rows[0] : null;
   },
+
+  async bulkCreateWithIds(conn, data) {
+    const { examSeriesId, subjects, enteredBy } = data;
+
+    const values = subjects.map((subj) => [
+      examSeriesId,
+      subj.subjCode,
+      subj.subjDesc,
+      subj.subjCredit,
+      enteredBy || null,
+      1,
+    ]);
+
+    const placeholders = subjects
+      .map(() => "(?, ?, ?, ?, ?, NOW(), ?)")
+      .join(", ");
+
+    const query = `
+    INSERT INTO examsubj 
+    (examseriesid, subjcode, subjdesc, subjearncredit, createdby, createddate, active)
+    VALUES ${placeholders}
+  `;
+
+    const [result] = await conn.execute(query, values.flat());
+
+    const firstId = result.insertId;
+    return Array.from({ length: subjects.length }, (_, i) => firstId + i);
+  },
 };
 
 module.exports = SubjModel;

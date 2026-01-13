@@ -399,6 +399,58 @@ const SubjGradeModel = {
     const [rows] = await pool.execute(query);
     return rows[0]?.total || 0;
   },
+
+  async bulkCopySubjGrades(conn, newSeriesId, sourceSeriesId, subjIdMap) {
+    const oldSubjIds = Object.keys(subjIdMap).map(Number);
+
+    if (oldSubjIds.length === 0) return;
+
+    const placeholders = oldSubjIds.map(() => "?").join(",");
+
+    const [subjGrades] = await conn.execute(
+      `SELECT examsubjid, subjgradeseq, subjmin, subjmax, 
+            subjgrade, subjgpa, subjresult 
+     FROM subjgrade 
+     WHERE examseriesid = ? 
+       AND active = 1
+       AND examsubjid IN (${placeholders})
+     ORDER BY subjgradeid ASC`,
+      [sourceSeriesId, ...oldSubjIds],
+    );
+
+    if (subjGrades.length === 0) return;
+
+    const values = subjGrades.map((grade) => {
+      const newSubjId = subjIdMap[grade.examsubjid];
+      if (!newSubjId) {
+        throw new Error(`No mapping for subject ID ${grade.examsubjid}`);
+      }
+
+      return [
+        newSeriesId,
+        newSubjId,
+        grade.subjgradeseq,
+        grade.subjmin,
+        grade.subjmax,
+        grade.subjgrade,
+        grade.subjgpa,
+        grade.subjresult,
+        1,
+      ];
+    });
+
+    const placeholders2 = values
+      .map(() => "(?, ?, ?, ?, ?, ?, ?, ?, ?)")
+      .join(", ");
+
+    await conn.execute(
+      `INSERT INTO subjgrade 
+     (examseriesid, examsubjid, subjgradeseq, subjmin, subjmax, 
+      subjgrade, subjgpa, subjresult, active)
+     VALUES ${placeholders2}`,
+      values.flat(),
+    );
+  },
 };
 
 module.exports = SubjGradeModel;

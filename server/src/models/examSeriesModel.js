@@ -14,7 +14,7 @@ const SeriesModel = {
     }
 
     if (byExam) {
-      conditions.push("LOWER(es.examid)=?");
+      conditions.push("es.examid=?");
       params.push(byExam);
     }
 

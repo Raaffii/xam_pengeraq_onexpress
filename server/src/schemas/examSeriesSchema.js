@@ -28,7 +28,7 @@ const createExamSeriesSchema = z.object({
   seriesEndDate: dateSchema,
   seriesStartDate: dateSchema,
   seriesCredit: numberScheme,
-  importSeries: examIdSchema.optional(),
+  importSeriesId: examIdSchema.optional(),
   examId: examIdSchema,
 });
 
