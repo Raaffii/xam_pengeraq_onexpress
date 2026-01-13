@@ -1,21 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { useEffect, useRef, useState } from "react";
 import PageHeader from "@/components/common/PageHeader";
 import { DataTable } from "@/components/table";
 import Delete_modal from "@/components/modals/Delete_modal";
 import { useExams } from "@/hooks/useExams";
 import { ExamModal } from "@/components/exam";
-import { ExamModal } from "@/components/exam";
 
 const ExamsPage = () => {
   const hasFetchedData = useRef(false);
-  const hasFetchedData = useRef(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("create");
-  const [modalMode, setModalMode] = useState("create");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [initialFormValues, setInitialFormValues] = useState({});
-  const [selectedExam, setSelectedExam] = useState(null);
   const [initialFormValues, setInitialFormValues] = useState({});
   const [selectedExam, setSelectedExam] = useState(null);
 
@@ -30,8 +24,6 @@ const ExamsPage = () => {
     setParams,
     onPageChange,
     onPageSizeChange,
-    isLoading,
-    isSubmitting,
     isLoading,
     isSubmitting,
   } = useExams();
@@ -87,21 +79,6 @@ const ExamsPage = () => {
     }
     return result.success;
   };
-  const handleFormSubmit = async (formData) => {
-    let result;
-    if (modalMode === "create") {
-      result = await createExams(formData);
-    } else {
-      result = await updateExams(formData.examId, formData);
-    }
-
-    if (result.success) {
-      setIsModalOpen(false);
-      setParams((prev) => ({ ...prev, page: 1 }));
-      await fetchExams({ page: 1 });
-    }
-    return result.success;
-  };
 
   return (
     <div className="min-h-screen ">
@@ -110,11 +87,6 @@ const ExamsPage = () => {
         subtitle="Manage exams records and exam series assignments"
         primaryAction={{
           label: "Add Exam",
-          onClick: () => {
-            setIsModalOpen(true);
-            setModalMode("create");
-            setInitialFormValues({});
-          },
           onClick: () => {
             setIsModalOpen(true);
             setModalMode("create");
@@ -146,7 +118,6 @@ const ExamsPage = () => {
         onSizeChange={onPageSizeChange}
         pagination={pagination}
         isLoading={isLoading}
-        isLoading={isLoading}
       />
 
       <ExamModal
@@ -157,16 +128,7 @@ const ExamsPage = () => {
         isSubmitting={isSubmitting}
         mode={modalMode}
       />
-      <ExamModal
-        open={isModalOpen}
-        onOpenChange={setIsModalOpen}
-        initialValues={initialFormValues}
-        onSubmit={handleFormSubmit}
-        isSubmitting={isSubmitting}
-        mode={modalMode}
-      />
 
-      {isDeleteModalOpen && selectedExam && (
       {isDeleteModalOpen && selectedExam && (
         <Delete_modal
           open={isDeleteModalOpen}
