@@ -4,22 +4,23 @@ import toast from "react-hot-toast";
 
 export const useExamSeries = () => {
   const [examSeries, setExamSeries] = useState([]);
+  const [seriesDetail, setSeriesDetail] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
   const [pagination, setPagination] = useState({
-    page: 1,
+    currentPage: 1,
     pageSize: 10,
-    totalPage: 1,
-    totalItem: 0,
+    totalPages: 1,
+    totalItems: 0,
   });
-  const [params, setParams] = useState({ page: 1, limit: 10 });
+  const [params, setParams] = useState({ pageSize: 10 });
 
   const formaExamSeriesData = useCallback((rawExamSeries) => {
     return rawExamSeries.map((item) => ({
       ...item,
-      id: item.userId,
+      id: item.seriesId,
     }));
   }, []);
 
@@ -43,14 +44,13 @@ export const useExamSeries = () => {
             pageSize: 10,
             totalPages: 1,
             totalItems: 0,
-          }
+          },
         );
         setExamSeries(data);
-        //   alert("cek");
 
         return { success: true, data: data };
       } catch (err) {
-        console.error("Error fetching users:", err);
+        console.error("Error fetching Exam Series:", err);
 
         setError(err.message);
         setExamSeries([]);
@@ -60,43 +60,40 @@ export const useExamSeries = () => {
         setIsLoading(false);
       }
     },
-    [params, formaExamSeriesData]
+    [params, formaExamSeriesData],
   );
 
-  const fetchExamSeriesByid = useCallback(
-    async (examSeriesId) => {
-      try {
-        setIsLoading(true);
-        setError(null);
+  const fetchExamSeriesByid = useCallback(async (examSeriesId) => {
+    if (!examSeriesId) {
+      return;
+    }
+    try {
+      setIsLoading(true);
+      setError(null);
 
-        const response = await examSeriesService.getExamSeriesById(
-          examSeriesId
-        );
+      const response = await examSeriesService.getExamSeriesById(examSeriesId);
 
-        setExamSeries(response.data);
-        //   alert("cek");
+      setSeriesDetail(response.data);
 
-        return { success: true, data: response.data };
-      } catch (err) {
-        console.error("Error fetching users:", err);
+      return { success: true, data: response.data };
+    } catch (err) {
+      console.error("Error fetching Exam Series:", err);
 
-        setError(err.message);
-        setExamSeries([]);
+      setError(err.message);
+      setExamSeries([]);
 
-        return { success: false, error: err.message };
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [params, formaExamSeriesData]
-  );
+      return { success: false, error: err.message };
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const createExamsSeries = useCallback(async (data) => {
     let toastId;
     try {
       setIsSubmitting(true);
       setError(null);
-      toastId = toast.loading("Creating new user...");
+      toastId = toast.loading("Creating new series...");
       const response = await examSeriesService.insertExamSeries(data);
       toast.success("Exam Series added successfully!", { id: toastId });
 
@@ -145,11 +142,11 @@ export const useExamSeries = () => {
       setIsSubmitting(true);
       setError(null);
       const response = await examSeriesService.deleteExamSeries(id);
-      toast.success("User deleted successfully");
+      toast.success("Exam Series deleted successfully");
 
       return { success: true, data: response };
     } catch (err) {
-      console.error("Error deleting user:", err);
+      console.error("Error deleting Exam Series:", err);
       toast.error(err.message);
       setError(err.message);
 
@@ -166,7 +163,7 @@ export const useExamSeries = () => {
 
       return await fetchExamSeries({ searchTerm, page: 1 });
     },
-    [fetchExamSeries, setParams, params]
+    [fetchExamSeries, setParams, params],
   );
 
   const onPageChange = useCallback(
@@ -175,16 +172,16 @@ export const useExamSeries = () => {
       setParams(newParams);
       return await fetchExamSeries({ page });
     },
-    [params, fetchExamSeries]
+    [params, fetchExamSeries],
   );
 
   const onPageSizeChange = useCallback(
-    async (limit) => {
-      const newParams = { ...params, limit, page: 1 };
+    async (pageSize) => {
+      const newParams = { ...params, pageSize, page: 1 };
       setParams(newParams);
-      return await fetchExamSeries({ limit, page: 1 });
+      return await fetchExamSeries({ pageSize, page: 1 });
     },
-    [params, fetchExamSeries]
+    [params, fetchExamSeries],
   );
 
   const onFilterChange = useCallback(
@@ -200,7 +197,7 @@ export const useExamSeries = () => {
         page: 1,
       });
     },
-    [params, fetchExamSeries]
+    [params, fetchExamSeries],
   );
 
   return {
@@ -214,6 +211,8 @@ export const useExamSeries = () => {
     setParams,
     onFilterChange,
     fetchExamSeriesByid,
+    setSeriesDetail,
+    seriesDetail,
     isSubmitting,
     examSeries,
     isLoading,

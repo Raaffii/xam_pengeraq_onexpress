@@ -2,24 +2,23 @@ const examService = require("../services/examService");
 
 const getExam = async (req, res) => {
   try {
-    let { page, limit, searchTerm } = req.query;
+    let { page, pageSize, searchTerm } = req.query;
 
-    const result = await examService.getExam(page, limit, searchTerm);
+    const result = await examService.getExam({ page, pageSize, searchTerm });
     res.status(200).json({
       data: result.data,
       pagination: {
         currentPage: page,
-        pageSize: limit,
-        totalPages: Math.ceil(result.total / limit),
+        pageSize: pageSize,
+        totalPages: Math.ceil(result.total / pageSize),
         totalItems: result.total,
       },
     });
   } catch (error) {
-    console.error("get expaloc error:", error);
+    console.error("get exam error:", error);
 
     res.status(500).json({
-      success: false,
-      message: "get expaloc failed",
+      message: "Failed to fetch exams",
       error: error.message,
     });
   }
@@ -27,7 +26,7 @@ const getExam = async (req, res) => {
 
 const getExamById = async (req, res) => {
   try {
-    const id = req.params.id;
+    const id = req.params.examId;
 
     const result = await examService.getExamById(id);
 
@@ -35,11 +34,10 @@ const getExamById = async (req, res) => {
       data: result,
     });
   } catch (error) {
-    console.error("get expaloc error:", error);
+    console.error("get exam error:", error);
 
     res.status(500).json({
-      success: false,
-      message: "get expaloc failed",
+      message: "Failed to fetch exam",
       error: error.message,
     });
   }
@@ -47,19 +45,20 @@ const getExamById = async (req, res) => {
 
 const postExam = async (req, res) => {
   try {
-    const data = await examService.postExam(req.body);
+    const data = await examService.postExam({
+      ...req.body,
+      enteredBy: req.user.userId,
+    });
 
     res.status(200).json(data);
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {
       return res.status(400).json({
-        error: true,
         message: "Duplicate entry",
       });
     }
     res.status(500).json({
-      success: false,
-      message: "get expaloc failed",
+      message: "Failed to create exam",
       error: error.message,
     });
   }
@@ -67,18 +66,24 @@ const postExam = async (req, res) => {
 
 const putExam = async (req, res) => {
   try {
-    const data = await examService.putExam(req.params.id, req.body);
+    const data = await examService.putExam(req.params.examId, {
+      ...req.body,
+      editedBy: req.user.userId,
+    });
     res.status(200).json(data);
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {
-      return res.status(400).json({
-        error: true,
+      return res.status(409).json({
         message: "Duplicate entry",
       });
     }
+    if (error.message.includes("not found")) {
+      return res.status(404).json({
+        message: error.message,
+      });
+    }
     res.status(500).json({
-      success: false,
-      message: "get expaloc failed",
+      message: "Failed to update exam",
       error: error.message,
     });
   }
@@ -86,18 +91,16 @@ const putExam = async (req, res) => {
 
 const deleteExam = async (req, res) => {
   try {
-    const data = await examService.deleteExam(req.params.id);
+    const data = await examService.deleteExam(req.params.examId);
     res.status(200).json(data);
   } catch (error) {
-    if (error.code === "ER_DUP_ENTRY") {
-      return res.status(400).json({
-        error: true,
-        message: "Duplicate entry",
+    if (error.message.includes("not found")) {
+      return res.status(404).json({
+        message: error.message,
       });
     }
     res.status(500).json({
-      success: false,
-      message: "get expaloc failed",
+      message: "get exam failed",
       error: error.message,
     });
   }

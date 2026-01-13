@@ -5,7 +5,7 @@ import { useStudentClass } from "@/hooks/useStudentClass";
 import { DataTable } from "../table";
 import { useEffect } from "react";
 import AddStudentClass from "./AddStudenctClass";
-import { useNavigate } from "react-router-dom";
+
 import { useStudents } from "@/hooks/useStudents";
 import { Button } from "../custom";
 
@@ -16,18 +16,13 @@ export default function ScheduleDetailPage() {
   const [enrolledMode, setEnrolledMode] = useState(true);
   const [selectedRows, setSelectedRows] = useState([]);
 
-  const { fetchStudentClass, studenctClass, pagination } = useStudentClass();
+  const { fetchStudentClass, assignStudentClass, studenctClass, pagination } =
+    useStudentClass();
   const {
     fetchStudents,
     students,
     pagination: paginationStudents,
   } = useStudents();
-
-  const navigate = useNavigate();
-
-  const openAddModal = () => {
-    setIsAddModalOpen(true);
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,6 +33,11 @@ export default function ScheduleDetailPage() {
   }, [fetchStudentClass, id]);
 
   const columns = [
+    {
+      accessorKey: "studentIdNo",
+      header: <div className='text-left w-full'>ID</div>,
+      cellClassName: "text-left",
+    },
     {
       accessorKey: "studentName",
       header: <div className='text-left w-full'>Subject Code</div>,
@@ -81,7 +81,19 @@ export default function ScheduleDetailPage() {
       await fetchStudentClass({ schedule: id });
     } else {
       setEnrolledMode(bool);
-      await fetchStudents();
+      const result = await fetchStudents();
+
+      const array = result.data.flatMap((student) =>
+        student.studentClass.map((sc) => {
+          if (id == sc.classSchedule) {
+            console.log("push in", sc.classSchedule, sc.classStudent);
+            return sc.classStudent;
+          }
+        })
+      );
+
+      console.log("array", array);
+      setSelectedRows(array);
     }
   };
 
@@ -96,6 +108,15 @@ export default function ScheduleDetailPage() {
     },
   ];
 
+  const assignToClass = async () => {
+    const submitData = selectedRows.map((item) => ({
+      scheduleId: id,
+      studentId: item,
+    }));
+
+    await assignStudentClass(submitData);
+  };
+
   const handleSelectRow = (row) => {
     setSelectedRows((prev) => {
       if (prev.includes(row)) {
@@ -106,6 +127,7 @@ export default function ScheduleDetailPage() {
     });
   };
 
+  console.log("student", selectedRows);
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='mx-auto'>
@@ -122,6 +144,7 @@ export default function ScheduleDetailPage() {
             columns={columns}
             idAccessor='examResultsId'
             pagination={pagination}
+            showActions={false}
           />
         ) : (
           <>
@@ -141,7 +164,9 @@ export default function ScheduleDetailPage() {
                   {selectedRows.length} selected
                 </span>
 
-                <Button className='px-4 py-2'>Assign to Class</Button>
+                <Button className='px-4 py-2' onClick={assignToClass}>
+                  Assign to Class
+                </Button>
               </div>
             </div>
 
@@ -152,7 +177,7 @@ export default function ScheduleDetailPage() {
                 columns={columnStudent}
                 idAccessor='studentClassId'
                 pagination={paginationStudents}
-                selectable
+                selectable={true}
                 selectedRows={selectedRows}
                 onSelectRow={handleSelectRow}
                 showActions={false}

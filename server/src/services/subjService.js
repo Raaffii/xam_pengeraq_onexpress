@@ -1,7 +1,7 @@
 const SubjModel = require("../models/subjModel");
 const SubjGradeModel = require("../models/subjGradeModel");
 const pool = require("../config/db");
-const { defaultExamFinalGrades } = require("../utils/data");
+const { defaultSubjGrades } = require("../utils/data");
 
 const subjService = {
   async getAllSubjs(options = {}) {
@@ -56,7 +56,7 @@ const subjService = {
       await SubjGradeModel.bulkInsert(conn, {
         examSubjId: subjId,
         examSeriesId: data.seriesId || null,
-        grades: defaultExamFinalGrades,
+        grades: defaultSubjGrades,
       });
 
       await conn.commit();

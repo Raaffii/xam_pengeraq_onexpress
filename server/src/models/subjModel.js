@@ -8,7 +8,7 @@ const SubjModel = {
     const params = [];
 
     if (series) {
-      conditions.push("LOWER(e.examseriesdescription) = ?");
+      conditions.push("e.examseriesid = ?");
       params.push(series.toLowerCase());
     }
 
@@ -71,12 +71,23 @@ const SubjModel = {
 
   async findByExamSeriesId(examSeriesId) {
     const query = `
-    SELECT 
-    es.examsubjid as examSubjId,
-    es.subjdesc as subjDesc
-    FROM examsubj es 
-    WHERE es.examseriesid = ?`;
-    const [rows] = await pool.query(query, [Number(examSeriesId)]);
+      SELECT 
+        s.examsubjid AS subjId,
+        s.subjcode AS subjCode,
+        s.subjdesc AS subjDesc,
+        s.subjearncredit AS subjCredit,
+        e.examseriesid AS seriesId,
+        e.examseriesdescription AS seriesDesc,
+        e.credits AS seriesCredits,
+        s.createddate AS enteredDate,
+        s.editeddate AS editedDate
+      FROM examsubj s
+      LEFT JOIN examseries e ON e.examseriesid = s.examseriesid
+      WHERE s.examseriesid = ?
+        AND s.active = 1
+    `;
+
+    const [rows] = await pool.execute(query, [examSeriesId]);
 
     return { examSubj: rows };
   },
@@ -191,6 +202,34 @@ const SubjModel = {
 
     const [rows] = await pool.execute(query, [subjId]);
     return rows.length > 0 ? rows[0] : null;
+  },
+
+  async bulkCreateWithIds(conn, data) {
+    const { examSeriesId, subjects, enteredBy } = data;
+
+    const values = subjects.map((subj) => [
+      examSeriesId,
+      subj.subjCode,
+      subj.subjDesc,
+      subj.subjCredit,
+      enteredBy || null,
+      1,
+    ]);
+
+    const placeholders = subjects
+      .map(() => "(?, ?, ?, ?, ?, NOW(), ?)")
+      .join(", ");
+
+    const query = `
+    INSERT INTO examsubj 
+    (examseriesid, subjcode, subjdesc, subjearncredit, createdby, createddate, active)
+    VALUES ${placeholders}
+  `;
+
+    const [result] = await conn.execute(query, values.flat());
+
+    const firstId = result.insertId;
+    return Array.from({ length: subjects.length }, (_, i) => firstId + i);
   },
 };
 

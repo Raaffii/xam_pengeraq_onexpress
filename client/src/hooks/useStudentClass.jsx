@@ -61,6 +61,28 @@ export const useStudentClass = () => {
     [params, formatStudentClass]
   );
 
+  const assignStudentClass = useCallback(async (data) => {
+    let toastId;
+    try {
+      setIsSubmitting(true);
+      setError(null);
+      toastId = toast.loading("Creating new students...");
+
+      const response = await studentClassService.assignStudentClass(data);
+      toast.success("Student added successfully!", { id: toastId });
+
+      return { success: true, data: response.data };
+    } catch (err) {
+      console.error("Error creating student:", err);
+      toast.error(err.message || "Failed to create student", { id: toastId });
+      setError(err.message);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, []);
+
   const onFilterChange = useCallback(
     async (filters) => {
       const newParams = {
@@ -107,13 +129,12 @@ export const useStudentClass = () => {
 
   return {
     fetchStudentClass,
+    assignStudentClass,
     onPageChange,
     onPageSizeChange,
     onSearch,
     setParams,
-
     onFilterChange,
-
     isSubmitting,
     studenctClass,
     isLoading,

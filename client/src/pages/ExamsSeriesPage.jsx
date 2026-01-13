@@ -1,22 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PageHeader from "@/components/common/PageHeader";
-
 import { DataTable } from "@/components/table";
-import Add_exam_series from "@/components/modals/add_exam_series";
-import Edit_modal from "@/components/modals/Edit_modal";
 import Delete_modal from "@/components/modals/Delete_modal";
 import { useExams } from "@/hooks/useExams";
 import { useExamSeries } from "@/hooks/useExamsSeries";
-import { ExamSeriesFilter } from "@/components/examseries/ExamSeriesFilter";
+import { ExamSeriesFilter, SeriesModal } from "@/components/examseries";
 
 const ExamsSeriesPage = () => {
+  const hasFetchedData = useRef(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedSExam, setSelectedExam] = useState(null);
+  const [selectedSeries, setSelectedSeries] = useState(null);
+  const [modalMode, setModalMode] = useState("create");
+  const [initialFormValues, setInitialFormValues] = useState({});
 
-  const { fetchExams, exams } = useExams();
+  const { fetchExams, exams, isLoading: examLoad } = useExams();
 
   const {
     fetchExamSeries,
@@ -31,49 +29,64 @@ const ExamsSeriesPage = () => {
     onPageChange,
     onPageSizeChange,
     params,
+    isSubmitting,
+    isLoading,
   } = useExamSeries();
 
   useEffect(() => {
+    if (hasFetchedData.current) return;
+    hasFetchedData.current = true;
     const fetchData = async () => {
-      await fetchExamSeries();
+      await fetchExamSeries({ page: 1 });
       await fetchExams();
     };
 
     fetchData();
   }, [fetchExamSeries, fetchExams]);
 
-  const openEditModal = (student) => {
-    setSelectedExam(student);
-    setIsEditModalOpen(true);
+  const openCreateModal = () => {
+    setModalMode("create");
+    setInitialFormValues({});
+    setIsModalOpen(true);
   };
 
-  const openDeleteModal = (student) => {
-    setSelectedExam(student);
+  const openEditModal = (data) => {
+    setModalMode("edit");
+    setInitialFormValues({
+      seriesId: data.seriesId,
+      examId: data.examId,
+      examName: data.examName,
+      seriesDesc: data.seriesDesc,
+      seriesStartDate: data.seriesStartDate,
+      seriesEndDate: data.seriesEndDate,
+      seriesCredit: data.seriesCredit,
+    });
+    setIsModalOpen(true);
+  };
+
+  const openDeleteModal = (data) => {
+    setSelectedSeries(data);
     setIsDeleteModalOpen(true);
   };
 
-  const handleExamSeriesEdit = async (formData) => {
-    const result = await updateExamsSeries(
-      selectedSExam.examSeriesId,
-      formData
-    );
-    if (result.success) {
-      fetchExamSeries();
+  const handleFormSubmit = async (formData) => {
+    let result;
+    if (modalMode === "create") {
+      result = await createExamsSeries(formData);
+    } else {
+      result = await updateExamsSeries(formData.seriesId, formData);
     }
-    return result.success;
-  };
 
-  const handleExamSeriesSubmit = async (formData) => {
-    const result = await createExamsSeries(formData);
     if (result.success) {
+      setIsModalOpen(false);
       setParams((prev) => ({ ...prev, page: 1 }));
-      fetchExamSeries({ page: 1 });
+      await fetchExamSeries({ page: 1 });
     }
     return result.success;
   };
 
   const handleExamSeriesDelete = async (entityData) => {
-    const result = await deleteExamsSeries(entityData.examSeriesId);
+    const result = await deleteExamsSeries(entityData.seriesId);
     if (result.success) {
       setParams((prev) => ({ ...prev, page: 1 }));
       fetchExamSeries({ page: 1 });
@@ -84,151 +97,95 @@ const ExamsSeriesPage = () => {
   const columns = [
     {
       accessorKey: "examName",
-      header: <div className='text-left w-full'>Exam</div>,
+      header: <div className="text-left w-full">Exam</div>,
       cellClassName: "text-left",
     },
     {
-      accessorKey: "examSeriesDescription",
-      header: <div className='text-left w-full'>Description</div>,
+      accessorKey: "seriesDesc",
+      header: <div className="text-left w-full">Description</div>,
       cellClassName: "text-left",
     },
     {
-      accessorKey: "examSeriesStartDate",
-      header: <div className='text-left w-full'>Start Date</div>,
+      accessorKey: "seriesStartDate",
+      header: <div className="text-left w-full">Start Date</div>,
       cellClassName: "text-left",
     },
     {
-      accessorKey: "examSeriesEndDate",
-      header: <div className='text-left w-full'>End Date</div>,
+      accessorKey: "seriesEndDate",
+      header: <div className="text-left w-full">End Date</div>,
       cellClassName: "text-left",
     },
     {
-      accessorKey: "credits",
-      header: <div className='text-left w-full'>Credits</div>,
+      accessorKey: "seriesCredit",
+      header: <div className="text-left w-full">Credits</div>,
       cellClassName: "text-left",
     },
   ];
 
-  const fields = [
-    {
-      label: "",
-      name: "examSeriesId",
-      type: "hidden",
-    },
-    {
-      label: "Exam",
-      name: "examId",
-      type: "dropdown",
-      required: true,
-    },
-    {
-      label: "Description",
-      name: "examSeriesDescription",
-      type: "text",
-      required: true,
-    },
-    {
-      label: "Start Date",
-      name: "examSeriesStartDate",
-      type: "date",
-      required: true,
-    },
-    {
-      label: "End Date",
-      name: "examSeriesEndDate",
-      type: "date",
-      required: true,
-    },
-    {
-      label: "Credits",
-      name: "credits",
-      type: "number",
-      required: true,
-    },
-  ];
-
-  const examOptions = [
-    { value: "all", label: "Exam Series" },
-    ...(Array.isArray(examSeries)
-      ? exams.map((item) => ({
-          value: item.examId,
-          label: item.examName,
-        }))
-      : []),
-  ];
+  const examOptions = Array.isArray(exams)
+    ? exams.map((item) => ({
+        value: item.examId,
+        label: item.examName,
+      }))
+    : [];
 
   return (
-    <div className='min-h-screen '>
+    <div className="min-h-screen">
       <PageHeader
-        title='Exams'
-        subtitle='Manage exams series records and exam item assignments'
+        title="Exams"
+        subtitle="Manage exams series records and exam item assignments"
         primaryAction={{
           label: "Add Exam Series",
-          onClick: () => setIsModalOpen(true),
+          onClick: openCreateModal,
         }}
         showSearch={true}
-        searchPlaceholder='Search by Exam Series Name'
+        searchPlaceholder="Search by Exam Series Name"
         onSearch={onSearch}
-        searchMaxLength={50}>
+        searchMaxLength={50}
+      >
         <ExamSeriesFilter
           data={exams}
-          valueKey='examId'
-          labelKey='examName'
-          filterKey='byExam'
-          placeholder='Filter by exam'
+          valueKey="examId"
+          labelKey="examName"
+          filterKey="byExam"
+          placeholder="Filter by Exam"
           initialFilters={{ byExam: params.byExam }}
           onFilterChange={onFilterChange}
+          isLoading={examLoad}
         />
       </PageHeader>
 
       <DataTable
         data={examSeries}
         columns={columns}
-        detailPage='series'
-        idAccessor='examSeriesId'
+        detailPage="series"
+        idAccessor="seriesId"
         onEdit={openEditModal}
         onDelete={openDeleteModal}
         onPageChange={onPageChange}
         onSizeChange={onPageSizeChange}
         pagination={pagination}
+        isLoading={isLoading}
       />
 
-      {isModalOpen && (
-        <Add_exam_series
-          open={isModalOpen}
-          setOpen={setIsModalOpen}
-          onSubmit={handleExamSeriesSubmit}
-          fields={fields}
-          title='Add New Exam Series'
-          dropdowns={{
-            examId: examOptions,
-          }}
-          optionalDropDown={false}
-        />
-      )}
+      <SeriesModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        initialValues={initialFormValues}
+        onSubmit={handleFormSubmit}
+        isSubmitting={isSubmitting}
+        mode={modalMode}
+        examOptions={examOptions}
+      />
 
-      {isEditModalOpen && selectedSExam && (
-        <Edit_modal
-          open={isEditModalOpen}
-          setOpen={setIsEditModalOpen}
-          onSubmit={handleExamSeriesEdit}
-          fields={fields}
-          entityData={selectedSExam}
-          title='Edit Exam Series'
-          dropdowns={{
-            examId: examOptions,
-          }}
-        />
-      )}
-
-      {isDeleteModalOpen && selectedSExam && (
+      {isDeleteModalOpen && selectedSeries && (
         <Delete_modal
           open={isDeleteModalOpen}
           setOpen={setIsDeleteModalOpen}
           onSubmit={handleExamSeriesDelete}
-          entityData={selectedSExam}
-          title='Delete Student'
-          confirmationText={`Are you sure you want to delete student "${selectedSExam.examname}"? This action cannot be undone.`}
+          entityData={selectedSeries}
+          title="Delete Exam Series"
+          confirmationText={`Are you sure you want to delete series "${selectedSeries.seriesDesc}"? This action cannot be undone.`}
         />
       )}
     </div>

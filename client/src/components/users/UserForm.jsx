@@ -142,7 +142,7 @@ export const UserForm = ({
           pageSize: 5,
         });
 
-        setSearchResults(response);
+        setSearchResults(response.data);
         if (response.length === 0) {
           setErrors((prev) => ({
             ...prev,
@@ -182,8 +182,8 @@ export const UserForm = ({
 
   const handleSelectStudent = (student) => {
     const studentData = {
-      studentId: student.studentidno,
-      studentName: student.studentname,
+      studentId: student.studentId,
+      studentName: student.studentName,
     };
 
     setSelectedStudent(studentData);
@@ -450,15 +450,15 @@ export const UserForm = ({
                       <div className="max-h-56 overflow-y-auto space-y-1">
                         {searchResults.map((student) => (
                           <button
-                            key={student.studentidno}
+                            key={student.studentIdNo}
                             type="button"
                             onClick={() => handleSelectStudent(student)}
                             disabled={isSubmitting}
                             className="w-full text-left p-3 border rounded-lg bg-white hover:bg-blue-50 hover:border-blue-300 transition"
                           >
-                            <p className="font-medium">{student.studentname}</p>
+                            <p className="font-medium">{student.studentName}</p>
                             <p className="text-sm text-gray-500">
-                              ID: {student.studentidno}
+                              ID: {student.studentIdNo}
                             </p>
                           </button>
                         ))}

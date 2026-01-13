@@ -1,48 +1,56 @@
-import PageHeader from "@/components/common/PageHeader";
-import { ExamSeriesFilter } from "@/components/examseries";
-import Delete_modal from "@/components/modals/Delete_modal";
-import { SubjectModal } from "@/components/subjects";
-import { DataTable } from "@/components/table";
-import { useExamSeries } from "@/hooks/useExamsSeries";
-import { useExamSubject } from "@/hooks/useExamSubj";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useExamSubject } from "@/hooks/useExamSubj";
+import { DataTable } from "../table";
+import { SubjectModal } from "../subjects";
+import Delete_modal from "../modals/Delete_modal";
+import PageHeader from "../common/PageHeader";
+import { ExamSeriesFilter } from "../examseries";
 
-const ExamSubjectPage = () => {
-  const hasFetchedData = useRef(false);
+export default function SubjectSection({
+  subjId,
+  examSeriesOptions,
+  isFilterOpen = false,
+  examSeries,
+  customParams = {},
+  seriesId,
+}) {
   const {
     fetchSubjects,
+    fetchSubjectById,
     onSearch,
     onPageChange,
     onPageSizeChange,
     setParams,
     removeSubject,
-    isLoading,
-    isSubmitting,
-    pagination,
+    isLoading: subjLoad,
+    isSubmitting: subjSubmit,
+    pagination: subjPagination,
     examSubj,
     newExamSubj,
     updateDetails,
     onFilterChange,
     params,
   } = useExamSubject();
-  const {
-    fetchExamSeries,
-    examSeries,
-    isLoading: seriesLoading,
-  } = useExamSeries();
+  const hasFetchedData = useRef(false);
+
   const [selectedSubj, setSelectedSubj] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubjModalOpen, setIsSubjModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("create");
 
   useEffect(() => {
     if (hasFetchedData.current) return;
     hasFetchedData.current = true;
-    fetchSubjects({ page: 1 });
-    fetchExamSeries();
-  }, [fetchSubjects, fetchExamSeries]);
 
-  const columns = [
+    if (subjId) {
+      fetchSubjectById(subjId);
+    } else {
+      setParams((prev) => ({ ...prev, ...customParams }));
+      fetchSubjects({ page: 1, ...customParams });
+    }
+  }, [fetchSubjects, fetchSubjectById, subjId, customParams, setParams]);
+
+  const subjColumns = [
     {
       accessorKey: "seriesDesc",
       header: "Exam Series",
@@ -79,7 +87,7 @@ const ExamSubjectPage = () => {
       } else {
         fetchSubjects();
       }
-      setIsModalOpen(false);
+      setIsSubjModalOpen(false);
       setSelectedSubj(null);
     }
   };
@@ -102,19 +110,12 @@ const ExamSubjectPage = () => {
       subjCode: "",
       subjDesc: "",
       subjCredit: 0,
-      seriesId: null,
+      seriesId: parseInt(seriesId) || "",
     };
-  }, [modalMode, selectedSubj]);
-
-  const seriesOptions = Array.isArray(examSeries)
-    ? examSeries.map((item) => ({
-        value: item.seriesId,
-        label: item.seriesDesc,
-      }))
-    : [];
+  }, [modalMode, selectedSubj, seriesId]);
 
   return (
-    <div className="min-h-screen">
+    <div>
       <PageHeader
         title="Subjects"
         subtitle="Manage available exam subjects"
@@ -126,31 +127,32 @@ const ExamSubjectPage = () => {
           label: "Add Subject",
           onClick: () => {
             setModalMode("create");
-            setIsModalOpen(true);
             setSelectedSubj(null);
+            setIsSubjModalOpen(true);
           },
         }}
       >
-        <ExamSeriesFilter
-          data={examSeries}
-          valueKey="seriesId"
-          labelKey="seriesDesc"
-          filterKey="bySeries"
-          placeholder="Filter by Series"
-          initialFilters={{ bySeries: params.bySeries }}
-          onFilterChange={onFilterChange}
-          isLoading={seriesLoading}
-        />
+        {isFilterOpen && examSeriesOptions && (
+          <ExamSeriesFilter
+            data={examSeries}
+            valueKey="seriesId"
+            labelKey="seriesDesc"
+            filterKey="bySeries"
+            placeholder="Filter by Series"
+            initialFilters={{ bySeries: params.bySeries }}
+            onFilterChange={onFilterChange}
+          />
+        )}
       </PageHeader>
       <DataTable
         data={examSubj}
-        isLoading={isLoading}
-        columns={columns}
+        isLoading={subjLoad}
+        columns={subjColumns}
         idAccessor="subjId"
         detailPage="subjects"
         onPageChange={onPageChange}
         onSizeChange={onPageSizeChange}
-        pagination={pagination}
+        pagination={subjPagination}
         onDelete={(e) => {
           setSelectedSubj(e);
           setIsDeleteModalOpen(true);
@@ -158,21 +160,19 @@ const ExamSubjectPage = () => {
         onEdit={(e) => {
           setSelectedSubj(e);
           setModalMode("edit");
-          setIsModalOpen(true);
+          setIsSubjModalOpen(true);
         }}
       />
-
       <SubjectModal
-        open={isModalOpen}
-        onOpenChange={setIsModalOpen}
+        open={isSubjModalOpen}
+        onOpenChange={setIsSubjModalOpen}
         initialValues={initialFormValues}
         onSubmit={handleFormSubmit}
-        isSubmitting={isSubmitting}
+        isSubmitting={subjSubmit}
         mode={modalMode}
-        examSeriesOptions={seriesOptions}
-        isLoadingSeries={seriesLoading}
+        examSeriesOptions={examSeriesOptions}
+        optionDisabled={!!seriesId}
       />
-
       {isDeleteModalOpen && selectedSubj && (
         <Delete_modal
           open={isDeleteModalOpen}
@@ -185,6 +185,4 @@ const ExamSubjectPage = () => {
       )}
     </div>
   );
-};
-
-export default ExamSubjectPage;
+}

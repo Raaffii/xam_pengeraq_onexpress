@@ -1,10 +1,9 @@
-import { examsService } from "@/services/examsService";
+import { examGradesService } from "@/services/examGradeService";
 import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
 
-export const useExams = () => {
-  const [exams, setExams] = useState([]);
-  const [examDetails, setExamDetails] = useState([]);
+export const useExamGrades = () => {
+  const [examGrades, setExamGrades] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -17,14 +16,14 @@ export const useExams = () => {
   });
   const [params, setParams] = useState({ page: 1, pageSize: 10 });
 
-  const formatExamsData = useCallback((rawExams) => {
-    return rawExams.map((item) => ({
+  const formatExamGradesData = useCallback((rawExamGrades) => {
+    return rawExamGrades.map((item) => ({
       ...item,
-      id: item.examId,
+      id: item.gradeId,
     }));
   }, []);
 
-  const fetchExams = useCallback(
+  const fetchExamGrades = useCallback(
     async (overrideParams = {}) => {
       try {
         setIsLoading(true);
@@ -34,8 +33,8 @@ export const useExams = () => {
         const apiParams = {
           ...finalParams,
         };
-        const response = await examsService.getExams(apiParams);
-        const data = formatExamsData(response.data);
+        const response = await examGradesService.getExamGrades(apiParams);
+        const data = formatExamGradesData(response.data);
         setPagination(
           response.pagination || {
             currentPage: 1,
@@ -44,52 +43,36 @@ export const useExams = () => {
             totalItems: 0,
           },
         );
-        setExams(data);
+        setExamGrades(data);
         return { success: true, data: data };
       } catch (err) {
-        console.error("Error fetching exams:", err);
+        console.error("Error fetching examGrades:", err);
 
         setError(err.message);
-        setExams([]);
+        setExamGrades([]);
 
         return { success: false, error: err.message };
       } finally {
         setIsLoading(false);
       }
     },
-    [params, formatExamsData],
+    [params, formatExamGradesData],
   );
 
-  const fetchExamsById = useCallback(async (examId) => {
-    try {
-      const response = await examsService.getExamsById(examId);
-      setExamDetails(response.data);
-
-      return { success: true, data: response.data };
-    } catch (err) {
-      console.error("Error fetching exams:", err);
-
-      setError(err.message);
-
-      return { success: false, error: err.message };
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const createExams = useCallback(async (data) => {
+  const createExamGrades = useCallback(async (data) => {
     let toastId;
     try {
       setIsSubmitting(true);
       setError(null);
-      toastId = toast.loading("Creating new exam...");
-      const response = await examsService.insertExams(data);
-      toast.success("Exam added successfully!", { id: toastId });
+      toastId = toast.loading("Creating new grade...");
+      console.log(data);
+      const response = await examGradesService.insertExamGrades(data);
+      toast.success("Exam Grade added successfully!", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating exam:", err);
-      toast.error(err.message || "Failed to create exam", { id: toastId });
+      console.error("Error creating examGrade:", err);
+      toast.error(err.message || "Failed to create Grade", { id: toastId });
       setError(err.message);
 
       return { success: false, error: err.message };
@@ -98,21 +81,21 @@ export const useExams = () => {
     }
   }, []);
 
-  const updateExams = useCallback(async (id, data) => {
+  const updateExamGrades = useCallback(async (id, data) => {
     if (!id) return;
     let toastId;
     try {
       setIsSubmitting(true);
       setError(null);
 
-      toastId = toast.loading("Updating exam details...");
-      const response = await examsService.updateExams(id, data);
-      toast.success("Exam updated successfully", { id: toastId });
+      toastId = toast.loading("Updating grade details...");
+      const response = await examGradesService.updateExamGrades(id, data);
+      toast.success("ExamGrade updated successfully", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error updating exam:", err);
-      toast.error(err.message || "Failed to update approval", {
+      console.error("Error updating examGrade:", err);
+      toast.error(err.message || "Failed to update grade", {
         id: toastId,
       });
       setError(err.message);
@@ -123,18 +106,18 @@ export const useExams = () => {
     }
   }, []);
 
-  const deleteExams = useCallback(async (id) => {
+  const deleteExamGrades = useCallback(async (id) => {
     if (!id) return;
     try {
       setIsSubmitting(true);
       setError(null);
 
-      const response = await examsService.deleteExams(id);
-      toast.success("Exam deleted successfully");
+      const response = await examGradesService.deleteExamGrades(id);
+      toast.success("Grade deleted successfully");
 
       return { success: true, data: response };
     } catch (err) {
-      console.error("Error deleting exam:", err);
+      console.error("Error deleting grade:", err);
       toast.error(err.message);
       setError(err.message);
 
@@ -149,42 +132,56 @@ export const useExams = () => {
       const newParams = { ...params, searchTerm };
       setParams(newParams);
 
-      return await fetchExams({ searchTerm, page: 1 });
+      return await fetchExamGrades({ searchTerm, page: 1 });
     },
-    [fetchExams, setParams, params],
+    [fetchExamGrades, setParams, params],
   );
 
   const onPageChange = useCallback(
     async (page) => {
       const newParams = { ...params, page };
       setParams(newParams);
-      return await fetchExams({ page });
+      return await fetchExamGrades({ page });
     },
-    [params, fetchExams],
+    [params, fetchExamGrades],
   );
 
   const onPageSizeChange = useCallback(
     async (pageSize) => {
       const newParams = { ...params, pageSize, page: 1 };
       setParams(newParams);
-      return await fetchExams({ pageSize, page: 1 });
+      return await fetchExamGrades({ pageSize, page: 1 });
     },
-    [params, fetchExams],
+    [params, fetchExamGrades],
+  );
+
+  const onFilterChange = useCallback(
+    async (filters) => {
+      const newParams = {
+        ...params,
+        bySeries: filters.bySeries,
+        page: 1,
+      };
+      setParams(newParams);
+      return await fetchExamGrades({
+        bySeries: filters.bySeries,
+        page: 1,
+      });
+    },
+    [params, fetchExamGrades],
   );
   return {
-    fetchExams,
-    updateExams,
+    fetchExamGrades,
+    updateExamGrades,
     onPageChange,
     onPageSizeChange,
-    createExams,
-    deleteExams,
+    createExamGrades,
+    deleteExamGrades,
+    onFilterChange,
     onSearch,
     setParams,
-    fetchExamsById,
-    examDetails,
-    setExamDetails,
     isSubmitting,
-    exams,
+    examGrades,
     isLoading,
     error,
     pagination,

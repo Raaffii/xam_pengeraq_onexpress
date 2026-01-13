@@ -1,138 +1,178 @@
 const pool = require("../config/db");
 
-const getExamSeries = async (page, limit, searchTerm = "", byExam, examId) => {
-  page = Number(page) || 1;
-  limit = Number(limit) || 10;
-  const conditions = [];
-  const params = [];
+const SeriesModel = {
+  async getSeries(page, pageSize, searchTerm = "", byExam, examId) {
+    const conditions = [];
+    const params = [];
 
-  if (searchTerm) {
-    conditions.push(
-      "(LOWER(es.examseriesdescription) LIKE ? OR LOWER(e.examname) LIKE ? )"
-    );
-    const searchValue = `%${searchTerm}%`;
-    params.push(searchValue, searchValue);
-  }
-  if (byExam) {
-    conditions.push("LOWER(es.examid)=?");
-    params.push(byExam);
-  }
-  if (examId) {
-    conditions.push("es.examseriesid=?");
-    params.push(examId);
-  }
-  const whereClause =
-    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
-  // base query
-  let query = `
-    SELECT 
-    es.examseriesid as examSeriesId,
-    es.examseriesdescription as examSeriesDescription,
-    es.examseriesenddate as examSeriesEndDate,
-    es.examseriesstartdate as examSeriesStartDate,
-    es.credits as credits,
-    es.examid as examId,
-    e.examname as examName 
-    FROM examseries es
-    LEFT JOIN exam e ON es.examid = e.examid   
-   ${whereClause}
-    ORDER BY es.createddate DESC
+    if (searchTerm) {
+      conditions.push(
+        "(LOWER(es.examseriesdescription) LIKE ? OR LOWER(e.examname) LIKE ?)"
+      );
+      const searchValue = `%${searchTerm}%`;
+      params.push(searchValue, searchValue);
+    }
+
+    if (byExam) {
+      conditions.push("es.examid=?");
+      params.push(byExam);
+    }
+
+    if (examId) {
+      conditions.push("es.examseriesid=?");
+      params.push(examId);
+    }
+
+    const whereClause =
+      conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    let query = `
+      SELECT 
+        es.examseriesid as seriesId,
+        es.examseriesdescription as seriesDesc,
+        es.examseriesenddate as seriesEndDate,
+        es.examseriesstartdate as seriesStartDate,
+        es.credits as seriesCredit,
+        es.examid as examId,
+        e.examname as examName 
+      FROM examseries es
+      LEFT JOIN exam e ON es.examid = e.examid   
+      ${whereClause}
+      ORDER BY es.createddate DESC
+
     `;
-  const queryParams = [...params];
-  if (page && limit) {
-    const offset = (page - 1) * limit;
-    query += `LIMIT ? OFFSET ?`;
-    queryParams.push(String(limit), String(offset));
-  }
-  const [rows] = await pool.execute(query, queryParams);
-  const countQuery = `
-    SELECT COUNT(*) AS total 
-    FROM examseries es
-    LEFT JOIN exam e ON es.examid = e.examid
-    ${whereClause}
-  `;
-  const [countResult] = await pool.execute(countQuery, params);
-  const total = countResult[0].total;
-  return { data: rows, total };
-};
 
-const getExamSeriesById = async (examSeriesId) => {
-  const sql = `SELECT * FROM examseries WHERE examseriesid=?`;
-  const [result] = await pool.query(sql, [examSeriesId]);
+    const queryParams = [...params];
 
-  return { data: result };
-};
+    if (page && pageSize) {
+      const offset = (page - 1) * pageSize;
+      query += ` LIMIT ? OFFSET ?`;
+      queryParams.push(String(pageSize), String(offset));
+    }
 
-const postExamSeries = async (data) => {
-  const {
-    examId,
-    examSeriesDescription,
-    examSeriesStartDate,
-    examSeriesEndDate,
-    credits,
-  } = data;
+    const [rows] = await pool.execute(query, queryParams);
 
-  try {
+    const countQuery = `
+      SELECT COUNT(*) AS total 
+      FROM examseries es
+      LEFT JOIN exam e ON es.examid = e.examid
+      ${whereClause}
+    `;
+
+    const [countResult] = await pool.execute(countQuery, params);
+    const total = countResult[0].total;
+
+    return { data: rows, total };
+  },
+
+  async getSeriesById(examSeriesId) {
+    const query = `
+      SELECT 
+        es.examseriesid as seriesId,
+        es.examseriesdescription as seriesDesc,
+        es.examseriesenddate as seriesEndDate,
+        es.examseriesstartdate as seriesStartDate,
+        es.credits as seriesCredit,
+        es.examid as examId,
+        e.examname as examName 
+      FROM examseries es
+      LEFT JOIN exam e ON es.examid = e.examid
+      WHERE es.examseriesid = ?
+    `;
+
+    const [rows] = await pool.execute(query, [examSeriesId]);
+
+    return rows.length > 0 ? rows[0] : null;
+  },
+
+  async postSeries(conn, data) {
+    const { examId, seriesDesc, seriesStartDate, seriesEndDate, seriesCredit } =
+      data;
+
     const sql =
-      "INSERT INTO examseries (examid,  examseriesdescription,examseriesstartdate,examseriesenddate,credits) VALUES (?, ?,?,?,?)";
-    const [result] = await pool.query(sql, [
+      "INSERT INTO examseries (examid, examseriesdescription, examseriesstartdate, examseriesenddate, credits) VALUES (?, ?, ?, ?, ?)";
+    const [result] = await conn.query(sql, [
       examId,
-      examSeriesDescription,
-      examSeriesStartDate,
-      examSeriesEndDate,
-      credits,
+      seriesDesc,
+      seriesStartDate,
+      seriesEndDate,
+      seriesCredit,
     ]);
     return result.insertId;
-  } catch (err) {
-    throw err;
-  }
-};
+  },
 
-const putExamSeries = async (id, data) => {
-  const {
-    examId,
-    examSeriesDescription,
-    examSeriesStartDate,
-    examSeriesEndDate,
-    credits,
-  } = data;
-
-  try {
-    const sql = `UPDATE examseries SET  examid = ?,
-    examseriesdescription = ?,
-    examseriesstartdate =? ,
-    examseriesenddate =? ,
-    credits=? WHERE examseriesid = ? ;`;
-    const [result] = await pool.query(sql, [
+  async putSeries(conn, seriesId, data) {
+    const {
       examId,
-      examSeriesDescription,
-      examSeriesStartDate,
-      examSeriesEndDate,
-      credits,
-      id,
-    ]);
-    return result;
-  } catch (err) {
-    throw err;
-  }
+      seriesDesc,
+      seriesStartDate,
+      seriesEndDate,
+      seriesCredit,
+      active,
+      editedBy,
+    } = data;
+
+    const fields = [];
+    const params = [];
+
+    if (seriesDesc !== undefined) {
+      fields.push("examseriesdescription = ?");
+      params.push(seriesDesc);
+    }
+
+    if (seriesStartDate !== undefined) {
+      fields.push("examseriesstartdate = ?");
+      params.push(seriesStartDate);
+    }
+
+    if (seriesEndDate !== undefined) {
+      fields.push("examseriesenddate = ?");
+      params.push(seriesEndDate);
+    }
+
+    if (seriesCredit !== undefined) {
+      fields.push("credits = ?");
+      params.push(seriesCredit);
+    }
+
+    if (examId !== undefined) {
+      fields.push("examid = ?");
+      params.push(examId);
+    }
+
+    if (active !== undefined) {
+      fields.push("active = ?");
+      params.push(active);
+    }
+
+    fields.push("editedby = ?");
+    params.push(editedBy);
+
+    fields.push("editeddate = NOW()");
+
+    const sql = `
+      UPDATE examseries
+      SET ${fields.join(", ")}
+      WHERE examseriesid = ?
+    `;
+
+    params.push(seriesId);
+
+    const [result] = await conn.execute(sql, params);
+    return result.affectedRows > 0;
+  },
+
+  async deleteSeries(data) {
+    const { examSeriesToDelete } = data;
+
+    try {
+      const sql = `DELETE FROM examseries WHERE examseriesid = ?`;
+      const [result] = await pool.query(sql, [examSeriesToDelete]);
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  },
 };
 
-const deleteExamSeries = async (data) => {
-  const { examSeriesToDelete, editedBy } = data;
-
-  try {
-    const sql = `DELETE FROM examseries WHERE examseriesid = ?;`;
-    const [result] = await pool.query(sql, [examSeriesToDelete]);
-    return result;
-  } catch (err) {
-    throw err;
-  }
-};
-
-module.exports = {
-  getExamSeries,
-  postExamSeries,
-  putExamSeries,
-  deleteExamSeries,
-  getExamSeriesById,
-};
+module.exports = SeriesModel;

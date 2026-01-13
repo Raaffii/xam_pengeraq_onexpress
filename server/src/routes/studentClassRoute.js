@@ -2,7 +2,7 @@ const express = require("express");
 const { authenticateToken } = require("../middlewares/authMiddleware");
 const {
   getStudentClass,
-  postClassSchedule,
+  assignStudentClass,
   deleteClassSchedule,
   putClassSchedule,
 } = require("../controllers/studentClassController");
@@ -26,5 +26,6 @@ const router = express.Router();
 router.use(authenticateToken);
 
 router.get("/", getStudentClass); //console.log class schedule detail
+router.post("/", assignStudentClass);
 
 module.exports = router;

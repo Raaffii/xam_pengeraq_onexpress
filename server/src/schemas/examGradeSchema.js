@@ -43,7 +43,8 @@ const gradeSchema = z.object({
     .positive("Grade sequence must be positive"),
   finalPercent: z
     .string("Minimum score is required")
-    .regex(/^\d+\.\d{2}$/, "Minimum score must be in format XX.XX")
+    .regex(/^\d+\.\d{1,2}$/, "GPA must be in format X.X or X.XX")
+    .transform((val) => parseFloat(val).toFixed(2))
     .refine(
       (val) => parseFloat(val) >= 0 && parseFloat(val) <= 100,
       "Minimum score must be between 0.00 and 100.00",
@@ -55,10 +56,11 @@ const gradeSchema = z.object({
     .trim(),
   gradePoint: z
     .string("Grade Point is required")
-    .regex(/^\d+\.\d{1}$/, "Grade point must be in format X.X")
+    .regex(/^\d+\.\d{1,2}$/, "GPA must be in format X.X or X.XX")
+    .transform((val) => parseFloat(val).toFixed(2))
     .refine(
       (val) => parseFloat(val) >= 0 && parseFloat(val) <= 4,
-      "Grade point must be between 0.0 and 4.0",
+      "Grade point must be between 0.00 and 4.00",
     ),
   gradeResult: z
     .string("Grade result is required")
@@ -78,13 +80,15 @@ const updateGradeSchema = z
     gradeSeq: z
       .number("Grade sequence is required")
       .int("Grade sequence must be an integer")
-      .positive("Grade sequence must be positive"),
+      .positive("Grade sequence must be positive")
+      .optional(),
     finalPercent: z
-      .string("Minimum score is required")
-      .regex(/^\d+\.\d{2}$/, "Minimum score must be in format XX.XX")
+      .string("Final Percent is required")
+      .regex(/^\d+\.\d{1,2}$/, "GPA must be in format X.X or X.XX")
+      .transform((val) => parseFloat(val).toFixed(2))
       .refine(
         (val) => parseFloat(val) >= 0 && parseFloat(val) <= 100,
-        "Minimum score must be between 0.00 and 100.00",
+        "Final Percent must be between 0.00 and 100.00",
       )
       .optional(),
     grade: z
@@ -95,7 +99,8 @@ const updateGradeSchema = z
       .optional(),
     gradePoint: z
       .string("Grade Point is required")
-      .regex(/^\d+\.\d{1}$/, "Grade point must be in format X.X")
+      .regex(/^\d+\.\d{1,2}$/, "GPA must be in format X.X or X.XX")
+      .transform((val) => parseFloat(val).toFixed(2))
       .refine(
         (val) => parseFloat(val) >= 0 && parseFloat(val) <= 4,
         "Grade point must be between 0.0 and 4.0",

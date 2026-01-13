@@ -1,24 +1,20 @@
 const { z } = require("zod");
-const { passwordSchema } = require("./authSchema");
 const { paginationSchema } = require(".");
 
-const ExamSeriesNameSchema = z
-  .string("Name is required")
-  .max(45, "Name must not exceed 45 characters")
-  .trim();
-
 const ExamSeriesDescription = z
-  .string("ExamSeries Description No is required")
-  .max(50, "ExamSeries Description no must not exceed 10 characters")
+  .string("Exam Series Description is required")
+  .max(50, "ExamSeries Description must not exceed 50 characters")
   .trim();
 
 const dateSchema = z.coerce.date({
   invalid_type_error: "Invalid date",
 });
 
-const numberScheme = z.coerce
-  .number({ invalid_type_error: "Credits must be a number" })
-  .int("Credits must be an integer");
+const numberScheme = z
+  .number("Credit must be a number")
+  .int("Credit must be an integer")
+  .min(0, "Credit must be non-negative")
+  .max(999, "Credit must not exceed 999");
 
 const examIdSchema = z.coerce
   .number({
@@ -28,30 +24,30 @@ const examIdSchema = z.coerce
   .positive("Exam ID must be greater than 0");
 
 const createExamSeriesSchema = z.object({
-  examSeriesDescription: ExamSeriesDescription,
-  examSeriesEndDate: dateSchema,
-  examSeriesStartDate: dateSchema,
-  credits: numberScheme,
-  importExamSeries: numberScheme,
+  seriesDesc: ExamSeriesDescription,
+  seriesEndDate: dateSchema,
+  seriesStartDate: dateSchema,
+  seriesCredit: numberScheme,
+  importSeriesId: examIdSchema.optional(),
   examId: examIdSchema,
 });
 
 const updateExamSeriesSchema = z.object({
-  examSeriesDescription: ExamSeriesDescription.optional(),
-  examSeriesEndDate: dateSchema.optional(),
-  examSeriesStartDate: dateSchema.optional(),
-  credits: numberScheme.optional(),
+  seriesDesc: ExamSeriesDescription.optional(),
+  seriesEndDate: dateSchema.optional(),
+  seriesStartDate: dateSchema.optional(),
+  seriesCredit: numberScheme.optional(),
   examId: examIdSchema.optional(),
 });
 
 const idParamsSchema = z.object({
-  id: z
-    .string("User ID is required")
+  seriesId: z
+    .string("Series ID is required")
     .pipe(
       z.coerce
-        .number("Invalid  ExamSeries ID")
+        .number("Invalid  Exam Series ID")
         .int()
-        .positive("ExamSeries ID must be a positive number")
+        .positive("Exam Series ID must be a positive number"),
     ),
 });
 

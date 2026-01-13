@@ -8,15 +8,14 @@ import {
   SearchableDropdown,
 } from "@/components/custom";
 import { useStudents } from "@/hooks/useStudents";
-import { useExamSeries } from "@/hooks/useExamsSeries";
 
 export default function EditStudent({
   open,
   setOpen,
   fetchStudents,
   entityData,
+  seriesOptions,
 }) {
-  const hasFetchedData = useRef(false);
   const [formData, setFormData] = useState({
     studentIdNo: entityData.studentIdNo,
     studentName: entityData.studentName,
@@ -24,17 +23,6 @@ export default function EditStudent({
   });
 
   const { updateStudents, isSubmitting } = useStudents();
-  const { fetchExamSeries, examSeries } = useExamSeries();
-
-  useEffect(() => {
-    if (hasFetchedData.current) return;
-    hasFetchedData.current = true;
-    const fetchData = async () => {
-      await fetchExamSeries();
-    };
-
-    fetchData();
-  }, [fetchExamSeries]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,11 +43,6 @@ export default function EditStudent({
       [name]: value,
     }));
   };
-
-  const optionsSubject = examSeries?.map((item) => ({
-    value: item.examSeriesId,
-    label: item.examSeriesDescription,
-  }));
 
   const addExamSeries = () => {
     setFormData((prev) => ({
@@ -95,52 +78,55 @@ export default function EditStudent({
       onClose={() => {
         setOpen(false);
       }}
-      title={<div className='flex items-center'>Edit Student</div>}
-      size='lg'>
+      title={<div className="flex items-center">Edit Student</div>}
+      size="lg"
+    >
       <Form
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
-        submitText='Submit'
-        cancelText='Cancel'
-        onCancel={() => setOpen(false)}>
+        submitText="Submit"
+        cancelText="Cancel"
+        onCancel={() => setOpen(false)}
+      >
         {" "}
-        <FormField label='Student'>
+        <FormField label="Student">
           <Input
-            type='text'
-            className='bg-gray-100 text-gray-600'
-            placeholder='student id'
-            name='studentIdNo'
+            type="text"
+            className="bg-gray-100 text-gray-600"
+            placeholder="student id"
+            name="studentIdNo"
             onChange={handleInputChange}
             value={formData.studentIdNo}
           />
         </FormField>
-        <FormField label='Student'>
+        <FormField label="Student">
           <Input
-            type='text'
-            className='bg-gray-100 text-gray-600'
-            placeholder='student name'
-            name='studentName'
+            type="text"
+            className="bg-gray-100 text-gray-600"
+            placeholder="student name"
+            name="studentName"
             onChange={handleInputChange}
             value={formData.studentName}
           />
         </FormField>
-        <FormField label='Exam Series'>
+        <FormField label="Exam Series">
           {formData.examSeries.map((value, index) => (
-            <div key={index} className='grid grid-cols-10 gap-2'>
+            <div key={index} className="grid grid-cols-10 gap-2">
               <SearchableDropdown
                 id={`examseries-${index}`}
-                options={optionsSubject}
+                options={seriesOptions}
                 value={value}
-                placeholder='Select exam series'
+                placeholder="Select exam series"
                 onChange={(val) => handleExamSeriesChange(index, val)}
-                className='col-span-9'
+                className="col-span-9"
               />
 
               {formData.examSeries.length > 1 && (
                 <button
-                  type='button'
+                  type="button"
                   onClick={() => removeExamSeries(index)}
-                  className='px-3 border rounded text-red-600'>
+                  className="px-3 border rounded text-red-600"
+                >
                   -
                 </button>
               )}
@@ -148,9 +134,10 @@ export default function EditStudent({
           ))}
 
           <button
-            type='button'
+            type="button"
             onClick={addExamSeries}
-            className='px-3 py-1 border rounded text-blue-600'>
+            className="px-3 py-1 border rounded text-blue-600"
+          >
             + Add Exam Series
           </button>
         </FormField>
@@ -177,7 +164,7 @@ EditStudent.propTypes = {
         PropTypes.number,
         PropTypes.bool,
       ]),
-    })
+    }),
   ).isRequired,
   dropdowns: PropTypes.objectOf(
     PropTypes.arrayOf(
@@ -185,8 +172,8 @@ EditStudent.propTypes = {
         value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
           .isRequired,
         label: PropTypes.string.isRequired,
-      })
-    )
+      }),
+    ),
   ),
   title: PropTypes.string,
   validateForm: PropTypes.func,

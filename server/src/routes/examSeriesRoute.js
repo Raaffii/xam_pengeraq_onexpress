@@ -26,20 +26,14 @@ const router = express.Router();
 router.use(authenticateToken);
 
 router.get("/", validateQuery(fetchExamSeriesQuerySchema), getExamSeries);
-router.get(
-  "/:id",
-  validateQuery(fetchExamSeriesQuerySchema),
-  getExamSeriesById
-);
+router.get("/:seriesId", validateParams(idParamsSchema), getExamSeriesById);
+
 router.post("/", validateBody(createExamSeriesSchema), createExamSeries);
 router.put(
-  "/:id",
+  "/:seriesId",
   validateMultiple({ params: idParamsSchema, body: updateExamSeriesSchema }),
-  updateExamSeries
+  updateExamSeries,
 );
-router.delete("/:id", validateParams(idParamsSchema), deleteExamSeries);
-// router.post("/", authenticateToken, postExpaloc);
-// router.put("/:id", authenticateToken, putExpaloc);
-// router.delete("/:id", authenticateToken, deleteExpaloc);
+router.delete("/:seriesId", validateParams(idParamsSchema), deleteExamSeries);
 
 module.exports = router;

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
 import {
   Modal,
@@ -8,9 +8,13 @@ import {
   SearchableDropdown,
 } from "@/components/custom";
 import { useStudents } from "@/hooks/useStudents";
-import { useExamSeries } from "@/hooks/useExamsSeries";
 
-export default function AddStudent({ open, setOpen, fetchStudents }) {
+export default function AddStudent({
+  open,
+  setOpen,
+  fetchStudents,
+  seriesOptions,
+}) {
   const [formData, setFormData] = useState({
     studentIdNo: "",
     studentName: "",
@@ -18,17 +22,6 @@ export default function AddStudent({ open, setOpen, fetchStudents }) {
   });
 
   const { createStudents, isSubmitting } = useStudents();
-  const { fetchExamSeries, examSeries } = useExamSeries();
-  const hasFetchedData = useRef(false);
-  useEffect(() => {
-    if (hasFetchedData.current) return;
-    hasFetchedData.current = true;
-    const fetchData = async () => {
-      await fetchExamSeries();
-    };
-
-    fetchData();
-  }, [fetchExamSeries]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,11 +40,6 @@ export default function AddStudent({ open, setOpen, fetchStudents }) {
       [name]: value,
     }));
   };
-
-  const optionsSubject = examSeries?.map((item) => ({
-    value: item.examSeriesId,
-    label: item.examSeriesDescription,
-  }));
 
   const addExamSeries = () => {
     setFormData((prev) => ({
@@ -87,50 +75,53 @@ export default function AddStudent({ open, setOpen, fetchStudents }) {
       onClose={() => {
         setOpen(false);
       }}
-      title={<div className='flex items-center'>Add Student</div>}
-      size='lg'>
+      title={<div className="flex items-center">Add Student</div>}
+      size="lg"
+    >
       <Form
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
-        submitText='Submit'
-        cancelText='Cancel'
-        onCancel={() => setOpen(false)}>
+        submitText="Submit"
+        cancelText="Cancel"
+        onCancel={() => setOpen(false)}
+      >
         {" "}
-        <FormField label='Student'>
+        <FormField label="Student">
           <Input
-            type='text'
-            className='bg-gray-100 text-gray-600'
-            placeholder='student id'
-            name='studentIdNo'
+            type="text"
+            className="bg-gray-100 text-gray-600"
+            placeholder="student id"
+            name="studentIdNo"
             onChange={handleInputChange}
           />
         </FormField>
-        <FormField label='Student'>
+        <FormField label="Student">
           <Input
-            type='text'
-            className='bg-gray-100 text-gray-600'
-            placeholder='student name'
-            name='studentName'
+            type="text"
+            className="bg-gray-100 text-gray-600"
+            placeholder="student name"
+            name="studentName"
             onChange={handleInputChange}
           />
         </FormField>
-        <FormField label='Exam Series'>
+        <FormField label="Exam Series">
           {formData.examSeries.map((value, index) => (
-            <div key={index} className='grid grid-cols-10 gap-2'>
+            <div key={index} className="grid grid-cols-10 gap-2">
               <SearchableDropdown
                 id={`examseries-${index}`}
-                options={optionsSubject}
+                options={seriesOptions}
                 value={value}
-                placeholder='Select exam series'
+                placeholder="Select exam series"
                 onChange={(val) => handleExamSeriesChange(index, val)}
-                className='col-span-9'
+                className="col-span-9"
               />
 
               {formData.examSeries.length > 1 && (
                 <button
-                  type='button'
+                  type="button"
                   onClick={() => removeExamSeries(index)}
-                  className='px-3 border rounded text-red-600 col-span-1'>
+                  className="px-3 border rounded text-red-600 col-span-1"
+                >
                   -
                 </button>
               )}
@@ -138,9 +129,10 @@ export default function AddStudent({ open, setOpen, fetchStudents }) {
           ))}
 
           <button
-            type='button'
+            type="button"
             onClick={addExamSeries}
-            className='px-3 py-1 border rounded text-blue-600'>
+            className="px-3 py-1 border rounded text-blue-600"
+          >
             + Add Exam Series
           </button>
         </FormField>
@@ -167,7 +159,7 @@ AddStudent.propTypes = {
         PropTypes.number,
         PropTypes.bool,
       ]),
-    })
+    }),
   ).isRequired,
   dropdowns: PropTypes.objectOf(
     PropTypes.arrayOf(
@@ -175,8 +167,8 @@ AddStudent.propTypes = {
         value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
           .isRequired,
         label: PropTypes.string.isRequired,
-      })
-    )
+      }),
+    ),
   ),
   title: PropTypes.string,
   validateForm: PropTypes.func,

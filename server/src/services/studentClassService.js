@@ -15,6 +15,20 @@ const getStudentClass = async (page, limit, searchTerm, schedule) => {
   }
 };
 
+const postStudentClass = async (data) => {
+  try {
+    const result = await StudentClass.postStudentClass(data);
+
+    await result;
+    return result;
+  } catch (error) {
+    console.error("Service error:", error);
+    throw error;
+  } finally {
+  }
+};
+
 module.exports = {
   getStudentClass,
+  postStudentClass,
 };

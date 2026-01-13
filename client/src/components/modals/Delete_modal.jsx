@@ -33,10 +33,11 @@ export default function Delete_modal({
     <Modal
       open={open}
       onClose={() => setOpen(false)}
-      title={<div className='flex items-center'>{title}</div>}
-      size='md'>
-      <div className='mb-6'>
-        <p className='text-sm text-gray-700'>
+      title={<div className="flex items-center">{title}</div>}
+      size="md"
+    >
+      <div className="mb-6">
+        <p className="text-sm text-gray-700">
           {confirmationText ||
             "Are you sure you want to delete this item? This action cannot be undone."}
         </p>
@@ -46,27 +47,30 @@ export default function Delete_modal({
         children={false}
         onSubmit={handleSubmit}
         isSubmitting={loading}
-        submitText='Delete'
-        cancelText='Cancel'
+        submitText="Delete"
+        cancelText="Cancel"
         onCancel={() => setOpen(false)}
         actions={
           <>
             <Button
-              type='button'
-              variant='secondary'
+              type="button"
+              variant="secondary"
               onClick={() => setOpen(false)}
-              disabled={loading}>
+              disabled={loading}
+            >
               Cancel
             </Button>
             <Button
-              type='submit'
-              variant='danger'
+              type="submit"
+              variant="danger"
               disabled={loading}
-              loading={loading}>
+              loading={loading}
+            >
               Delete
             </Button>
           </>
-        }></Form>
+        }
+      ></Form>
     </Modal>
   );
 }

@@ -1,105 +1,149 @@
 import { useParams } from "react-router-dom";
-
 import { useExamSeries } from "@/hooks/useExamsSeries";
-import { useEffect } from "react";
-import { DataTable } from "@/components/table";
+import { useEffect, useRef, useState } from "react";
+import PageHeader from "../common/PageHeader";
+import { Edit } from "lucide-react";
+import { DetailsInfoCard } from "../common";
+import { SeriesModal } from ".";
+import { useExams } from "@/hooks/useExams";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import SubjectSection from "../subjects/SubjectSection";
+import GradeSections from "./GradeSections";
 
 export default function ExamSeriesDetailPage() {
   const { id } = useParams();
+  const hasFetchedData = useRef(false);
+  const {
+    fetchExamSeriesByid,
+    seriesDetail,
+    isLoading,
+    updateExamsSeries,
+    setSeriesDetail,
+    isSubmitting,
+  } = useExamSeries();
+  const { fetchExams, exams } = useExams();
 
-  const { fetchExamSeriesById, examSeries, pagination } = useExamSeries();
+  const [isSeriesModalOpen, setIsSeriesModalOpen] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      console.log("cek", id);
-      const student = await fetchExamSeriesById({ byExam: id });
-      console.log("");
-    };
+    if (hasFetchedData.current) return;
+    hasFetchedData.current = true;
+    if (id) {
+      fetchExamSeriesByid(id);
+      fetchExams();
+    }
+  }, [fetchExamSeriesByid, id, fetchExams]);
 
-    fetchData();
-  }, []);
-
-  console.log("cekcekc", examSeries);
-
-  const columns = [
+  const seriesDetailFields = [
     {
-      accessorKey: "examName",
-      header: <div className='text-left w-full'>Exam</div>,
-      cellClassName: "text-left",
-    },
-    {
-      accessorKey: "examSeriesDescription",
-      header: <div className='text-left w-full'>Description</div>,
-      cellClassName: "text-left",
-    },
-    {
-      accessorKey: "examSeriesStartDate",
-      header: <div className='text-left w-full'>Start Date</div>,
-      cellClassName: "text-left",
-    },
-    {
-      accessorKey: "examSeriesEndDate",
-      header: <div className='text-left w-full'>End Date</div>,
-      cellClassName: "text-left",
-    },
-    {
-      accessorKey: "credits",
-      header: <div className='text-left w-full'>Credits</div>,
-      cellClassName: "text-left",
-    },
-  ];
-
-  const fields = [
-    {
-      label: "",
-      name: "examSeriesId",
-      type: "hidden",
-    },
-    {
-      label: "Exam",
-      name: "examId",
-      type: "dropdown",
-      required: true,
+      label: "Series ID",
+      value: seriesDetail?.seriesId,
     },
     {
       label: "Description",
-      name: "examSeriesDescription",
-      type: "text",
-      required: true,
+      value: seriesDetail?.seriesDesc,
+    },
+    {
+      label: "Credit",
+      value: seriesDetail?.seriesCredit,
+    },
+    {
+      label: "Exam",
+      value: seriesDetail?.examName,
     },
     {
       label: "Start Date",
-      name: "examSeriesStartDate",
-      type: "date",
-      required: true,
+      value: seriesDetail?.seriesStartDate,
     },
     {
       label: "End Date",
-      name: "examSeriesEndDate",
-      type: "date",
-      required: true,
-    },
-    {
-      label: "Credits",
-      name: "credits",
-      type: "number",
-      required: true,
+      value: seriesDetail?.seriesEndDate,
     },
   ];
 
+  const handleUpdateSeries = async (formData) => {
+    const response = await updateExamsSeries(id, formData);
+
+    if (response?.success) {
+      setSeriesDetail((prev) => ({
+        ...prev,
+        ...formData,
+      }));
+      setIsSeriesModalOpen(false);
+    }
+  };
+
+  const examOptions = Array.isArray(exams)
+    ? exams.map((item) => ({
+        value: item.examId,
+        label: item.examName,
+      }))
+    : [];
+
   return (
-    <>
-      <DataTable
-        data={examSeries}
-        columns={columns}
-        detailPage='series'
-        idAccessor='examSeriesId'
-        // onEdit={openEditModal}
-        // onDelete={openDeleteModal}
-        // onPageChange={onPageChange}
-        // onSizeChange={onPageSizeChange}
-        pagination={pagination}
+    <div className="min-h-screen">
+      <PageHeader
+        title={`${seriesDetail?.seriesDesc || ""}`}
+        subtitle={"Manage exam series details"}
+        actions={[
+          {
+            variant: "default",
+            label: "Edit Details",
+            onClick: () => {
+              setIsSeriesModalOpen(true);
+            },
+            icon: Edit,
+          },
+        ]}
       />
-    </>
+      <DetailsInfoCard
+        title="Series Details"
+        fields={seriesDetailFields}
+        columnSize={3}
+        isLoading={isLoading}
+        className="mb-6"
+      />
+
+      <Tabs defaultValue="subjects" className="w-full">
+        <TabsList>
+          <TabsTrigger value="subjects">Subjects</TabsTrigger>
+          <TabsTrigger value="grades">Grades</TabsTrigger>
+        </TabsList>
+        <TabsContent value="subjects">
+          <SubjectSection
+            customParams={{ bySeries: id }}
+            seriesId={id}
+            examSeriesOptions={[
+              {
+                value: seriesDetail?.seriesId,
+                label: seriesDetail?.seriesDesc,
+              },
+            ]}
+          />
+        </TabsContent>
+        <TabsContent value="grades">
+          <GradeSections
+            customParams={{ bySeries: id }}
+            seriesId={id}
+            examSeriesOptions={[
+              {
+                value: seriesDetail?.seriesId,
+                label: seriesDetail?.seriesDesc,
+              },
+            ]}
+          />
+        </TabsContent>
+      </Tabs>
+
+      <SeriesModal
+        open={isSeriesModalOpen}
+        onOpenChange={setIsSeriesModalOpen}
+        initialValues={seriesDetail}
+        onSubmit={handleUpdateSeries}
+        isSubmitting={isSubmitting}
+        mode={"edit"}
+        examOptions={examOptions}
+      />
+    </div>
   );
 }

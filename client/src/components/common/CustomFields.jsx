@@ -309,24 +309,46 @@ export const SearchableDropdown = ({
   icon: Icon = Search,
   defaultOption = null,
   minSearchLength = 2,
+  className = "",
+  isManualSearch = false,
 }) => {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [hasSearched, setHasSearched] = useState(false);
   const searchTimeoutRef = useRef(null);
 
-  const mergedOptions = useMemo(() => {
-    if (!defaultOption || !value) return options;
-
-    const existsInOptions = options.some((opt) => opt.value === value);
-
-    if (existsInOptions || defaultOption.value !== value) {
+  const displayOptions = useMemo(() => {
+    if (isManualSearch) {
+      if (!hasSearched && defaultOption && value === defaultOption.value) {
+        return [defaultOption];
+      }
+      if (defaultOption && value === defaultOption.value) {
+        const existsInOptions = options.some((opt) => opt.value === value);
+        if (!existsInOptions) {
+          return [defaultOption, ...options];
+        }
+      }
       return options;
     }
 
+    if (!defaultOption || !value) return options;
+    const existsInOptions = options.some((opt) => opt.value === value);
+    if (existsInOptions || defaultOption.value !== value) {
+      return options;
+    }
     return [defaultOption, ...options];
-  }, [options, defaultOption, value]);
+  }, [isManualSearch, hasSearched, defaultOption, value, options]);
 
-  const selectedOption = mergedOptions.find((opt) => opt.value === value);
+  const filteredOptions = useMemo(() => {
+    if (onSearch) return displayOptions;
+    if (!searchTerm) return displayOptions;
+    const lowerSearch = searchTerm.toLowerCase();
+    return displayOptions.filter((option) =>
+      option.label.toLowerCase().includes(lowerSearch),
+    );
+  }, [displayOptions, searchTerm, onSearch]);
+
+  const selectedOption = filteredOptions.find((opt) => opt.value === value);
   const displayValue = selectedOption ? selectedOption.label : "";
 
   const handleSearchChange = (e) => {
@@ -337,34 +359,32 @@ export const SearchableDropdown = ({
       clearTimeout(searchTimeoutRef.current);
     }
 
-    if (value.length >= minSearchLength) {
-      searchTimeoutRef.current = setTimeout(() => {
-        if (onSearch) {
+    if (onSearch) {
+      if (value.length >= minSearchLength) {
+        searchTimeoutRef.current = setTimeout(() => {
           onSearch(value);
-        }
-      }, 300);
-    } else if (value.length === 0) {
-      searchTimeoutRef.current = setTimeout(() => {
-        if (onSearch) {
+          setHasSearched(true);
+        }, 300);
+      } else if (value.length === 0) {
+        searchTimeoutRef.current = setTimeout(() => {
           onSearch("");
-        }
-      }, 300);
+          setHasSearched(true);
+        }, 300);
+      }
     }
   };
 
   const handleSelect = (selectedValue) => {
-    const selectedOption = mergedOptions.find(
+    const selectedOption = filteredOptions.find(
       (opt) => opt.value === selectedValue,
     );
-
     onChange(
       selectedValue === value ? null : selectedValue,
       selectedValue === value ? null : selectedOption?.label,
     );
-
     setOpen(false);
     setSearchTerm("");
-
+    setHasSearched(false);
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
     }
@@ -374,7 +394,7 @@ export const SearchableDropdown = ({
     e.stopPropagation();
     onChange(null, null);
     setSearchTerm("");
-
+    setHasSearched(false);
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
     }
@@ -384,11 +404,18 @@ export const SearchableDropdown = ({
     setOpen(isOpen);
     if (!isOpen) {
       setSearchTerm("");
+      setHasSearched(false);
       if (searchTimeoutRef.current) {
         clearTimeout(searchTimeoutRef.current);
       }
     }
   };
+
+  useEffect(() => {
+    if (!isManualSearch && onSearch) {
+      onSearch("");
+    }
+  }, [isManualSearch, onSearch]);
 
   useEffect(() => {
     return () => {
@@ -397,6 +424,16 @@ export const SearchableDropdown = ({
       }
     };
   }, []);
+
+  const getEmptyMessage = () => {
+    if (isManualSearch && !hasSearched) {
+      return `Type at least ${minSearchLength} characters to search`;
+    }
+    if (searchTerm && searchTerm.length < minSearchLength) {
+      return `Type at least ${minSearchLength} characters to search`;
+    }
+    return searchTerm ? emptyMessage : "Start typing to search...";
+  };
 
   return (
     <div className="space-y-2 w-full">
@@ -417,11 +454,12 @@ export const SearchableDropdown = ({
             className={cn(
               "w-full justify-between bg-gray-50 border-gray-300 hover:bg-gray-100 h-11",
               error && "border-red-500 focus:ring-2 focus:ring-red-200",
-              !displayValue && "text-gray-400",
+              !displayValue && "text-gray-600",
+              className,
             )}
           >
             <div className="flex items-center gap-2 overflow-hidden">
-              <Icon className="w-5 h-5 shrink-0 text-gray-400" />
+              <Icon className="w-5 h-5 shrink-0 text-gray-600" />
               <span className="truncate">{displayValue || placeholder}</span>
             </div>
             <div className="flex items-center gap-1 shrink-0">
@@ -435,7 +473,7 @@ export const SearchableDropdown = ({
               )}
               <ChevronDown
                 className={cn(
-                  "w-4 h-4 text-gray-400 transition-transform",
+                  "w-4 h-4 text-gray-600 transition-transform",
                   open && "rotate-180",
                 )}
               />
@@ -447,7 +485,6 @@ export const SearchableDropdown = ({
           align="start"
         >
           <div className="flex flex-col">
-            {/* Search Input */}
             <div className="flex items-center border-b px-3 py-2">
               <Search className="mr-2 h-4 w-4 shrink-0 text-gray-400" />
               <Input
@@ -458,16 +495,20 @@ export const SearchableDropdown = ({
               />
             </div>
 
-            {/* Options List */}
-            <ScrollArea className="max-h-[300px]">
-              {isLoading ? (
-                <div className="px-4 py-8 text-center text-gray-500">
-                  <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-gray-700"></div>
-                  <p className="mt-2 text-sm">Loading...</p>
-                </div>
-              ) : mergedOptions.length > 0 ? (
+            {isLoading ? (
+              <div className="px-4 py-8 text-center text-gray-500">
+                <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-gray-700"></div>
+                <p className="mt-2 text-sm">Loading...</p>
+              </div>
+            ) : filteredOptions.length > 0 ? (
+              <ScrollArea
+                className="max-h-[200px] overflow-y-auto"
+                onWheel={(e) => {
+                  e.stopPropagation();
+                }}
+              >
                 <div className="py-1">
-                  {mergedOptions.map((option) => (
+                  {filteredOptions.map((option) => (
                     <div
                       key={option.value}
                       onClick={() => handleSelect(option.value)}
@@ -479,23 +520,21 @@ export const SearchableDropdown = ({
                     >
                       <Check
                         className={cn(
-                          "mr-2 h-4 w-4",
+                          "mr-2 h-4 w-4 shrink-0",
                           value === option.value ? "opacity-100" : "opacity-0",
                         )}
                       />
-                      <span className="flex-1">{option.label}</span>
+                      <span className="flex-1 break-words">{option.label}</span>
                     </div>
                   ))}
                 </div>
-              ) : (
-                <div className="px-4 py-8 text-center text-gray-500">
-                  <Search className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm">
-                    {searchTerm ? emptyMessage : "Start typing to search..."}
-                  </p>
-                </div>
-              )}
-            </ScrollArea>
+              </ScrollArea>
+            ) : (
+              <div className="px-4 py-8 text-center text-gray-500">
+                <Search className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                <p className="text-sm">{getEmptyMessage()}</p>
+              </div>
+            )}
           </div>
         </PopoverContent>
       </Popover>

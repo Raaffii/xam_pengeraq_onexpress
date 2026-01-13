@@ -9,7 +9,7 @@ import EditExamsGrades from "../modals/editExamGrades";
 import TableHeader from "../common/TableHeader";
 import { useStudentsExamSeries } from "@/hooks/useStudentsExamSeries";
 import Delete_modal from "../modals/Delete_modal";
-// import Add_exams_grades from "../modals/add_exam_grades";
+import { DetailsInfoCard } from "../common";
 
 export default function StudentsDetailPage() {
   const { id } = useParams();
@@ -21,7 +21,7 @@ export default function StudentsDetailPage() {
   const [searchKeyword, setSearchKeyword] = useState("");
   const { fetchStudentExamSeriesById, studentsExamSeries } =
     useStudentsExamSeries();
-  const { getStudentById, students } = useStudents();
+  const { getStudentById, students, isLoading: loadStudent } = useStudents();
   const {
     fetchExamsResult,
     examsResult,
@@ -31,6 +31,7 @@ export default function StudentsDetailPage() {
     onSearch,
     onFilterChange,
     deleteExamResult,
+    isLoading,
   } = useExamsResult();
 
   useEffect(() => {
@@ -144,6 +145,7 @@ export default function StudentsDetailPage() {
     },
   ];
 
+  console.log("student exam series", studentsExamSeries);
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='mx-auto'>
@@ -156,37 +158,22 @@ export default function StudentsDetailPage() {
           }}
         />
 
-        <div className=''>
-          <div className='bg-white overflow-hidden shadow-sm ring-1 ring-gray-200 rounded-sm border border-gray-100 mb-6'>
-            <div className='px-6 py-6'>
-              <h3 className='text-lg font-semibold text-gray-900 mb-4'>
-                Student Information
-              </h3>
-              <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Student ID
-                  </label>
-                  <div className='bg-gray-50 rounded-lg px-4 py-3 border border-gray-200'>
-                    <span className='text-gray-900 font-medium'>
-                      {students.studentIdNo || "Loading..."}
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Student Name
-                  </label>
-                  <div className='bg-gray-50 rounded-lg px-4 py-3 border border-gray-200'>
-                    <span className='text-gray-900 font-medium'>
-                      {students.studentName || "Loading..."}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <DetailsInfoCard
+          title='Student Information'
+          fields={[
+            {
+              label: "Student ID",
+              value: students.studentIdNo,
+            },
+            {
+              label: "Student Name",
+              value: students.studentName,
+            },
+          ]}
+          columnSize={2}
+          isLoading={loadStudent}
+          className='mb-6'
+        />
 
         <TableHeader
           search={{
@@ -214,7 +201,6 @@ export default function StudentsDetailPage() {
           ]}
         />
 
-        {/* cecleclelc */}
         <DataTable
           data={examsResult}
           columns={columns}
@@ -224,6 +210,7 @@ export default function StudentsDetailPage() {
           onPageChange={onPageChange}
           onSizeChange={onPageSizeChange}
           pagination={pagination}
+          isLoading={isLoading}
         />
 
         {isAddModalOpen && (

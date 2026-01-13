@@ -70,8 +70,8 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
   };
 
   const optionsExamSeries = examSeries?.map((item) => ({
-    value: item.examSeriesId,
-    label: item.examSeriesDescription,
+    value: item.seriesId,
+    label: item.seriesDesc,
   }));
 
   const optionsExamSubject = subject?.map((item) => ({
@@ -117,7 +117,6 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
     }
   };
 
-  console.log("cekce", formData);
   return (
     <Modal
       open={open}

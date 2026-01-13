@@ -1,5 +1,4 @@
 const { z } = require("zod");
-const { passwordSchema } = require("./authSchema");
 const { paginationSchema } = require(".");
 
 const ExamNameSchema = z
@@ -14,22 +13,22 @@ const ExamDescription = z
 
 const createExamSchema = z.object({
   examName: ExamNameSchema,
-  examDescription: ExamDescription,
+  examDesc: ExamDescription,
 });
 
 const updateExamSchema = z.object({
   examName: ExamNameSchema.optional(),
-  examDescription: ExamDescription.optional(),
+  examDesc: ExamDescription.optional(),
 });
 
 const idParamsSchema = z.object({
-  id: z
-    .string("User ID is required")
+  examId: z
+    .string("Exam ID is required")
     .pipe(
       z.coerce
-        .number("Invalid  Exam ID")
+        .number("Invalid Exam ID")
         .int()
-        .positive("Exam ID must be a positive number")
+        .positive("Exam ID must be a positive number"),
     ),
 });
 

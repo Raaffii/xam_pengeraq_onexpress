@@ -1,18 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PageHeader from "@/components/common/PageHeader";
-
 import { DataTable } from "@/components/table";
-import Add_modal from "@/components/modals/Add_modal";
-import Edit_modal from "@/components/modals/Edit_modal";
 import Delete_modal from "@/components/modals/Delete_modal";
 import { useExams } from "@/hooks/useExams";
+import { ExamModal } from "@/components/exam";
 
 const ExamsPage = () => {
+  const hasFetchedData = useRef(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState("create");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedSExam, setSelectedExam] = useState(null);
+  const [initialFormValues, setInitialFormValues] = useState({});
+  const [selectedExam, setSelectedExam] = useState(null);
 
   const {
     createExams,
@@ -25,42 +24,19 @@ const ExamsPage = () => {
     setParams,
     onPageChange,
     onPageSizeChange,
+    isLoading,
+    isSubmitting,
   } = useExams();
 
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchExams();
-    };
-
-    fetchData();
+    if (hasFetchedData.current) return;
+    hasFetchedData.current = true;
+    fetchExams();
   }, [fetchExams]);
-
-  const openEditModal = (student) => {
-    setSelectedExam(student);
-    setIsEditModalOpen(true);
-  };
 
   const openDeleteModal = (student) => {
     setSelectedExam(student);
     setIsDeleteModalOpen(true);
-  };
-
-  const handleStudentEdit = async (formData) => {
-    const result = await updateExams(selectedSExam.examId, formData);
-    if (result.success) {
-      fetchExams();
-    }
-    return result.success;
-  };
-
-  const handleExamSubmit = async (formData) => {
-    const result = await createExams(formData);
-
-    if (result.success) {
-      setParams((prev) => ({ ...prev, page: 1 }));
-      fetchExams({ page: 1 });
-    }
-    return result.success;
   };
 
   const handleExamDelete = async (entityData) => {
@@ -79,33 +55,27 @@ const ExamsPage = () => {
       cellClassName: "text-left",
     },
     {
-      accessorKey: "examDescription",
+      accessorKey: "examDesc",
       header: <div className='text-left w-full'>Description</div>,
       cellClassName: "text-left",
     },
   ];
 
-  const fields = [
-    {
-      label: "",
-      name: "examId",
-      type: "hidden",
-    },
-    {
-      label: "Name",
-      name: "examName",
-      type: "text",
-      maxLength: 45,
-      required: true,
-    },
-    {
-      label: "Description",
-      name: "examDescription",
-      type: "textarea",
-      maxLength: 50,
-      required: true,
-    },
-  ];
+  const handleFormSubmit = async (formData) => {
+    let result;
+    if (modalMode === "create") {
+      result = await createExams(formData);
+    } else {
+      result = await updateExams(formData.examId, formData);
+    }
+
+    if (result.success) {
+      setIsModalOpen(false);
+      setParams((prev) => ({ ...prev, page: 1 }));
+      await fetchExams({ page: 1 });
+    }
+    return result.success;
+  };
 
   return (
     <div className='min-h-screen '>
@@ -114,7 +84,11 @@ const ExamsPage = () => {
         subtitle='Manage exams records and exam series assignments'
         primaryAction={{
           label: "Add Exam",
-          onClick: () => setIsModalOpen(true),
+          onClick: () => {
+            setIsModalOpen(true);
+            setModalMode("create");
+            setInitialFormValues({});
+          },
         }}
         showSearch={true}
         searchPlaceholder='Search by exam name'
@@ -127,42 +101,39 @@ const ExamsPage = () => {
         columns={columns}
         detailPage='exams'
         idAccessor='examId'
-        onEdit={openEditModal}
+        onEdit={(data) => {
+          setModalMode("edit");
+          setInitialFormValues({
+            examId: data.examId,
+            examName: data.examName,
+            examDesc: data.examDesc,
+          });
+          setIsModalOpen(true);
+        }}
         onDelete={openDeleteModal}
         onPageChange={onPageChange}
         onSizeChange={onPageSizeChange}
         pagination={pagination}
+        isLoading={isLoading}
       />
 
-      {isModalOpen && (
-        <Add_modal
-          open={isModalOpen}
-          setOpen={setIsModalOpen}
-          onSubmit={handleExamSubmit}
-          fields={fields}
-          title='Add New Exam'
-        />
-      )}
+      <ExamModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        initialValues={initialFormValues}
+        onSubmit={handleFormSubmit}
+        isSubmitting={isSubmitting}
+        mode={modalMode}
+      />
 
-      {isEditModalOpen && selectedSExam && (
-        <Edit_modal
-          open={isEditModalOpen}
-          setOpen={setIsEditModalOpen}
-          onSubmit={handleStudentEdit}
-          fields={fields}
-          entityData={selectedSExam}
-          title='Edit Student'
-        />
-      )}
-
-      {isDeleteModalOpen && selectedSExam && (
+      {isDeleteModalOpen && selectedExam && (
         <Delete_modal
           open={isDeleteModalOpen}
           setOpen={setIsDeleteModalOpen}
           onSubmit={handleExamDelete}
-          entityData={selectedSExam}
+          entityData={selectedExam}
           title='Delete Student'
-          confirmationText={`Are you sure you want to delete student "${selectedSExam.examName}"? This action cannot be undone.`}
+          confirmationText={`Are you sure you want to delete student "${selectedExam.examName}"? This action cannot be undone.`}
         />
       )}
     </div>
