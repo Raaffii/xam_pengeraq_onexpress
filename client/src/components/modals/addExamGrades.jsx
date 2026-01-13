@@ -4,6 +4,8 @@ import { useStudentsExamSeries } from "@/hooks/useStudentsExamSeries";
 import { useSubject } from "@/hooks/useSubject";
 import { useSubjectGrade } from "@/hooks/useSubjectGrade";
 import { useExamsResult } from "@/hooks/useExamResult";
+import { useExamSubject } from "@/hooks/useExamSubj";
+
 import {
   Modal,
   Form,
@@ -23,6 +25,7 @@ export default function AddExamsGrades({
   const { fetchSubjectByExamSeriesId, subject } = useSubject();
   const { postExamResult } = useExamsResult();
   const { fetchSubjectGradeByExamSubjectId, subjectGrade } = useSubjectGrade();
+  const { fetchSubjects, examSubj } = useExamSubject();
 
   useEffect(() => {
     const fetch = async () => {
@@ -50,8 +53,8 @@ export default function AddExamsGrades({
     label: item.examSeriesDescription,
   }));
 
-  const optionsSubject = subject?.map((item) => ({
-    value: item.examSubjId,
+  const optionsSubject = examSubj?.map((item) => ({
+    value: item.subjId,
     label: item.subjDesc,
   }));
 
@@ -120,7 +123,7 @@ export default function AddExamsGrades({
     }));
 
     if (name == "examSeriesId") {
-      await fetchSubjectByExamSeriesId(value);
+      await fetchSubjects({ bySeries: value });
     } else if (name == "examSubjId") {
       await fetchSubjectGradeByExamSubjectId(value);
     } else if (name == "marks") {

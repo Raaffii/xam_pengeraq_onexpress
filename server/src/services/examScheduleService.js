@@ -1,15 +1,83 @@
 const pool = require("../config/db");
 
 const Students = require("../models/studentModel");
-const StudentExam = require("../models/studentExamModel");
 
-const getExamSchedule = async (page, limit, searchTerm) => {
+const ClassSchedule = require("../models/classScheduleModel");
+const ClassScheduleDetail = require("../models/classScheduleDetailsModel");
+
+const addDateByRepeat = require("../utils/addDateByRepeat");
+
+const getClassSchedule = async (page, limit, searchTerm, date) => {
   try {
-    const result = await Students.getStudent(page, limit, searchTerm);
+    const result = await ClassSchedule.getClassSchedule(
+      page,
+      limit,
+      searchTerm,
+      date
+    );
     return result;
   } catch (error) {
     console.error("Service error:", error);
     throw new Error("Failed to get student by id");
+  }
+};
+
+const postClassSchedule = async (data, userId) => {
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    console.log("data", data);
+
+    const resultId = await ClassSchedule.postClassSchedule(
+      connection,
+      data,
+      userId
+    );
+
+    //start making loop
+    const dataForBulk = [];
+
+    let current = new Date(data.startDateTime);
+    const end = new Date(data.endDateTime);
+
+    if (data.repeatFreq == 1) {
+      while (current <= end) {
+        dataForBulk.push({
+          classchhdid: resultId,
+          teacherId: data.teacherId,
+          examSeriesId: data.examSeriesId,
+          examSubjId: data.examSubjId,
+          locationId: data.locationId,
+          startDateTime: current.toISOString().slice(0, 16),
+        });
+
+        current = addDateByRepeat(current, data.repeatValue, data.repeatFreq);
+      }
+    } else {
+      dataForBulk.push({
+        classchhdid: resultId,
+        teacherId: data.teacherId,
+        examSeriesId: data.examSeriesId,
+        examSubjId: data.examSubjId,
+        locationId: data.locationId,
+        startDateTime: current.toISOString().slice(0, 16),
+      });
+    }
+
+    const result = await ClassScheduleDetail.bulkInsertScheduleDetail(
+      connection,
+      dataForBulk
+    );
+
+    await connection.commit();
+    return result;
+  } catch (error) {
+    await connection.rollback();
+    console.error("Service error:", error);
+    throw error;
+  } finally {
+    connection.release();
   }
 };
 
@@ -24,21 +92,55 @@ const getStudentById = async (studentId) => {
   }
 };
 
-const postStudent = async (data, userId) => {
+const putClassSchedule = async (id, data, userId) => {
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
-    const studentId = await Students.postStudent(connection, data, userId);
-    let result;
-    if (Array.isArray(data.examSeries) && data.examSeries.length > 0) {
-      result = await StudentExam.postStudentExamSeries(
-        connection,
-        data.examSeries,
-        studentId,
-        userId
-      );
+
+    await ClassSchedule.putClassSchedule(connection, id, data, userId);
+
+    // change ig only date change ---------------------------------------
+    await ClassScheduleDetail.deleteClassScheduleDetail(connection, id);
+
+    //start making loop
+    const dataForBulk = [];
+
+    let current = new Date(data.startDateTime);
+    const end = new Date(data.endDateTime);
+
+    if (data.repeatFreq == 1) {
+      while (current <= end) {
+        dataForBulk.push({
+          classchhdid: id,
+          teacherId: data.teacherId,
+          examSeriesId: data.examSeriesId,
+          examSubjId: data.examSubjId,
+          locationId: data.locationId,
+          startDateTime: current.toISOString().slice(0, 16),
+        });
+
+        current = addDateByRepeat(current, data.repeatValue, data.repeatFreq);
+      }
+    } else {
+      dataForBulk.push({
+        classchhdid: id,
+        teacherId: data.teacherId,
+        examSeriesId: data.examSeriesId,
+        examSubjId: data.examSubjId,
+        locationId: data.locationId,
+        startDateTime: current.toISOString().slice(0, 16),
+      });
     }
+
+    const result = await ClassScheduleDetail.bulkInsertScheduleDetail(
+      connection,
+      dataForBulk
+    );
+
+    // change ig only date change ---------------------------------------
+
     await connection.commit();
+
     return result;
   } catch (error) {
     await connection.rollback();
@@ -49,40 +151,13 @@ const postStudent = async (data, userId) => {
   }
 };
 
-const putStudent = async (id, data, userId) => {
+const deleteClassSchedule = async (id) => {
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
-    await StudentExam.deleteByStudentId(connection, id);
-    const result = await Students.putStudent(connection, id, data, userId);
 
-    if (Array.isArray(data.examSeries) && data.examSeries.length > 0) {
-      await StudentExam.postStudentExamSeries(
-        connection,
-        data.examSeries,
-        id,
-        userId
-      );
-    }
-
-    await connection.commit();
-
-    return result;
-  } catch (error) {
-    await connection.rollback();
-    console.error("Service error:", error);
-    throw error;
-  } finally {
-    connection.release();
-  }
-};
-
-const deleteStudent = async (id) => {
-  const connection = await pool.getConnection();
-  try {
-    await connection.beginTransaction();
-    await StudentExam.deleteByStudentId(connection, id);
-    const result = await Students.deleteStudent(connection, id);
+    await ClassScheduleDetail.deleteClassScheduleDetail(connection, id);
+    const result = await ClassSchedule.deleteClassSchedule(connection, id);
 
     await connection.commit();
     return result;
@@ -96,9 +171,9 @@ const deleteStudent = async (id) => {
 };
 
 module.exports = {
-  getExamSchedule,
-  postStudent,
-  putStudent,
-  deleteStudent,
+  getClassSchedule,
+  postClassSchedule,
+  putClassSchedule,
+  deleteClassSchedule,
   getStudentById,
 };

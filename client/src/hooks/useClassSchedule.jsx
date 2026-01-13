@@ -60,14 +60,14 @@ export const useClassSchedule = () => {
     [params, formatClassSchedule]
   );
 
-  const postExamResult = useCallback(async (data) => {
+  const postClassSchedule = useCallback(async (data) => {
     let toastId;
     try {
       setIsSubmitting(true);
       setError(null);
       toastId = toast.loading("Creating new exam result...");
 
-      const response = await examResultService.postExamResult(data);
+      const response = await classScheduleService.postClassSchedule(data);
       toast.success("Exam Result added successfully!", { id: toastId });
 
       return { success: true, data: response.data };
@@ -84,15 +84,15 @@ export const useClassSchedule = () => {
     }
   }, []);
 
-  const putExamResult = useCallback(async (examResultsId, data) => {
+  const putClassSchedule = useCallback(async (classScheduleId, data) => {
     let toastId;
     try {
       setIsSubmitting(true);
       setError(null);
       toastId = toast.loading("Creating new exam result...");
-
-      const response = await examResultService.putExamResult(
-        examResultsId,
+      console.log("ce", classScheduleId);
+      const response = await classScheduleService.putClassSchedule(
+        classScheduleId,
         data
       );
       toast.success("Exam Result added successfully!", { id: toastId });
@@ -111,17 +111,19 @@ export const useClassSchedule = () => {
     }
   }, []);
 
-  const deleteExamResult = useCallback(async (examResultsId) => {
+  const deleteClassSchedule = useCallback(async (classschhdid) => {
     let toastId;
     try {
       setIsSubmitting(true);
       setError(null);
-      toastId = toast.loading("Deleting new exam result...");
-      console.log("exa", examResultsId);
-      const response = await examResultService.deleteExamResult(examResultsId);
-      toast.success("Exam Result delete successfully!", { id: toastId });
+      toastId = toast.loading("Deleting new schedule...");
+
+      const response = await classScheduleService.deleteClassSchedule(
+        classschhdid
+      );
+      toast.success("Schedule delete successfully!", { id: toastId });
       setClassSchedule((prev) =>
-        prev.filter((item) => item.examResultsId !== examResultsId)
+        prev.filter((item) => item.classschhdid !== classschhdid)
       );
       return { success: true, data: response.data };
     } catch (err) {
@@ -187,10 +189,10 @@ export const useClassSchedule = () => {
     onPageSizeChange,
     onSearch,
     setParams,
-    postExamResult,
+    postClassSchedule,
     onFilterChange,
-    deleteExamResult,
-    putExamResult,
+    deleteClassSchedule,
+    putClassSchedule,
     isSubmitting,
     classSchedule,
     isLoading,

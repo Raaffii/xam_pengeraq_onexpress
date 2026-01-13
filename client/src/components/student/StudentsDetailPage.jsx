@@ -10,6 +10,7 @@ import TableHeader from "../common/TableHeader";
 import { useStudentsExamSeries } from "@/hooks/useStudentsExamSeries";
 import Delete_modal from "../modals/Delete_modal";
 import { DetailsInfoCard } from "../common";
+import { DetailsInfoCard } from "../common";
 
 export default function StudentsDetailPage() {
   const { id } = useParams();
@@ -22,6 +23,7 @@ export default function StudentsDetailPage() {
   const { fetchStudentExamSeriesById, studentsExamSeries } =
     useStudentsExamSeries();
   const { getStudentById, students, isLoading: loadStudent } = useStudents();
+  const { getStudentById, students, isLoading: loadStudent } = useStudents();
   const {
     fetchExamsResult,
     examsResult,
@@ -31,6 +33,7 @@ export default function StudentsDetailPage() {
     onSearch,
     onFilterChange,
     deleteExamResult,
+    isLoading,
     isLoading,
   } = useExamsResult();
 
@@ -146,6 +149,7 @@ export default function StudentsDetailPage() {
     },
   ];
 
+  console.log("student exam series", studentsExamSeries);
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto">
@@ -210,6 +214,7 @@ export default function StudentsDetailPage() {
           onPageChange={onPageChange}
           onSizeChange={onPageSizeChange}
           pagination={pagination}
+          isLoading={isLoading}
           isLoading={isLoading}
         />
 

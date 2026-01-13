@@ -44,7 +44,7 @@ export const useExamSubject = () => {
             pageSize: 10,
             totalPages: 1,
             totalItems: 0,
-          },
+          }
         );
 
         return { success: true, data: data };
@@ -59,7 +59,7 @@ export const useExamSubject = () => {
         setIsLoading(false);
       }
     },
-    [params, formatExamSubjData],
+    [params, formatExamSubjData]
   );
 
   const fetchSubjectById = useCallback(async (subjId) => {
@@ -190,7 +190,7 @@ export const useExamSubject = () => {
       toastId = toast.loading("Updating grade details...");
       const response = await subjectService.putSubjectGrade(
         gradeId,
-        examSubjData,
+        examSubjData
       );
       toast.success("Subject Grade updated successfully", { id: toastId });
 
@@ -232,6 +232,30 @@ export const useExamSubject = () => {
     }
   }, []);
 
+  const fetchSubjectByExamSeriesId = useCallback(async (examSeriesId) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await subjectService.getSubjectByExamSeriesId(
+        examSeriesId
+      );
+
+      setExamSubj(response.data);
+
+      return { success: true, data: response.data };
+    } catch (err) {
+      console.error("Error fetching Student:", err);
+
+      setError(err.message);
+      setExamSubj([]);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const clearError = useCallback(() => {
     setError(null);
   }, []);
@@ -250,7 +274,7 @@ export const useExamSubject = () => {
       setParams(newParams);
       return await fetchSubjects({ page });
     },
-    [params, fetchSubjects],
+    [params, fetchSubjects]
   );
 
   const onPageSizeChange = useCallback(
@@ -259,7 +283,7 @@ export const useExamSubject = () => {
       setParams(newParams);
       return await fetchSubjects({ pageSize, page: 1 });
     },
-    [params, fetchSubjects],
+    [params, fetchSubjects]
   );
 
   const onSearch = useCallback(
@@ -268,7 +292,7 @@ export const useExamSubject = () => {
       setParams(newParams);
       return await fetchSubjects({ searchTerm, page: 1 });
     },
-    [params, fetchSubjects],
+    [params, fetchSubjects]
   );
 
   const onFilterChange = useCallback(
@@ -284,7 +308,7 @@ export const useExamSubject = () => {
         page: 1,
       });
     },
-    [params, fetchSubjects],
+    [params, fetchSubjects]
   );
 
   return {
@@ -299,6 +323,7 @@ export const useExamSubject = () => {
 
     // Actions
     fetchSubjects,
+    fetchSubjectByExamSeriesId,
     newExamSubj,
     removeSubject,
     clearError,

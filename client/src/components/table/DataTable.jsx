@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Link } from "react-router-dom";
 import {
   Select,
   SelectContent,
@@ -251,14 +252,14 @@ export const DataTable = ({
                       <td className='px-4 py-4 text-center'>
                         <div className='flex items-center justify-center space-x-2'>
                           {detailPage && (
-                            <a href={`/${detailPage}/${row[idAccessor]}`}>
+                            <Link to={`/${detailPage}/${row[idAccessor]}`}>
                               <button
                                 type='button'
                                 className='inline-flex items-center justify-center w-8 h-8 rounded-lg border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-150'
                                 title='View Details'>
                                 <Info className='h-4 w-4' aria-hidden='true' />
                               </button>
-                            </a>
+                            </Link>
                           )}
                           {onEdit && (
                             <button
