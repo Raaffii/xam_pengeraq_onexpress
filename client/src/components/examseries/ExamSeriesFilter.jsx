@@ -12,6 +12,7 @@ export const ExamSeriesFilter = ({
   initialFilters = {},
   onFilterChange,
   isLoading,
+  showClearBtn = true,
 }) => {
   const [value, setValue] = useState(initialFilters[filterKey] ?? null);
 
@@ -24,7 +25,7 @@ export const ExamSeriesFilter = ({
   const options = useMemo(() => {
     return Array.isArray(data)
       ? data.map((item) => ({
-          value: String(item[valueKey]),
+          value: item[valueKey],
           label: item[labelKey],
         }))
       : [];
@@ -77,7 +78,7 @@ export const ExamSeriesFilter = ({
         />
       </div>
 
-      {hasActiveFilter && (
+      {showClearBtn && hasActiveFilter && (
         <Button
           variant="ghost"
           onClick={handleClear}
