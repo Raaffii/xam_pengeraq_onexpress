@@ -17,11 +17,13 @@ const teacherRoute = require("./teacherRoutes");
 const classLocationRoute = require("./classLocationRoutes");
 const classScheduleDetailRoute = require("./classScheduleDetailRoute");
 const studentClassRoute = require("./studentClassRoute");
+const dashboardRoute = require("./dashboardRoutes");
 
 const Router = express.Router();
 
 // Auth Route
 Router.use("/auth", authRoute);
+Router.use("/dashboard", dashboardRoute);
 Router.use("/examseries", examSeriesRoute);
 Router.use("/student", studentRoute);
 Router.use("/profile", profileRoute);

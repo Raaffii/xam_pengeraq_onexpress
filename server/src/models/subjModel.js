@@ -48,7 +48,7 @@ const SubjModel = {
       FROM examsubj s
       LEFT JOIN examseries e ON e.examseriesid = s.examseriesid
       ${whereClause}
-      ORDER BY s.createddate DESC
+      ORDER BY s.subjdesc ASC
     `;
 
     const queryParams = [...params];
