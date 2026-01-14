@@ -14,6 +14,7 @@ import { useSubject } from "@/hooks/useSubject";
 import { useTeacher } from "@/hooks/useTeacher";
 import { useClassLocation } from "@/hooks/useClassLocation";
 import { useClassSchedule } from "@/hooks/useClassSchedule";
+import { useExamSubject } from "@/hooks/useExamSubj";
 
 export default function EditSchedule({
   open,
@@ -38,6 +39,7 @@ export default function EditSchedule({
   const { fetchSubjectByExamSeriesId, subject } = useSubject();
   const { fetchTeacher, teacher } = useTeacher();
   const { fetchClassLocation, classLocation } = useClassLocation();
+  const { fetchSubjects, examSubj } = useExamSubject();
   const { putClassSchedule, isSubmitting } = useClassSchedule();
   const [repeatCheck, setRepeatCheck] = useState(
     selectedSchedule?.repeatFreq ? true : false
@@ -51,8 +53,7 @@ export default function EditSchedule({
       await fetchExamSeries();
       await fetchTeacher();
       await fetchClassLocation();
-
-      await fetchSubjectByExamSeriesId(selectedSchedule.examSeriesId);
+      await fetchSubjects({ bySeries: selectedSchedule.examSeriesId });
     };
 
     fetchData();
@@ -84,12 +85,12 @@ export default function EditSchedule({
   };
 
   const optionsExamSeries = examSeries?.map((item) => ({
-    value: item.examSeriesId,
-    label: item.examSeriesDescription,
+    value: item.seriesId,
+    label: item.seriesDesc,
   }));
 
-  const optionsExamSubject = subject?.map((item) => ({
-    value: item.examSubjId,
+  const optionsExamSubject = examSubj?.map((item) => ({
+    value: item.subjId,
     label: item.subjDesc,
   }));
 
@@ -127,7 +128,7 @@ export default function EditSchedule({
     }));
 
     if (name == "examSeriesId") {
-      await fetchSubjectByExamSeriesId(value);
+      await fetchSubjects({ bySeries: value });
     }
   };
 

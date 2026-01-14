@@ -14,7 +14,8 @@ const getStudentClass = async (page, limit, searchTerm = "", schedule) => {
     SELECT 
     s.studentname as studentName,
     sc.studentclassid as studentClassId,
-    s.studentidno as studentIdNo
+    s.studentidno as studentIdNo,
+    sc.createddate as enteredDate
 
     FROM studentclass sc 
     LEFT JOIN students s ON sc.studentid = s.studentid

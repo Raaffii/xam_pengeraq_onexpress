@@ -4,14 +4,15 @@ import PageHeader from "../common/PageHeader";
 import { useStudentClass } from "@/hooks/useStudentClass";
 import { DataTable } from "../table";
 import { useEffect } from "react";
-import AddStudentClass from "./AddStudenctClass";
+import AddStudentClass from "../schedule/AddStudenctClass";
 import { useClassSchedule } from "@/hooks/useClassSchedule";
+import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
 import { useStudents } from "@/hooks/useStudents";
 import { Button } from "../custom";
 import toast from "react-hot-toast";
 import { SearchableDropdown } from "../common";
 
-export default function ScheduleDetailPage() {
+export default function TeacherScheduleDetailPage() {
   const { id } = useParams();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -22,6 +23,9 @@ export default function ScheduleDetailPage() {
 
   const { fetchStudentClass, assignStudentClass, studenctClass, pagination } =
     useStudentClass();
+
+  const { fetchClassScheduleDetail, classScheduleDetail } =
+    useClassScheduleDetail();
 
   const { getClassScheduleById, classSchedule } = useClassSchedule();
 
@@ -36,6 +40,7 @@ export default function ScheduleDetailPage() {
   useEffect(() => {
     const fetchData = async () => {
       await fetchStudentClass({ schedule: id });
+      await fetchClassScheduleDetail({ schedule: id });
       await getClassScheduleById(id);
     };
 
@@ -60,7 +65,6 @@ export default function ScheduleDetailPage() {
     },
   ];
 
-  console.log("classschedule", classSchedule);
   const columnStudent = [
     {
       accessorKey: "studentIdNo",
@@ -171,11 +175,12 @@ export default function ScheduleDetailPage() {
     }
   };
 
+  console.log("clas", classScheduleDetail);
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='mx-auto'>
         <PageHeader
-          title={`Class Details - ${classSchedule?.subjDesc || "Loading..."}`}
+          title={`Class Schedule - ${classSchedule?.subjDesc || "Loading..."}`}
           subtitle={`teacher: ${classSchedule?.teacherName || ""}`}
           showSearch={true}
           actions2={actions}

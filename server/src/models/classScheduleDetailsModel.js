@@ -21,7 +21,15 @@ const bulkInsertScheduleDetail = async (conn, data) => {
   return result.affectedRows;
 };
 
-const getClassScheduleDetail = async (page, limit, searchTerm = "", date) => {
+const getClassScheduleDetail = async (
+  page,
+  limit,
+  searchTerm = "",
+  date,
+  teacherId,
+  scheduleId,
+  nowDate = false
+) => {
   page = Number(page) || 1;
   limit = Number(limit) || 10;
   const offset = (page - 1) * limit;
@@ -32,7 +40,37 @@ const getClassScheduleDetail = async (page, limit, searchTerm = "", date) => {
   const year = dateFilter.getFullYear();
   const month = dateFilter.getMonth() + 1;
 
-  const query = `
+  const conditions = [];
+  const params = [];
+
+  if (teacherId) {
+    conditions.push("cs.teacherid=?");
+    params.push(teacherId);
+  }
+
+  if (year) {
+    conditions.push("YEAR(cd.classdatetime) = ?");
+    params.push(year);
+  }
+
+  if (month) {
+    conditions.push(" MONTH(cd.classdatetime) = ?");
+    params.push(month);
+  }
+  console.log("ceeeeeeeeeeeee", scheduleId, nowDate);
+  if (scheduleId) {
+    conditions.push("cd.classschhdid=?");
+    params.push(scheduleId);
+  }
+
+  if (nowDate) {
+    conditions.push("DATE(cd.classdatetime) = CURDATE()");
+  }
+
+  const whereClause =
+    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+  let query = `
     SELECT 
     cs.classschhdid as classschhdid,
     cs.startdatetime as startDateTime,
@@ -42,6 +80,7 @@ const getClassScheduleDetail = async (page, limit, searchTerm = "", date) => {
     t.teachername as teacherName,
     ese.examseriesdescription as examSeriesDescription,
     es.subjDesc as subjDesc,
+    cd.startdatetime as classStartDateTime,
     
     t.teacherid as teacherId,   
     es.examsubjid as examSubjId,
@@ -55,13 +94,19 @@ const getClassScheduleDetail = async (page, limit, searchTerm = "", date) => {
     LEFT JOIN examsubj es ON cs.examsubjectid= es.examsubjid
     LEFT JOIN examseries ese ON cs.examseriesid=ese.examseriesid 
     LEFT JOIN classlocation cl on cs.locationid=cl.classlocationid
-    
-    WHERE YEAR(cd.classdatetime) = ?
-    AND MONTH(cd.classdatetime) = ?
-  
+     ${whereClause}
+
 
     `;
-  const [rows] = await pool.query(query, [year, month]);
+  const queryParams = [...params];
+
+  // if (page) {
+  //   const offset = (page - 1) * page;
+  //   query += ` LIMIT ? OFFSET ?`;
+  //   queryParams.push(String(limit), String(offset));
+  // }
+
+  const [rows] = await pool.execute(query, queryParams);
 
   return { data: rows };
 };
@@ -75,8 +120,67 @@ const deleteClassScheduleDetail = async (conn, id) => {
     throw err;
   }
 };
+
+const startClassSession = async (classschhdid, hashToken) => {
+  try {
+    const sql = `
+      UPDATE classschdetails cd
+      JOIN classschhd cs ON cs.classschhdid = cd.classschhdid
+      SET cd.classtoken = ?, cd.startdatetime = ?
+      WHERE cs.classschhdid = ?
+        AND DATE(cd.classdatetime) = CURDATE()
+    `;
+
+    const [result] = await pool.query(sql, [
+      hashToken,
+      new Date(),
+      classschhdid,
+    ]);
+
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const newTokenClassSession = async (classschhdid, hashToken) => {
+  try {
+    const sql = `
+      UPDATE classschdetails cd
+      JOIN classschhd cs ON cs.classschhdid = cd.classschhdid
+      SET cd.classtoken = ?
+      WHERE cs.classschhdid = ?
+        AND DATE(cd.classdatetime) = CURDATE()
+    `;
+
+    const [result] = await pool.query(sql, [hashToken, classschhdid]);
+
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const openClassSession = async (classschhdid, hashToken) => {
+  try {
+    const sql = `
+    SELECT cd.classdatetime as classDateTime FROM classschdetails cd  WHERE cd.classschhdid = ?
+    AND DATE(cd.classdatetime) = CURDATE() 
+    `;
+
+    const [result] = await pool.query(sql, [classschhdid]);
+
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
 module.exports = {
   bulkInsertScheduleDetail,
   getClassScheduleDetail,
   deleteClassScheduleDetail,
+  startClassSession,
+  openClassSession,
+  newTokenClassSession,
 };

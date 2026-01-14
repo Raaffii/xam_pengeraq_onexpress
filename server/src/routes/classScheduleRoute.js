@@ -5,7 +5,8 @@ const {
   postClassSchedule,
   deleteClassSchedule,
   putClassSchedule,
-} = require("../controllers/examScheduleController");
+  getClassScheduleById,
+} = require("../controllers/classScheduleController");
 
 const {
   validateQuery,
@@ -27,6 +28,7 @@ router.use(authenticateToken);
 
 router.get("/", validateQuery(classScheduleQuerySchema), getClassSchedule);
 router.post("/", validateBody(createClassScheduleSchema), postClassSchedule);
+router.get("/:id", validateParams(idParamsSchema), getClassScheduleById);
 router.put(
   "/:id",
   validateMultiple({ params: idParamsSchema, body: updateClassScheduleSchema }),

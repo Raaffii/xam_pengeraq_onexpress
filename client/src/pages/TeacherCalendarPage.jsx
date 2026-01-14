@@ -9,7 +9,7 @@ import { useState } from "react";
 import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
 import { useEffect } from "react";
 
-export default function CalendarPage() {
+export default function TeacherCalendarPage() {
   const locales = {
     "en-US": enUS,
   };
@@ -42,11 +42,11 @@ export default function CalendarPage() {
   const actions = [
     {
       label: "table",
-      onClick: () => navigate("/schedule"),
+      onClick: () => navigate("/teacher/schedule"),
     },
     {
       label: "calendar",
-      onClick: () => navigate("/schedule/calendar"),
+      onClick: () => navigate("/teacher/schedule/calendar"),
     },
   ];
 
@@ -66,7 +66,7 @@ export default function CalendarPage() {
             }`}>
             <div className='flex items-center gap-1'>
               {/* <UserIcon className='w-4' /> */}
-              <h2>{event?.teacher} </h2>
+              <h2>{event?.examsubject} </h2>
             </div>
             {view === "agenda" && (
               <>
@@ -112,7 +112,6 @@ export default function CalendarPage() {
   };
 
   const handleEvent = async (data) => {
-    console.log("datadata", data);
     const mappedEvents = data.map((item) => ({
       start: new Date(item.classDateTime),
       end: new Date(new Date(item.classDateTime).getTime() + 40 * 60 * 1000),
@@ -131,6 +130,8 @@ export default function CalendarPage() {
       const resultOri = await fetchClassScheduleDetail({
         date: new Date().setMonth(new Date().getMonth() + calendarShow + 1),
       });
+
+      console.log("result ori", resultOri);
 
       await handleEvent(resultOri.data);
       setCalendarShow(calendarShow + 1);
@@ -155,8 +156,8 @@ export default function CalendarPage() {
   return (
     <div>
       <PageHeader
-        title='Schedule'
-        subtitle='Manage student records and exam series assignments'
+        title='Teacher Schedule'
+        subtitle='Your Schedule'
         showSearch={true}
         searchPlaceholder='Search by name'
         searchMaxLength={50}

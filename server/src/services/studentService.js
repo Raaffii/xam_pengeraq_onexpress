@@ -3,9 +3,9 @@ const pool = require("../config/db");
 const Students = require("../models/studentModel");
 const StudentExam = require("../models/studentExamModel");
 
-const getStudent = async (page, limit, searchTerm) => {
+const getStudent = async (page, limit, searchTerm, filter) => {
   try {
-    const result = await Students.getStudent(page, limit, searchTerm);
+    const result = await Students.getStudent(page, limit, searchTerm, filter);
     return result;
   } catch (error) {
     console.error("Service error:", error);

@@ -61,6 +61,55 @@ export const useClassScheduleDetail = () => {
     [params, formatClassSchedule]
   );
 
+  const startClassSession = useCallback(async (classschhdid) => {
+    let toastId;
+    try {
+      setIsSubmitting(true);
+      setError(null);
+      toastId = toast.loading("Creating new students...");
+
+      const response = await classScheduleDetailService.startClassSession(
+        classschhdid
+      );
+      toast.success("Student added successfully!", { id: toastId });
+
+      console.log("cekceec", response.data);
+      return { success: true, data: response.data, token: response.data.token };
+    } catch (err) {
+      console.error("Error creating student:", err);
+      toast.error(err.message || "Failed to create student", { id: toastId });
+      setError(err.message);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, []);
+
+  const openClassSession = useCallback(async (classschhdid) => {
+    let toastId;
+    try {
+      setIsSubmitting(true);
+      setError(null);
+      toastId = toast.loading("Creating new students...");
+
+      const response = await classScheduleDetailService.openClassSession(
+        classschhdid
+      );
+      toast.success("Student added successfully!", { id: toastId });
+
+      return { success: true, data: response.data, token: response.data.token };
+    } catch (err) {
+      console.error("Error creating student:", err);
+      toast.error(err.message || "Failed to create student", { id: toastId });
+      setError(err.message);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, []);
+
   const onFilterChange = useCallback(
     async (filters) => {
       const newParams = {
@@ -111,9 +160,9 @@ export const useClassScheduleDetail = () => {
     onPageSizeChange,
     onSearch,
     setParams,
-
+    startClassSession,
     onFilterChange,
-
+    openClassSession,
     isSubmitting,
     classScheduleDetail,
     isLoading,

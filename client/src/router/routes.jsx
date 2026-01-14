@@ -14,14 +14,32 @@ import ExamSeriesDetailPage from "@/components/examseries/ExamSeriesDetailPage";
 import ExamDetailPage from "@/components/exam/ExamDetailPage";
 import ExamSubjectPage from "@/pages/ExamSubjectPage";
 import SchedulesPages from "@/pages/SchedulePage";
+import TeacherSchedulesPages from "@/pages/TeacherSchedulePage";
 import CalendarPage from "@/pages/CalendarPage";
 import ScheduleDetailPage from "@/components/schedule/ScheduleDetailPage";
 import { ExamSubjectGradePage } from "@/components/subjects";
+import TeacherCalendarPage from "@/pages/TeacherCalendarPage";
+import TeacherScheduleDetailPage from "@/components/teacher/teacherScheduleDetailPage";
 
-const privateRoutes = {
+const teacherPrivateRoutes = {
+  path: "/teacher",
+  element: (
+    <ProtectedRoute roles={["teacher"]}>
+      <Layout />
+    </ProtectedRoute>
+  ),
+  children: [
+    { index: true, element: <DashboardPage /> },
+    { path: "schedule", element: <TeacherSchedulesPages /> },
+    { path: "scheduledetail/:id", element: <TeacherScheduleDetailPage /> },
+    { path: "schedule/calendar", element: <TeacherCalendarPage /> },
+  ],
+};
+
+const adminPrivateRoutes = {
   path: "/",
   element: (
-    <ProtectedRoute>
+    <ProtectedRoute roles={["admin", "teacher"]}>
       <Layout />
     </ProtectedRoute>
   ),
@@ -41,6 +59,9 @@ const privateRoutes = {
     { path: "schedule", element: <SchedulesPages /> },
     { path: "schedule/:id", element: <ScheduleDetailPage /> },
     { path: "schedule/calendar", element: <CalendarPage /> },
+    { path: "schedule", element: <SchedulesPages /> },
+    { path: "schedule/:id", element: <ScheduleDetailPage /> },
+    { path: "schedule/calendar", element: <CalendarPage /> },
   ],
 };
 
@@ -57,6 +78,7 @@ const publicRoutes = [
 
 export const routes = [
   ...publicRoutes,
-  privateRoutes,
+  teacherPrivateRoutes,
+  adminPrivateRoutes,
   { path: "*", element: <NotFoundPage /> },
 ];

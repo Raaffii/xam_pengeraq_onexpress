@@ -7,13 +7,14 @@ const ClassScheduleDetail = require("../models/classScheduleDetailsModel");
 
 const addDateByRepeat = require("../utils/addDateByRepeat");
 
-const getClassSchedule = async (page, limit, searchTerm, date) => {
+const getClassSchedule = async (page, limit, searchTerm, date, teacherId) => {
   try {
     const result = await ClassSchedule.getClassSchedule(
       page,
       limit,
       searchTerm,
-      date
+      date,
+      teacherId
     );
     return result;
   } catch (error) {
@@ -81,9 +82,9 @@ const postClassSchedule = async (data, userId) => {
   }
 };
 
-const getStudentById = async (studentId) => {
+const getScheduleById = async (scheduleId) => {
   try {
-    const result = await Students.getStudentById(studentId);
+    const result = await ClassSchedule.getScheduleById(scheduleId);
 
     return result;
   } catch (error) {
@@ -175,5 +176,5 @@ module.exports = {
   postClassSchedule,
   putClassSchedule,
   deleteClassSchedule,
-  getStudentById,
+  getScheduleById,
 };

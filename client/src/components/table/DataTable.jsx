@@ -289,7 +289,9 @@ export const DataTable = ({
                               }`}
                               onClick={() => action.onClick(row)}
                               title={action.title}>
-                              {action.icon}
+                              {action.icon && (
+                                <action.icon className='w-4 h-4' />
+                              )}
                             </button>
                           ))}
                         </div>

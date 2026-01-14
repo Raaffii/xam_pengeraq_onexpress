@@ -14,4 +14,26 @@ export const classScheduleDetailService = {
       handleServiceError(error, "Failed to fetch student");
     }
   },
+
+  startClassSession: async (classschhdid) => {
+    try {
+      const response = await api.put(BASE_URL, classschhdid);
+
+      return response.data;
+    } catch (error) {
+      handleServiceError(error, "Failed to fetch student");
+    }
+  },
+
+  openClassSession: async (classschhdid) => {
+    try {
+      const response = await api.get(
+        `${BASE_URL}/classsession/${classschhdid}`
+      );
+
+      return response.data;
+    } catch (error) {
+      handleServiceError(error, "Failed to fetch student");
+    }
+  },
 };

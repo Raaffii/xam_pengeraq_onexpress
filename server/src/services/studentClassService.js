@@ -11,11 +11,11 @@ const getStudentClass = async (page, limit, searchTerm, schedule) => {
     return result;
   } catch (error) {
     console.error("Service error:", error);
-    throw new Error("Get exam failed");
+    throw new Error("Get student class failed");
   }
 };
 
-const postStudentClass = async (data) => {
+const putStudentClass = async (data) => {
   try {
     let addResult = null;
     let removeResult = null;
@@ -47,5 +47,5 @@ const postStudentClass = async (data) => {
 
 module.exports = {
   getStudentClass,
-  postStudentClass,
+  putStudentClass,
 };

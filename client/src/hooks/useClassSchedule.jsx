@@ -60,20 +60,44 @@ export const useClassSchedule = () => {
     [params, formatClassSchedule]
   );
 
+  const getClassScheduleById = useCallback(async (scheduleId) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await classScheduleService.getClassScheduleById(
+        scheduleId
+      );
+
+      setClassSchedule(response.data);
+
+      return { success: true, data: response.data };
+    } catch (err) {
+      console.error("Error fetching Student:", err);
+
+      setError(err.message);
+      setClassSchedule([]);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const postClassSchedule = useCallback(async (data) => {
     let toastId;
     try {
       setIsSubmitting(true);
       setError(null);
-      toastId = toast.loading("Creating new exam result...");
+      toastId = toast.loading("Creating new Schedule...");
 
       const response = await classScheduleService.postClassSchedule(data);
-      toast.success("Exam Result added successfully!", { id: toastId });
+      toast.success("Schedule added successfully!", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating exam result:", err);
-      toast.error(err.message || "Failed to create exam result", {
+      console.error("Error creating schedul:", err);
+      toast.error(err.message || "Failed to create schedule", {
         id: toastId,
       });
       setError(err.message);
@@ -89,18 +113,18 @@ export const useClassSchedule = () => {
     try {
       setIsSubmitting(true);
       setError(null);
-      toastId = toast.loading("Creating new exam result...");
+      toastId = toast.loading("Creating new schedule...");
       console.log("ce", classScheduleId);
       const response = await classScheduleService.putClassSchedule(
         classScheduleId,
         data
       );
-      toast.success("Exam Result added successfully!", { id: toastId });
+      toast.success("Schedule added successfully!", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating exam result:", err);
-      toast.error(err.message || "Failed to create exam result", {
+      console.error("Error creating Schedule:", err);
+      toast.error(err.message || "Failed to create schedule", {
         id: toastId,
       });
       setError(err.message);
@@ -193,6 +217,7 @@ export const useClassSchedule = () => {
     onFilterChange,
     deleteClassSchedule,
     putClassSchedule,
+    getClassScheduleById,
     isSubmitting,
     classSchedule,
     isLoading,

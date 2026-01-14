@@ -15,18 +15,17 @@ const {
 } = require("../middlewares/validateSchema");
 
 const {
-  createClassScheduleSchema,
-  updateClassScheduleSchema,
+  assignSchema,
   idParamsSchema,
-  classScheduleQuerySchema,
-} = require("../schemas/classScheduleSchema");
+  studentClassQuerySchema,
+} = require("../schemas/studentClassSchema");
 
 const router = express.Router();
 
 router.use(authenticateToken);
 
-router.get("/", getStudentClass); //console.log class schedule detail
+router.get("/", validateQuery(studentClassQuerySchema), getStudentClass);
 
-router.put("/", assignStudentClass);
+router.put("/", validateBody(assignSchema), assignStudentClass);
 
 module.exports = router;

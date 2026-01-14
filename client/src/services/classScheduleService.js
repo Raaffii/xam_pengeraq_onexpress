@@ -35,15 +35,15 @@ export const classScheduleService = {
       handleServiceError(error, "Failed to delete student");
     }
   },
-  // getStudentsById: async (studentId) => {
-  //   // const margedData = { data1, data2 };
-  //   try {
-  //     const response = await api.get(`${BASE_URL}/${studentId}`);
-  //     return response.data;
-  //   } catch (error) {
-  //     handleServiceError(error, "Failed to fetch student");
-  //   }
-  // },
+  getClassScheduleById: async (scheduleId) => {
+    // const margedData = { data1, data2 };
+    try {
+      const response = await api.get(`${BASE_URL}/${scheduleId}`);
+      return response.data;
+    } catch (error) {
+      handleServiceError(error, "Failed to fetch student");
+    }
+  },
 
   putClassSchedule: async (id, data) => {
     // const margedData = { data1, data2 };

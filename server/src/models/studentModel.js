@@ -1,9 +1,11 @@
 const pool = require("../config/db");
 
-const getStudent = async (page, limit, searchTerm = "") => {
+const getStudent = async (page, limit, searchTerm = "", filter = {}) => {
   page = Number(page) || 1;
   limit = Number(limit) || 10;
   const offset = (page - 1) * limit;
+
+  const { enrolledClass } = filter;
 
   const searchValue = searchTerm ? `%${searchTerm}%` : "%";
 
@@ -27,16 +29,37 @@ const getStudent = async (page, limit, searchTerm = "") => {
 
   const ids = studentIds.map((row) => row.studentid);
 
+  let orderBy = "ORDER BY s.createddate DESC";
+  const orderParams = [];
+
+  if (enrolledClass) {
+    orderBy = `
+      ORDER BY
+        CASE WHEN sc.classschhdid = ? THEN 0 ELSE 1 END,
+        s.createddate DESC
+    `;
+    orderParams.push(enrolledClass);
+  } else {
+    orderBy = `
+      ORDER BY
+        CASE WHEN sc.classschhdid = ? THEN 1 ELSE 0 END,
+        s.createddate DESC
+    `;
+    orderParams.push(enrolledClass);
+  }
+
   const detailQuery = `
     SELECT
       s.studentid AS studentId,
       s.studentname AS studentName,
       s.studentidno AS studentIdNo,
+
       se.examseriesid AS examSeriesId,
       es.examseriesdescription AS examSeriesDescription,
+
       sc.studentclassid AS studentClassId,
-      sc.classschhdid as classSchedule,
-      sc.studentid as classStudent
+      sc.classschhdid AS classSchedule,
+      sc.studentid AS classStudent
 
     FROM students s
     LEFT JOIN studentexamseries se
@@ -46,12 +69,11 @@ const getStudent = async (page, limit, searchTerm = "") => {
     LEFT JOIN studentclass sc
       ON s.studentid = sc.studentid
 
-
     WHERE s.studentid IN (?)
-    ORDER BY s.createddate DESC
+    ${orderBy}
   `;
 
-  const [rows] = await pool.query(detailQuery, [ids]);
+  const [rows] = await pool.query(detailQuery, [ids, ...orderParams]);
 
   const map = new Map();
 
@@ -91,13 +113,10 @@ const getStudent = async (page, limit, searchTerm = "") => {
   `;
 
   const [countResult] = await pool.query(countQuery, [searchValue]);
-  const total = countResult[0].total;
-
-  console.log("formated", formattedRows);
 
   return {
     data: formattedRows,
-    total,
+    total: countResult[0].total,
   };
 };
 

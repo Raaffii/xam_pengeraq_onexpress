@@ -134,7 +134,6 @@ export const useStudentClass = () => {
     onPageSizeChange,
     onSearch,
     setParams,
-    assignStudentClass,
     onFilterChange,
     isSubmitting,
     studenctClass,
