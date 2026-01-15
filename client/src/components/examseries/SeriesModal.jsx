@@ -284,45 +284,6 @@ export const SeriesModal = ({
             className="h-12"
           />
 
-          {/* Series Selection - Show when "Yes" is selected and exam is chosen */}
-          {mode === "create" && isImportSeries === "yes" && (
-            <>
-              {!formData.examId ? (
-                <p className="text-sm text-blue-700">
-                  Please select an exam first to see available series for import
-                </p>
-              ) : (
-                <>
-                  <SearchableDropdown
-                    label="Select Series to Import"
-                    value={importSeriesId}
-                    onChange={handleImportSeriesChange}
-                    options={seriesOptions}
-                    disabled={isSubmitting || isLoading}
-                    error={errors.importSeriesId}
-                    isRequired
-                    placeholder={
-                      isLoading
-                        ? "Loading series..."
-                        : "Select a series to import data from..."
-                    }
-                    searchPlaceholder="Search series..."
-                    emptyMessage={
-                      isLoading ? "Loading..." : "No series found for this exam"
-                    }
-                    minSearchLength={0}
-                    className="h-12"
-                    isLoading={isLoading}
-                  />
-                  <p className="text-sm text-blue-700 mt-2">
-                    Importing will copy subjects and grades configuration from
-                    the selected series
-                  </p>
-                </>
-              )}
-            </>
-          )}
-
           {/* Description */}
           <div className="relative">
             <InputField
@@ -425,6 +386,45 @@ export const SeriesModal = ({
               disabled={isSubmitting}
               optionsLayout="horizontal"
             />
+          )}
+
+          {/* Series Selection - Show when "Yes" is selected and exam is chosen */}
+          {mode === "create" && isImportSeries === "yes" && (
+            <>
+              {!formData.examId ? (
+                <p className="text-sm text-blue-700">
+                  Please select an exam first to see available series for import
+                </p>
+              ) : (
+                <>
+                  <SearchableDropdown
+                    label="Select Series to Import"
+                    value={importSeriesId}
+                    onChange={handleImportSeriesChange}
+                    options={seriesOptions}
+                    disabled={isSubmitting || isLoading}
+                    error={errors.importSeriesId}
+                    isRequired
+                    placeholder={
+                      isLoading
+                        ? "Loading series..."
+                        : "Select a series to import data from..."
+                    }
+                    searchPlaceholder="Search series..."
+                    emptyMessage={
+                      isLoading ? "Loading..." : "No series found for this exam"
+                    }
+                    minSearchLength={0}
+                    className="h-12"
+                    isLoading={isLoading}
+                  />
+                  <p className="text-sm text-blue-700 mt-2">
+                    Importing will copy subjects and grades configuration from
+                    the selected series
+                  </p>
+                </>
+              )}
+            </>
           )}
 
           {mode === "edit" && !hasChanges && (
