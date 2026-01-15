@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Modal } from "../custom";
 import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
+import CountDown from "./CountDown";
 
 const AttendanceQRCodeModal = ({
   open,
@@ -15,12 +16,8 @@ const AttendanceQRCodeModal = ({
   const [classStarted, setClassStarted] = useState();
   const [urlToken, setUrlToken] = useState();
 
-  const {
-    startClassSession,
-    fetchClassScheduleDetail,
-    openClassSession,
-    classScheduleDetail,
-  } = useClassScheduleDetail();
+  const { startClassSession, openClassSession } = useClassScheduleDetail();
+  const [startDateTime, setStartDateTime] = useState();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,18 +25,21 @@ const AttendanceQRCodeModal = ({
       if (open) {
         console.log("cek1");
         result = await openClassSession(classschhdid);
+
+        setStartDateTime(result.startDateTime);
         setClassStarted(result.token ? true : false);
         setUrlToken(`${CHECKIN_URL}/checkin/?token=${result.token}`);
       }
     };
 
     fetchData();
-  }, [openClassSession, classschhdid]);
+  }, [openClassSession, classschhdid, open]);
 
   const CHECKIN_URL = import.meta.env.VITE_STUDENT_PORTAL;
 
   const handleStartClass = async () => {
     const result = await startClassSession({ classschhdid });
+    setStartDateTime(result.startDateTime);
     setUrlToken(`${CHECKIN_URL}/checkin/?token=${result.token}`);
     setClassStarted(true);
   };
@@ -104,21 +104,25 @@ const AttendanceQRCodeModal = ({
                   Teacher: <span className='font-medium'>{teacherName}</span>
                 </p>
               </div>
+              <CountDown startDateTime={startDateTime} />
 
-              {/* QR Code */}
               <div className='flex justify-center'>
                 <div className='p-4 border rounded-xl bg-gray-50'>
                   <QRCodeCanvas value={String(urlToken)} size={200} />
                 </div>
               </div>
 
-              {/* Note */}
               <p className='text-xs text-gray-400 text-center mt-4'>
                 This QR code is only valid for the current class session
               </p>
 
-              {/* End Class */}
               <div className='flex justify-center mt-6'>
+                <button
+                  type='button'
+                  className='px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700'
+                  onClick={handleStartClass}>
+                  Refresh
+                </button>
                 <button
                   type='button'
                   className='px-4 py-2 rounded-md border text-red-600 hover:bg-red-50'

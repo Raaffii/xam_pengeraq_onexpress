@@ -49,10 +49,11 @@ const startClassSession = async (req, res) => {
       classschhdid,
       hashToken
     );
-    console.log("token", token);
+
     const dataToken = {
-      datas: data,
+      data: data,
       token: token,
+      startDateTime: data.startDateTime,
     };
 
     res.status(201).json(dataToken);
@@ -83,20 +84,25 @@ const openClassSession = async (req, res) => {
     const token = crypto.randomUUID();
     let dataToken;
 
-    if (data.length > 0) {
+    if (data.startDateTime) {
       console.log("haloman");
       const hashToken = crypto.createHash("sha256").update(token).digest("hex");
       await classScheduleDetailService.startClassSession(
         classschhdid,
-        hashToken
+        hashToken,
+        false
       );
 
       dataToken = {
         token: token,
+        startDateTime: data.startDateTime,
+        classDateTime: data.classDateTime,
       };
     } else {
       dataToken = {
         token: null,
+        startDateTime: null,
+        classDateTime: null,
       };
     }
 

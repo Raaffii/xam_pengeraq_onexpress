@@ -121,23 +121,35 @@ const deleteClassScheduleDetail = async (conn, id) => {
   }
 };
 
-const startClassSession = async (classschhdid, hashToken) => {
+const startClassSession = async (classschhdid, hashToken, newClass) => {
   try {
-    const sql = `
-      UPDATE classschdetails cd
-      JOIN classschhd cs ON cs.classschhdid = cd.classschhdid
-      SET cd.classtoken = ?, cd.startdatetime = ?
-      WHERE cs.classschhdid = ?
-        AND DATE(cd.classdatetime) = CURDATE()
-    `;
+    let sql;
+    let params;
 
-    const [result] = await pool.query(sql, [
-      hashToken,
-      new Date(),
-      classschhdid,
-    ]);
+    const nowDate = new Date();
+    if (newClass) {
+      sql = `
+        UPDATE classschdetails cd
+        JOIN classschhd cs ON cs.classschhdid = cd.classschhdid
+        SET cd.classtoken = ?, cd.startdatetime = ?
+        WHERE cs.classschhdid = ?
+          AND DATE(cd.classdatetime) = CURDATE()
+      `;
+      params = [hashToken, new Date(), classschhdid];
+    } else {
+      sql = `
+        UPDATE classschdetails cd
+        JOIN classschhd cs ON cs.classschhdid = cd.classschhdid
+        SET cd.classtoken = ?
+        WHERE cs.classschhdid = ?
+          AND DATE(cd.classdatetime) = CURDATE()
+      `;
+      params = [hashToken, classschhdid];
+    }
 
-    return result;
+    const [result] = await pool.query(sql, params);
+    console.log("result", result);
+    return { result, startDateTime: nowDate };
   } catch (err) {
     throw err;
   }
@@ -164,13 +176,13 @@ const newTokenClassSession = async (classschhdid, hashToken) => {
 const openClassSession = async (classschhdid, hashToken) => {
   try {
     const sql = `
-    SELECT cd.classdatetime as classDateTime FROM classschdetails cd  WHERE cd.classschhdid = ?
+    SELECT cd.classdatetime as classDateTime, cd.startdatetime as startDateTime FROM classschdetails cd  WHERE cd.classschhdid = ?
     AND DATE(cd.classdatetime) = CURDATE() 
     `;
 
     const [result] = await pool.query(sql, [classschhdid]);
 
-    return result;
+    return result[0];
   } catch (err) {
     throw err;
   }

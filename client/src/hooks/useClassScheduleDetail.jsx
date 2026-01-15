@@ -74,7 +74,11 @@ export const useClassScheduleDetail = () => {
       toast.success("Student added successfully!", { id: toastId });
 
       console.log("cekceec", response.data);
-      return { success: true, data: response.data, token: response.data.token };
+      return {
+        success: true,
+        token: response.data.token,
+        startDateTime: response.data.startDateTime,
+      };
     } catch (err) {
       console.error("Error creating student:", err);
       toast.error(err.message || "Failed to create student", { id: toastId });
@@ -91,17 +95,30 @@ export const useClassScheduleDetail = () => {
     try {
       setIsSubmitting(true);
       setError(null);
-      toastId = toast.loading("Creating new students...");
+
+      toastId = toast.loading("Checking QR code availability...");
 
       const response = await classScheduleDetailService.openClassSession(
         classschhdid
       );
-      toast.success("Student added successfully!", { id: toastId });
 
-      return { success: true, data: response.data, token: response.data.token };
+      console.log("Cecekekcekekcek", response);
+
+      if (response.data.token) {
+        toast.success("QR code is available.", { id: toastId });
+      } else {
+        toast.dismiss(toastId);
+      }
+
+      return {
+        success: true,
+        token: response.data.token,
+        startDateTime: response.data.startDateTime,
+        classDateTime: response.data.classDateTime,
+      };
     } catch (err) {
       console.error("Error creating student:", err);
-      toast.error(err.message || "Failed to create student", { id: toastId });
+      toast.error("Failed to get QrCode information", { id: toastId });
       setError(err.message);
 
       return { success: false, error: err.message };

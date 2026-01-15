@@ -26,11 +26,12 @@ const getClassScheduleDetail = async (
   }
 };
 
-const startClassSession = async (classschhdid, hashToken) => {
+const startClassSession = async (classschhdid, hashToken, newClass = true) => {
   try {
     const result = await ClassScheduleDetail.startClassSession(
       classschhdid,
-      hashToken
+      hashToken,
+      newClass
     );
     return result;
   } catch (error) {
