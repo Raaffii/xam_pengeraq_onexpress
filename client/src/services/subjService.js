@@ -24,10 +24,13 @@ export const subjectService = {
     }
   },
 
-  gradingByScore: async (subjectId, score) => {
+  gradingByScore: async (subjectId, score, params = {}) => {
     try {
       const response = await api.get(
         `${BASE_URL}/${subjectId}/grades/byScore/${score}`,
+        {
+          params,
+        },
       );
       return response.data;
     } catch (error) {

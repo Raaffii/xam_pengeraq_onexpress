@@ -34,7 +34,6 @@ export const useExamSubject = () => {
           ...finalParams,
         };
         const response = await subjectService.getSubjects(apiParams);
-        console.log("response: ", response);
         const data = formatExamSubjData(response.data);
 
         setExamSubj(data);
@@ -256,6 +255,33 @@ export const useExamSubject = () => {
     }
   }, []);
 
+  const getGradesBySubjIdAndScore = useCallback(
+    async (subjId, score, isRetake) => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const queryParams = isRetake ? { isRetake: true } : {};
+        const response = await subjectService.gradingByScore(
+          subjId,
+          score,
+          queryParams,
+        );
+
+        return { success: true, data: response.data };
+      } catch (err) {
+        console.error("Error fetching grades by subject and score:", err);
+
+        setError(err.message);
+
+        return { success: false, error: err.message };
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [],
+  );
+
   const clearError = useCallback(() => {
     setError(null);
   }, []);
@@ -324,6 +350,7 @@ export const useExamSubject = () => {
     // Actions
     fetchSubjects,
     fetchSubjectByExamSeriesId,
+    getGradesBySubjIdAndScore,
     newExamSubj,
     removeSubject,
     clearError,

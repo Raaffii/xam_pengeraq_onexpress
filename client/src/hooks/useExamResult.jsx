@@ -14,7 +14,7 @@ export const useExamsResult = () => {
     totalPages: 1,
     totalItems: 0,
   });
-  const [params, setParams] = useState({ page: 1, limit: 10 });
+  const [params, setParams] = useState({ page: 1, pageSize: 10 });
 
   const formatExamsData = useCallback((rawExams) => {
     return rawExams.map((item) => ({
@@ -37,7 +37,7 @@ export const useExamsResult = () => {
 
         const response = await examResultService.getExamResult(
           apiParams,
-          overrideParams.studentId || params.studentId
+          overrideParams.studentId || params.studentId,
         );
         const data = formatExamsData(response.data);
         setPagination(
@@ -46,7 +46,7 @@ export const useExamsResult = () => {
             pageSize: 10,
             totalPages: 1,
             totalItems: 0,
-          }
+          },
         );
         setExamsResult(data);
         return { success: true, data: data };
@@ -61,7 +61,7 @@ export const useExamsResult = () => {
         setIsLoading(false);
       }
     },
-    [params, formatExamsData]
+    [params, formatExamsData],
   );
 
   const postExamResult = useCallback(async (data) => {
@@ -97,7 +97,7 @@ export const useExamsResult = () => {
 
       const response = await examResultService.putExamResult(
         examResultsId,
-        data
+        data,
       );
       toast.success("Exam Result added successfully!", { id: toastId });
 
@@ -121,11 +121,10 @@ export const useExamsResult = () => {
       setIsSubmitting(true);
       setError(null);
       toastId = toast.loading("Deleting new exam result...");
-      console.log("exa", examResultsId);
       const response = await examResultService.deleteExamResult(examResultsId);
       toast.success("Exam Result delete successfully!", { id: toastId });
       setExamsResult((prev) =>
-        prev.filter((item) => item.examResultsId !== examResultsId)
+        prev.filter((item) => item.examResultsId !== examResultsId),
       );
       return { success: true, data: response.data };
     } catch (err) {
@@ -154,7 +153,7 @@ export const useExamsResult = () => {
         page: 1,
       });
     },
-    [params, fetchExamsResult]
+    [params, fetchExamsResult],
   );
 
   const onSearch = useCallback(
@@ -164,7 +163,7 @@ export const useExamsResult = () => {
 
       return await fetchExamsResult({ search, page: 1 });
     },
-    [fetchExamsResult, setParams, params]
+    [fetchExamsResult, setParams, params],
   );
 
   const onPageChange = useCallback(
@@ -173,16 +172,16 @@ export const useExamsResult = () => {
       setParams(newParams);
       return await fetchExamsResult({ page });
     },
-    [params, fetchExamsResult]
+    [params, fetchExamsResult],
   );
 
   const onPageSizeChange = useCallback(
-    async (limit) => {
-      const newParams = { ...params, limit, page: 1 };
+    async (pageSize) => {
+      const newParams = { ...params, pageSize, page: 1 };
       setParams(newParams);
-      return await fetchExamsResult({ limit, page: 1 });
+      return await fetchExamsResult({ pageSize, page: 1 });
     },
-    [params, fetchExamsResult]
+    [params, fetchExamsResult],
   );
 
   return {

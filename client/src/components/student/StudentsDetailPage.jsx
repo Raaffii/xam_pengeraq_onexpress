@@ -1,24 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useStudents } from "@/hooks/useStudents";
 import { useExamsResult } from "@/hooks/useExamResult";
 import { DataTable } from "@/components/table";
 import PageHeader from "../common/PageHeader";
-import AddExamsGrades from "../modals/addExamGrades";
-import EditExamsGrades from "../modals/editExamGrades";
-import TableHeader from "../common/TableHeader";
 import { useStudentsExamSeries } from "@/hooks/useStudentsExamSeries";
 import Delete_modal from "../modals/Delete_modal";
 import { DetailsInfoCard } from "../common";
+import { ExamResultModal } from "../dashboard";
+import { ExamSeriesFilter } from "../examseries";
 
 export default function StudentsDetailPage() {
   const { id } = useParams();
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const hasFetchedData = useRef(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState("create");
+  const [initialFormValues, setInitialFormValues] = useState({});
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedSeries, setSelectedSeries] = useState("all");
   const [selectedExamsResult, setSelectedExamsResult] = useState();
-  const [searchKeyword, setSearchKeyword] = useState("");
   const { fetchStudentExamSeriesById, studentsExamSeries } =
     useStudentsExamSeries();
   const { getStudentById, students, isLoading: loadStudent } = useStudents();
@@ -32,17 +32,29 @@ export default function StudentsDetailPage() {
     onFilterChange,
     deleteExamResult,
     isLoading,
+    postExamResult,
+    putExamResult,
+    isSubmitting,
+    setParams,
+    params,
   } = useExamsResult();
 
   useEffect(() => {
+    if (hasFetchedData.current) return;
+    hasFetchedData.current = true;
     const fetchData = async () => {
       try {
         const student = await getStudentById(id);
 
         if (!student?.data?.studentId) return;
-        // setParams({ studentId: id });
+        setParams((prev) => ({
+          ...prev,
+          studentId: student.data.studentId,
+          page: 1,
+        }));
         await fetchStudentExamSeriesById(id);
-        await fetchExamsResult({ studentId: student.data.studentId });
+
+        await fetchExamsResult({ studentId: student.data.studentId, page: 1 });
       } catch (error) {
         console.error("Failed to fetch student data:", error);
       }
@@ -51,32 +63,13 @@ export default function StudentsDetailPage() {
     if (id) {
       fetchData();
     }
-  }, [id, getStudentById, fetchStudentExamSeriesById, fetchExamsResult]);
-
-  const loadExamResults = async (examseriesid = null) => {
-    const params = { studentId: id };
-    if (examseriesid && examseriesid !== "all") {
-      params.byExamSeriesId = examseriesid;
-    }
-
-    await onFilterChange(params);
-  };
-
-  const handleSeriesChange = async (value) => {
-    setSelectedSeries(value);
-
-    await loadExamResults(value);
-  };
-
-  const handleSearchChange = (e) => {
-    setSearchKeyword(e.target.value);
-    onSearch(e.target.value);
-  };
-
-  const openEditModal = (examsResult) => {
-    setIsEditModalOpen(true);
-    setSelectedExamsResult(examsResult);
-  };
+  }, [
+    id,
+    getStudentById,
+    fetchStudentExamSeriesById,
+    fetchExamsResult,
+    setParams,
+  ]);
 
   const openDeleteModal = (examsResult) => {
     setIsDeleteModalOpen(true);
@@ -84,12 +77,8 @@ export default function StudentsDetailPage() {
   };
 
   const handleExamResultDelete = async () => {
-    await deleteExamResult(selectedExamsResult.examResultsId);
+    await deleteExamResult(selectedExamsResult.resultId);
     setIsDeleteModalOpen(false);
-  };
-
-  const openAddModal = () => {
-    setIsAddModalOpen(true);
   };
 
   const columns = [
@@ -119,16 +108,16 @@ export default function StudentsDetailPage() {
       cellClassName: "text-left",
     },
     {
-      accessorKey: "subjResults",
+      accessorKey: "subjResult",
       header: <div className="text-left w-full">Rank</div>,
       cellClassName: "text-left",
     },
     {
-      accessorKey: "retake",
+      accessorKey: "isRetake",
       header: <div className="text-left w-full">Retake</div>,
       cellClassName: "text-left",
       render: (row) => {
-        const isRetake = row.retake === "Yes";
+        const isRetake = row.isRetake === "Yes";
 
         return (
           <span
@@ -146,7 +135,30 @@ export default function StudentsDetailPage() {
     },
   ];
 
-  console.log("student exam series", studentsExamSeries);
+  const handleFormSubmit = async (formData) => {
+    let result;
+    if (modalMode === "create") {
+      result = await postExamResult(formData);
+    } else {
+      result = await putExamResult(initialFormValues.resultId, formData);
+    }
+
+    if (result.success) {
+      setParams((prev) => ({ ...prev, page: 1 }));
+      await fetchExamsResult();
+
+      setIsModalOpen(false);
+    }
+    return result.success;
+  };
+
+  const options = Array.isArray(studentsExamSeries)
+    ? studentsExamSeries.map((item) => ({
+        value: item.seriesId,
+        label: item.seriesDesc,
+      }))
+    : [];
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto">
@@ -155,7 +167,14 @@ export default function StudentsDetailPage() {
           subtitle={`Student ID: ${students.studentIdNo || ""}`}
           primaryAction={{
             label: "Add Grades",
-            onClick: openAddModal,
+            onClick: () => {
+              setModalMode("create");
+              setInitialFormValues({
+                studentId: students.studentId,
+                studentName: students.studentName,
+              });
+              setIsModalOpen(true);
+            },
           }}
         />
 
@@ -176,65 +195,68 @@ export default function StudentsDetailPage() {
           className="mb-6"
         />
 
-        <TableHeader
-          search={{
-            enabled: true,
-            placeholder: "Search exam results...",
-            value: searchKeyword,
-            onChange: handleSearchChange,
-          }}
-          filters={[
-            {
-              id: "examSeries",
-              label: "Exam Series",
-              type: "dropdown",
-              value: selectedSeries,
-              onChange: handleSeriesChange,
-              options: [
-                { value: "all", label: "All Exam Series" },
-                ...studentsExamSeries.map((item) => ({
-                  value: item.examSeriesId,
-                  label: item.examSeriesDescription,
-                })),
-              ],
-              hideAllOption: true,
-            },
-          ]}
-        />
+        <PageHeader
+          title=""
+          subtitle=""
+          showSearch={true}
+          searchPlaceholder="Search exam result..."
+          onSearch={onSearch}
+          searchMaxLength={50}
+        >
+          <ExamSeriesFilter
+            data={studentsExamSeries}
+            valueKey="seriesId"
+            labelKey="seriesDesc"
+            filterKey="bySeries"
+            placeholder="Filter by Series"
+            initialFilters={params}
+            onFilterChange={onFilterChange}
+            isLoading={isLoading}
+          />
+        </PageHeader>
 
         <DataTable
           data={examsResult}
           columns={columns}
-          idAccessor="examResultsId"
-          onEdit={openEditModal}
+          idAccessor="resultId"
+          onEdit={(result) => {
+            setModalMode("edit");
+            setInitialFormValues({
+              resultId: result.resultId,
+              studentId: students.studentId,
+              studentName: students.studentName,
+              examSeriesId: result.seriesId,
+              seriesDesc: result.seriesDesc,
+              examSubjId: result.subjId,
+              subjDesc: result.subjDesc,
+              isRetake: result.isRetake,
+              marks: result.marks,
+              subjGpa: result.subjGpa,
+              subjResult: result.subjResult,
+              subjGrade: result.subjGrade,
+            });
+            setIsModalOpen(true);
+          }}
           onDelete={openDeleteModal}
           onPageChange={onPageChange}
           onSizeChange={onPageSizeChange}
           pagination={pagination}
           isLoading={isLoading}
         />
-
-        {isAddModalOpen && (
-          <AddExamsGrades
-            open={isAddModalOpen}
-            setOpen={setIsAddModalOpen}
-            student={students}
-            fetchExamsResult={fetchExamsResult}
-            selectedExamsResult={selectedExamsResult}
-          />
-        )}
-
-        {isEditModalOpen && (
-          <EditExamsGrades
-            open={isEditModalOpen}
-            setOpen={setIsEditModalOpen}
-            student={students}
-            fetchExamsResult={fetchExamsResult}
-            selectedExamsResult={selectedExamsResult}
-            selectedEdit={selectedExamsResult}
-          />
-        )}
-
+        <ExamResultModal
+          open={isModalOpen}
+          onOpenChange={setIsModalOpen}
+          initialValues={initialFormValues}
+          onSubmit={handleFormSubmit}
+          onSuccessDelete={() => {
+            fetchExamsResult();
+          }}
+          isSubmitting={isSubmitting}
+          mode={modalMode}
+          seriesOptions={options}
+          optionDisabled={modalMode === "edit"}
+          lockStudent={true}
+        />
         {isDeleteModalOpen && selectedExamsResult && (
           <Delete_modal
             open={isDeleteModalOpen}

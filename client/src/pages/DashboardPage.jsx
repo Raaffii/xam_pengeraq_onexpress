@@ -2,15 +2,24 @@ import PageHeader from "@/components/common/PageHeader";
 import { ExamSeriesFilter } from "@/components/examseries";
 import { DataTable } from "@/components/table";
 import { useDashboard } from "@/hooks/useDashboard";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getGradeColor } from "@/utils";
-import { GradeDisplay, SeriesDetailCard } from "@/components/dashboard";
+import {
+  ExamResultModal,
+  GradeDisplay,
+  SeriesDetailCard,
+} from "@/components/dashboard";
+import { useExamsResult } from "@/hooks/useExamResult";
 
 const DashboardPage = () => {
   const hasFetchedData = useRef(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState("create");
+  const [initialFormValues, setInitialFormValues] = useState({});
   const {
     fetchInitialDashboard,
     dashboardData,
+    setDashboardData,
     seriesOption,
     seriesSubj,
     selectedSeries,
@@ -21,7 +30,10 @@ const DashboardPage = () => {
     onSearch,
     isLoading,
     onFilterChange,
+    fetchDashboard,
+    setParams,
   } = useDashboard();
+  const { postExamResult, putExamResult, isSubmitting } = useExamsResult();
 
   useEffect(() => {
     if (hasFetchedData.current) return;
@@ -66,7 +78,26 @@ const DashboardPage = () => {
           render: (row) => {
             const result = getResultForSubject(row, subject.subjId);
             return result ? (
-              <div onClick={() => console.log("clicked: ", row, result)}>
+              <div
+                onClick={() => {
+                  setModalMode("edit");
+                  setInitialFormValues({
+                    resultId: result.resultId,
+                    studentId: row.studentId,
+                    studentName: row.studentName,
+                    examSeriesId: selectedSeries.seriesId,
+                    seriesDesc: selectedSeries.seriesDesc,
+                    examSubjId: result.subjId,
+                    subjDesc: result.subjDesc,
+                    isRetake: result.isRetake,
+                    marks: result.marks,
+                    subjGpa: result.subjGpa,
+                    subjResult: result.subjResult,
+                    subjGrade: result.subjGrade,
+                  });
+                  setIsModalOpen(true);
+                }}
+              >
                 <GradeDisplay
                   grade={result.subjGrade}
                   marks={result.marks}
@@ -107,6 +138,76 @@ const DashboardPage = () => {
     },
   ];
 
+  const handleFormSubmit = async (formData) => {
+    let result;
+    if (modalMode === "create") {
+      result = await postExamResult(formData);
+    } else {
+      result = await putExamResult(initialFormValues.resultId, formData);
+    }
+
+    if (result.success) {
+      if (modalMode === "edit") {
+        setDashboardData((prevData) => {
+          return prevData.map((student) => {
+            if (student.studentId === initialFormValues.studentId) {
+              return {
+                ...student,
+                results: student.results.map((res) => {
+                  if (res.resultId === initialFormValues.resultId) {
+                    return {
+                      ...res,
+                      ...formData,
+                      editedDate: new Date()
+                        .toISOString()
+                        .slice(0, 19)
+                        .replace("T", " "),
+                    };
+                  }
+                  return res;
+                }),
+              };
+            }
+            return student;
+          });
+        });
+      } else {
+        setParams((prev) => ({ ...prev, page: 1 }));
+        fetchDashboard();
+      }
+
+      setIsModalOpen(false);
+    }
+    return result.success;
+  };
+
+  const handleSuccessDelete = () => {
+    setDashboardData((prevData) => {
+      return prevData
+        .map((student) => {
+          if (student.studentId === initialFormValues.studentId) {
+            return {
+              ...student,
+              results: student.results.filter(
+                (result) => result.resultId !== initialFormValues.resultId,
+              ),
+            };
+          }
+          return student;
+        })
+        .filter((student) => student.results.length > 0);
+    });
+  };
+
+  const options = Array.isArray(seriesOption)
+    ? seriesOption.map((item) => ({
+        value: item.seriesId,
+        label: item.seriesDesc,
+      }))
+    : [];
+
+  console.log(dashboardData);
+
   return (
     <div className="min-h-screen bg-gray-50 mx-auto">
       {/* Page Header */}
@@ -117,6 +218,14 @@ const DashboardPage = () => {
         searchPlaceholder="Search by student name or id"
         onSearch={onSearch}
         searchMaxLength={50}
+        primaryAction={{
+          label: "New Exam Result",
+          onClick: () => {
+            setModalMode("create");
+            setInitialFormValues({});
+            setIsModalOpen(true);
+          },
+        }}
       >
         {/* Exam Series Filter */}
         <ExamSeriesFilter
@@ -144,6 +253,18 @@ const DashboardPage = () => {
         onSizeChange={onPageSizeChange}
         isLoading={isLoading}
         showActions={false}
+      />
+
+      <ExamResultModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        initialValues={initialFormValues}
+        onSubmit={handleFormSubmit}
+        onSuccessDelete={handleSuccessDelete}
+        isSubmitting={isSubmitting}
+        mode={modalMode}
+        seriesOptions={options}
+        optionDisabled={modalMode === "edit"}
       />
     </div>
   );
