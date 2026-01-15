@@ -1,5 +1,4 @@
 const pool = require("../config/db");
-
 const Students = require("../models/studentModel");
 const StudentExam = require("../models/studentExamModel");
 
@@ -31,12 +30,11 @@ const postStudent = async (data, userId) => {
     const studentId = await Students.postStudent(connection, data, userId);
     let result;
     if (Array.isArray(data.examSeries) && data.examSeries.length > 0) {
-      result = await StudentExam.postStudentExamSeries(
-        connection,
-        data.examSeries,
+      result = await StudentExam.postStudentExam(connection, {
+        examSeriesIds: data.examSeries,
         studentId,
-        userId
-      );
+        userId,
+      });
     }
     await connection.commit();
     return result;
@@ -57,12 +55,11 @@ const putStudent = async (id, data, userId) => {
     const result = await Students.putStudent(connection, id, data, userId);
 
     if (Array.isArray(data.examSeries) && data.examSeries.length > 0) {
-      await StudentExam.postStudentExamSeries(
-        connection,
-        data.examSeries,
-        id,
-        userId
-      );
+      await StudentExam.postStudentExam(connection, {
+        examSeriesIds: data.examSeries,
+        studentId: id,
+        userId,
+      });
     }
 
     await connection.commit();
