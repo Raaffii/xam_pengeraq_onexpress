@@ -2,25 +2,14 @@ const pool = require("../config/db");
 
 const ExamResultModel = {
   async getExamResult(options = {}) {
-    const {
-      page = 1,
-      limit = 10,
-      search = "",
-      studentId,
-      byExamSeriesId,
-    } = options;
-
-    const pageNum = Number(page);
-    const limitNum = Number(limit);
-    const offset = (pageNum - 1) * limitNum;
+    const { page, pageSize, studentId, searchTerm, byExamSeriesId } = options;
 
     const conditions = [];
     const params = [];
 
-    if (search) {
-      conditions.push("(es.subjcode LIKE ? OR es.subjdesc LIKE ?)");
-      const searchValue = `%${search}%`;
-      params.push(searchValue, searchValue);
+    if (studentId) {
+      conditions.push("er.studentid = ?");
+      params.push(studentId);
     }
 
     if (byExamSeriesId) {
@@ -28,45 +17,70 @@ const ExamResultModel = {
       params.push(byExamSeriesId);
     }
 
-    if (studentId) {
-      conditions.push("er.studentid = ?");
-      params.push(studentId);
+    conditions.push("er.active = ? AND es.active = ?");
+    params.push(1, 1);
+
+    if (searchTerm) {
+      conditions.push(
+        "(LOWER(es.subjdesc) LIKE ? OR LOWER(es.subjcode) LIKE ?)",
+      );
+      const searchPattern = `%${searchTerm.toLowerCase()}%`;
+      params.push(searchPattern, searchPattern);
     }
 
     const whereClause =
       conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
-    const query = `
+    const countQuery = `
+      SELECT COUNT(*) AS total 
+      FROM examresults er 
+      LEFT JOIN examsubj es ON er.examsubjid = es.examsubjid
+      LEFT JOIN examseries esr ON er.examseriesid = esr.examseriesid
+      ${whereClause}
+    `;
+    const [countResult] = await pool.execute(countQuery, params);
+    const total = countResult[0].total;
+
+    // Build base query
+    let query = `
       SELECT 
-        er.examresultsid as examResultsId,
+        er.examresultsid as resultId,
+        er.studentid as studentId,
+        er.examseriesid as seriesId,
+        er.examsubjid as subjId,
         er.marks as marks,
         er.subjgpa as subjGpa,
         er.subjgrade as subjGrade,
-        er.subjresults as subjResults,
-        er.retake as retake,
+        er.subjresults as subjResult,
+        er.retake as isRetake,
         es.subjcode as subjCode,
         es.subjdesc as subjDesc,
-        es.examsubjid as examSubjId,
-        esr.examseriesdescription as examSeriesDescription
+        esr.examseriesdescription as seriesDesc,
+        er.createddate as createdDate,
+        er.createdby as createdBy
       FROM examresults er 
       LEFT JOIN examsubj es ON er.examsubjid = es.examsubjid
       LEFT JOIN examseries esr ON er.examseriesid = esr.examseriesid
       ${whereClause}
       ORDER BY er.createddate DESC
-      LIMIT ? OFFSET ?`;
+    `;
 
-    const [rows] = await pool.query(query, [...params, limitNum, offset]);
+    const queryParams = [...params];
 
-    const countQuery = `
-      SELECT COUNT(*) AS total 
-      FROM examresults er 
-      LEFT JOIN examsubj es ON er.examsubjid = es.examsubjid 
-      ${whereClause}`;
+    if (page && pageSize) {
+      const offset = (page - 1) * pageSize;
+      query += ` LIMIT ? OFFSET ?`;
+      queryParams.push(String(pageSize), String(offset));
+    }
 
-    const [countResult] = await pool.query(countQuery, params);
-    const total = countResult[0].total;
+    const [rows] = await pool.execute(query, queryParams);
 
-    return { data: rows, total };
+    return {
+      data: rows,
+      total,
+      page: page || null,
+      pageSize: pageSize || null,
+    };
   },
 
   async postExamResult(data) {
@@ -77,8 +91,8 @@ const ExamResultModel = {
       marks,
       subjGpa,
       subjGrade,
-      subjResults,
-      retake,
+      subjResult,
+      isRetake,
     } = data;
 
     try {
@@ -92,10 +106,10 @@ const ExamResultModel = {
         examSubjId,
         studentId,
         marks,
-        retake,
+        isRetake,
         subjGpa,
         subjGrade,
-        subjResults,
+        subjResult,
       ]);
 
       return result;
@@ -128,7 +142,7 @@ const ExamResultModel = {
   },
 
   async putExamResult(id, data) {
-    const { marks, subjGpa, subjGrade, subjResults, retake } = data;
+    const { marks, subjGpa, subjGrade, subjResults, isRetake } = data;
     const fields = [];
     const params = [];
 
@@ -148,9 +162,9 @@ const ExamResultModel = {
       fields.push("subjresults = ?");
       params.push(subjResults);
     }
-    if (retake !== undefined) {
+    if (isRetake !== undefined) {
       fields.push("retake = ?");
-      params.push(retake);
+      params.push(isRetake);
     }
 
     if (fields.length === 0) {

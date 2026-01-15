@@ -2,26 +2,28 @@ const examResultService = require("../services/examResultService");
 
 const getExamResult = async (req, res) => {
   try {
-    let { page, limit, search, byExamSeriesId } = req.query;
+    let { page, pageSize, searchTerm, byExamSeriesId, studentId } = req.query;
 
-    const studentId = req.params.id;
-
-    const result = await examResultService.getExamResult(
-      page,
-      limit,
-      search,
+    const result = await examResultService.getExamResult({
+      page: parseInt(page),
+      pageSize: parseInt(pageSize),
+      searchTerm,
+      byExamSeriesId,
       studentId,
-      byExamSeriesId
-    );
-    res.status(200).json({
-      data: result.data,
-      pagination: {
-        currentPage: page,
-        pageSize: limit,
-        totalPages: Math.ceil(result.total / limit),
-        totalItems: result.total,
-      },
     });
+    const response = {
+      data: result.data,
+    };
+
+    if (page && pageSize) {
+      response.pagination = {
+        currentPage: result.page,
+        pageSize: result.pageSize,
+        totalItems: result.total,
+        totalPages: Math.ceil(result.total / result.pageSize),
+      };
+    }
+    res.status(200).json(response);
   } catch (error) {
     console.error("get exam result error:", error);
 
