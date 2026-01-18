@@ -154,7 +154,7 @@ export const DataTable = ({
           currentPage,
           currentPage + 1,
           "...",
-          totalPages
+          totalPages,
         );
       }
     }
@@ -188,7 +188,7 @@ export const DataTable = ({
                   <TableHead
                     key={idx}
                     className={`text-white font-semibold p-4 ${getAlignClass(
-                      column.align
+                      column.align,
                     )} ${column.headerClassName || ""}`}
                     style={{ width: column.width }}>
                     {column.header}
@@ -242,10 +242,10 @@ export const DataTable = ({
                         {column.render
                           ? column.render(row, rowIdx)
                           : column.cell
-                          ? column.cell(row, rowIdx)
-                          : column.accessorKey
-                          ? row[column.accessorKey]
-                          : null}
+                            ? column.cell(row, rowIdx)
+                            : column.accessorKey
+                              ? row[column.accessorKey]
+                              : null}
                       </TableCell>
                     ))}
                     {showActions && (
@@ -292,6 +292,8 @@ export const DataTable = ({
                               {action.icon && (
                                 <action.icon className='w-4 h-4' />
                               )}
+
+                              {action.render && action.render(row)}
                             </button>
                           ))}
                         </div>
@@ -363,7 +365,7 @@ export const DataTable = ({
                     onClick={() => handlePageChange(page)}>
                     {page}
                   </Button>
-                )
+                ),
               )}
             </div>
 

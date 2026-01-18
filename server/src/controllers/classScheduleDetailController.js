@@ -4,7 +4,7 @@ const crypto = require("crypto");
 const getClassScheduleDetail = async (req, res) => {
   try {
     let { page, limit, searchTerm, date, scheduleId, nowDate } = req.query;
-    console.log("sssssssss", req.query);
+
     const { teacherId } = req.user;
 
     const result = await classScheduleDetailService.getClassScheduleDetail(
@@ -14,7 +14,7 @@ const getClassScheduleDetail = async (req, res) => {
       date,
       teacherId,
       scheduleId,
-      nowDate
+      nowDate,
     );
     res.status(200).json({
       data: result.data,
@@ -47,7 +47,7 @@ const startClassSession = async (req, res) => {
 
     const data = await classScheduleDetailService.startClassSession(
       classschhdid,
-      hashToken
+      hashToken,
     );
 
     const dataToken = {
@@ -76,21 +76,18 @@ const openClassSession = async (req, res) => {
   try {
     const classschhdid = req.params.id;
 
-    const data = await classScheduleDetailService.openClassSession(
-      classschhdid
-    );
+    const data =
+      await classScheduleDetailService.openClassSession(classschhdid);
 
-    console.log("data", data);
     const token = crypto.randomUUID();
     let dataToken;
 
     if (data.startDateTime) {
-      console.log("haloman");
       const hashToken = crypto.createHash("sha256").update(token).digest("hex");
       await classScheduleDetailService.startClassSession(
         classschhdid,
         hashToken,
-        false
+        false,
       );
 
       dataToken = {

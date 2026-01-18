@@ -28,7 +28,7 @@ const getClassScheduleDetail = async (
   date,
   teacherId,
   scheduleId,
-  nowDate = false
+  nowDate = false,
 ) => {
   page = Number(page) || 1;
   limit = Number(limit) || 10;
@@ -57,7 +57,7 @@ const getClassScheduleDetail = async (
     conditions.push(" MONTH(cd.classdatetime) = ?");
     params.push(month);
   }
-  console.log("ceeeeeeeeeeeee", scheduleId, nowDate);
+
   if (scheduleId) {
     conditions.push("cd.classschhdid=?");
     params.push(scheduleId);
@@ -148,7 +148,7 @@ const startClassSession = async (classschhdid, hashToken, newClass) => {
     }
 
     const [result] = await pool.query(sql, params);
-    console.log("result", result);
+
     return { result, startDateTime: nowDate };
   } catch (err) {
     throw err;

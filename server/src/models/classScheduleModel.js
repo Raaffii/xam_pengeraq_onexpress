@@ -5,7 +5,7 @@ const getClassSchedule = async (
   limit,
   searchTerm = "",
   date,
-  teacherId
+  teacherId,
 ) => {
   page = Number(page) || 1;
   limit = Number(limit) || 10;
@@ -19,7 +19,6 @@ const getClassSchedule = async (
   if (teacherId) {
     conditions.push("cs.teacherid=?");
     params.push(teacherId);
-    console.log("here");
   }
 
   const whereClause =

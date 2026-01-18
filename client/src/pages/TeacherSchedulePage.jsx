@@ -7,7 +7,7 @@ import AddSchedule from "@/components/schedule/AddSchedule";
 import EditSchedule from "@/components/schedule/EditSchedule";
 import Delete_modal from "@/components/modals/Delete_modal";
 
-import { QrCode } from "lucide-react";
+import { QrCode, Flag } from "lucide-react";
 import QrCodeModal from "@/components/teacher/QrCodeModal";
 
 export default function TeacherSchedulesPages() {
@@ -55,6 +55,33 @@ export default function TeacherSchedulesPages() {
     return result.success;
   };
 
+  const isClassToday = (row) => {
+    const today = new Date();
+    const classDate = new Date(row.startDateTime);
+
+    const todayDate = today.getDate();
+    const todayMonth = today.getMonth();
+    const todayDay = today.getDay();
+
+    const classDateOnly = classDate.getDate();
+    const classMonth = classDate.getMonth();
+    const classDay = classDate.getDay();
+
+    if (row.repeatValue === "daily") {
+      return true;
+    }
+
+    if (row.repeatValue === "weekly") {
+      return todayDay === classDay;
+    }
+
+    if (row.repeatValue === "monthly") {
+      return todayDate === classDateOnly;
+    }
+
+    return todayDate === classDateOnly && todayMonth === classMonth;
+  };
+
   const columns = [
     {
       accessorKey: "teacherName",
@@ -90,18 +117,41 @@ export default function TeacherSchedulesPages() {
         </div>
       ),
     },
+    // {
+    //   header: <div className='text-left w-full'>End Date</div>,
+    //   cellClassName: "text-left",
+    //   render: (row) => (
+    //     <div className='flex flex-wrap gap-1'>
+    //       <span
+    //         className='px-2 py-0.5 text-xs rounded-full
+    //                bg-blue-50 text-blue-700 border border-blue-200'>
+    //         {row.endDateTime}
+    //       </span>
+    //     </div>
+    //   ),
+    // },
     {
-      header: <div className='text-left w-full'>End Date</div>,
+      header: <div className='text-center w-full'>Class Today</div>,
       cellClassName: "text-left",
-      render: (row) => (
-        <div className='flex flex-wrap gap-1'>
-          <span
-            className='px-2 py-0.5 text-xs rounded-full
-                   bg-blue-50 text-blue-700 border border-blue-200'>
-            {row.endDateTime}
-          </span>
-        </div>
-      ),
+      render: (row) => {
+        const canStart = isClassToday(row);
+
+        return (
+          <div className='flex items-center justify-center gap-3 w-full'>
+            {/* Status Badge */}
+            <span
+              className={`px-3 py-1 text-xs font-semibold rounded-sm border
+      ${
+        canStart
+          ? "bg-green-100 text-green-800 border-green-300"
+          : "bg-red-100 text-red-800 border-red-300"
+      }
+    `}>
+              {canStart ? "Class Today" : "No Class Today"}
+            </span>
+          </div>
+        );
+      },
     },
   ];
 
@@ -117,18 +167,49 @@ export default function TeacherSchedulesPages() {
   ];
 
   const handleStartClass = (row) => {
-    setIsOpenQrCode(true);
-    console.log("halo", row);
-    setSelectedClass(row);
+    const canStart = isClassToday(row);
+
+    if (!canStart) {
+      alert("No Class Today");
+    } else {
+      setIsOpenQrCode(true);
+      setSelectedClass(row);
+    }
   };
 
   const startClassAction = [
     {
       title: "Start",
-      icon: QrCode,
       onClick: (row) => handleStartClass(row),
+      render: (row) => {
+        const canStart = isClassToday(row);
+        return (
+          <button>
+            {canStart ? (
+              <div className='relative bg-green-200 rounded-lg p-1'>
+                {/* Flag Badge */}
+                <div className='absolute -top-1 -right-1 bg-green-500/50 rounded-full p-[2px] shadow'>
+                  <Flag size={10} className='text-white' />
+                </div>
+
+                {/* QR Icon */}
+                <QrCode size={18} />
+              </div>
+            ) : (
+              <div className='relative bg-red-200 rounded-lg p-1'>
+                {/* Flag Badge */}
+
+                {/* QR Icon */}
+                <QrCode size={18} />
+              </div>
+            )}
+          </button>
+        );
+      },
     },
   ];
+
+  console.log("c;ass", classSchedule);
 
   return (
     <div className='min-h-screen bg-gray-50'>

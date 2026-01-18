@@ -14,7 +14,7 @@ const getClassSchedule = async (page, limit, searchTerm, date, teacherId) => {
       limit,
       searchTerm,
       date,
-      teacherId
+      teacherId,
     );
     return result;
   } catch (error) {
@@ -28,12 +28,10 @@ const postClassSchedule = async (data, userId) => {
   try {
     await connection.beginTransaction();
 
-    console.log("data", data);
-
     const resultId = await ClassSchedule.postClassSchedule(
       connection,
       data,
-      userId
+      userId,
     );
 
     //start making loop
@@ -68,7 +66,7 @@ const postClassSchedule = async (data, userId) => {
 
     const result = await ClassScheduleDetail.bulkInsertScheduleDetail(
       connection,
-      dataForBulk
+      dataForBulk,
     );
 
     await connection.commit();
@@ -135,7 +133,7 @@ const putClassSchedule = async (id, data, userId) => {
 
     const result = await ClassScheduleDetail.bulkInsertScheduleDetail(
       connection,
-      dataForBulk
+      dataForBulk,
     );
 
     // change ig only date change ---------------------------------------
