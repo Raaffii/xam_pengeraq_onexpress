@@ -4,7 +4,6 @@ const crypto = require("crypto");
 const getClassScheduleDetail = async (req, res) => {
   try {
     let { page, limit, searchTerm, date, scheduleId, nowDate } = req.query;
-
     const { teacherId } = req.user;
 
     const result = await classScheduleDetailService.getClassScheduleDetail(
@@ -36,11 +35,32 @@ const getClassScheduleDetail = async (req, res) => {
   }
 };
 
+const getClassScheduleDetailById = async (req, res) => {
+  try {
+    const classSchDetailsId = req.params.id;
+    const result =
+      await classScheduleDetailService.getClassScheduleDetailById(
+        classSchDetailsId,
+      );
+    res.status(200).json({
+      data: result.data,
+    });
+  } catch (error) {
+    console.error("get student error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "get student failed",
+      error: error.message,
+    });
+  }
+};
+
 const startClassSession = async (req, res) => {
   try {
     const { userId } = req.user;
 
-    const { classschhdid } = req.body;
+    const classschhdid = req.params.id;
 
     const token = crypto.randomUUID();
     const hashToken = crypto.createHash("sha256").update(token).digest("hex");
@@ -56,7 +76,7 @@ const startClassSession = async (req, res) => {
       startDateTime: data.startDateTime,
     };
 
-    res.status(201).json(dataToken);
+    res.status(201).json({ dataTo: dataToken });
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {
       return res.status(400).json({
@@ -123,4 +143,5 @@ module.exports = {
   getClassScheduleDetail,
   startClassSession,
   openClassSession,
+  getClassScheduleDetailById,
 };

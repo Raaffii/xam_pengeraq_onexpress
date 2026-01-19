@@ -3,15 +3,14 @@ import { QRCodeCanvas } from "qrcode.react";
 import { Modal } from "../custom";
 import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
 import CountDown from "./CountDown";
+import PropTypes from "prop-types";
 
 const AttendanceQRCodeModal = ({
   open,
   setOpen,
-  link,
   subjectName,
   teacherName,
   classschhdid,
-  classStartDateTime,
 }) => {
   const [classStarted, setClassStarted] = useState();
   const [urlToken, setUrlToken] = useState();
@@ -23,7 +22,6 @@ const AttendanceQRCodeModal = ({
     const fetchData = async () => {
       let result;
       if (open) {
-        console.log("cek1");
         result = await openClassSession(classschhdid);
 
         setStartDateTime(result.startDateTime);
@@ -38,8 +36,9 @@ const AttendanceQRCodeModal = ({
   const CHECKIN_URL = import.meta.env.VITE_STUDENT_PORTAL;
 
   const handleStartClass = async () => {
-    const result = await startClassSession({ classschhdid });
+    const result = await startClassSession(classschhdid);
     setStartDateTime(result.startDateTime);
+
     setUrlToken(`${CHECKIN_URL}/checkin/?token=${result.token}`);
     setClassStarted(true);
   };
@@ -136,6 +135,15 @@ const AttendanceQRCodeModal = ({
       )}
     </Modal>
   );
+};
+
+AttendanceQRCodeModal.propTypes = {
+  open: PropTypes.bool.isRequired,
+  setOpen: PropTypes.func.isRequired,
+  subjectName: PropTypes.string.isRequired,
+  teacherName: PropTypes.string.isRequired,
+  classschhdid: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
 };
 
 export default AttendanceQRCodeModal;

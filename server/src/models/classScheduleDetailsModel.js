@@ -81,7 +81,7 @@ const getClassScheduleDetail = async (
     ese.examseriesdescription as examSeriesDescription,
     es.subjDesc as subjDesc,
     cd.startdatetime as classStartDateTime,
-    
+    cd.classschdetailsid as classSchDetailsId,
     t.teacherid as teacherId,   
     es.examsubjid as examSubjId,
     ese.examseriesid as examSeriesId,
@@ -109,6 +109,43 @@ const getClassScheduleDetail = async (
   const [rows] = await pool.execute(query, queryParams);
 
   return { data: rows };
+};
+
+const getClassScheduleDetailById = async (classSchDetailsId) => {
+  let query = `
+    SELECT 
+    cs.classschhdid as classschhdid,
+    cs.startdatetime as startDateTime,
+    cs.enddatetime as endDateTime,
+    cs.repeatfreq as repeatFreq, 
+    cs.repeatvalue as repeatValue,
+    t.teachername as teacherName,
+    ese.examseriesdescription as examSeriesDescription,
+    es.subjDesc as subjDesc,
+    cd.startdatetime as classStartDateTime,
+    cd.classschdetailsid as classSchDetailsId,
+    t.teacherid as teacherId,   
+    es.examsubjid as examSubjId,
+    ese.examseriesid as examSeriesId,
+    cl.classlocationid as classLocationId,
+    cd.classdatetime as classDateTime 
+
+    FROM classschdetails cd 
+    LEFT JOIN classschhd cs ON cd.classschhdid = cs.classschhdid
+    LEFT JOIN teacher t ON cs.teacherid = t.teacherid
+    LEFT JOIN examsubj es ON cs.examsubjectid= es.examsubjid
+    LEFT JOIN examseries ese ON cs.examseriesid=ese.examseriesid 
+    LEFT JOIN classlocation cl on cs.locationid=cl.classlocationid
+    
+    WHERE cd.classschdetailsid = ?
+
+
+    `;
+
+  const [rows] = await pool.execute(query, [classSchDetailsId]);
+
+  console.log("cekckece", rows[0]);
+  return { data: rows[0] };
 };
 
 const deleteClassScheduleDetail = async (conn, id) => {
@@ -190,6 +227,7 @@ const openClassSession = async (classschhdid, hashToken) => {
 
 module.exports = {
   bulkInsertScheduleDetail,
+  getClassScheduleDetailById,
   getClassScheduleDetail,
   deleteClassScheduleDetail,
   startClassSession,

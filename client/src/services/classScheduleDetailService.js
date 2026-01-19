@@ -15,9 +15,21 @@ export const classScheduleDetailService = {
     }
   },
 
+  getClassScheduleDetailById: async (scheduleDetailId) => {
+    // const margedData = { data1, data2 };
+    try {
+      const response = await api.get(`${BASE_URL}/${scheduleDetailId}`);
+      return response.data;
+    } catch (error) {
+      handleServiceError(error, "Failed to fetch student");
+    }
+  },
+
   startClassSession: async (classschhdid) => {
     try {
-      const response = await api.put(BASE_URL, classschhdid);
+      const response = await api.put(
+        `${BASE_URL}/classsession/${classschhdid}`,
+      );
 
       return response.data;
     } catch (error) {
@@ -28,7 +40,7 @@ export const classScheduleDetailService = {
   openClassSession: async (classschhdid) => {
     try {
       const response = await api.get(
-        `${BASE_URL}/classsession/${classschhdid}`
+        `${BASE_URL}/classsession/${classschhdid}`,
       );
 
       return response.data;

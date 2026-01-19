@@ -16,6 +16,7 @@ export default function TeacherSchedulesPages() {
     deleteClassSchedule,
     classSchedule,
     pagination,
+    onSearch,
     onPageChange,
     onPageSizeChange,
   } = useClassSchedule();
@@ -117,19 +118,6 @@ export default function TeacherSchedulesPages() {
         </div>
       ),
     },
-    // {
-    //   header: <div className='text-left w-full'>End Date</div>,
-    //   cellClassName: "text-left",
-    //   render: (row) => (
-    //     <div className='flex flex-wrap gap-1'>
-    //       <span
-    //         className='px-2 py-0.5 text-xs rounded-full
-    //                bg-blue-50 text-blue-700 border border-blue-200'>
-    //         {row.endDateTime}
-    //       </span>
-    //     </div>
-    //   ),
-    // },
     {
       header: <div className='text-center w-full'>Class Today</div>,
       cellClassName: "text-left",
@@ -209,8 +197,6 @@ export default function TeacherSchedulesPages() {
     },
   ];
 
-  console.log("c;ass", classSchedule);
-
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='mx-auto'>
@@ -218,9 +204,10 @@ export default function TeacherSchedulesPages() {
           title='Teacher Schedules'
           subtitle='Your Schedule'
           showSearch={true}
-          searchPlaceholder='Search by name'
+          searchPlaceholder='Search by subject'
           searchMaxLength={50}
           actions2={actions}
+          onSearch={onSearch}
         />
 
         <DataTable

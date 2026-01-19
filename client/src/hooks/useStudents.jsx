@@ -41,7 +41,7 @@ export const useStudents = () => {
             pageSize: 10,
             totalPages: 1,
             totalItems: 0,
-          }
+          },
         );
 
         return { success: true, data: data };
@@ -56,7 +56,7 @@ export const useStudents = () => {
         setIsLoading(false);
       }
     },
-    [params, formatStudentData]
+    [params, formatStudentData],
   );
 
   const getStudentById = useCallback(async (studentId) => {
@@ -155,7 +155,7 @@ export const useStudents = () => {
 
       return await fetchStudents({ searchTerm, page: 1 });
     },
-    [fetchStudents, setParams, params]
+    [fetchStudents, setParams, params],
   );
 
   const onPageChange = useCallback(
@@ -165,7 +165,7 @@ export const useStudents = () => {
       setParams(newParams);
       return await fetchStudents({ page });
     },
-    [params, fetchStudents]
+    [params, fetchStudents],
   );
 
   const onPageSizeChange = useCallback(
@@ -174,7 +174,7 @@ export const useStudents = () => {
       setParams(newParams);
       return await fetchStudents({ limit, page: 1 });
     },
-    [params, fetchStudents]
+    [params, fetchStudents],
   );
   return {
     fetchStudents,

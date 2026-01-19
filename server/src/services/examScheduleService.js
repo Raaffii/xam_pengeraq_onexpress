@@ -1,7 +1,5 @@
 const pool = require("../config/db");
 
-const Students = require("../models/studentModel");
-
 const ClassSchedule = require("../models/classScheduleModel");
 const ClassScheduleDetail = require("../models/classScheduleDetailsModel");
 

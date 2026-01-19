@@ -11,14 +11,17 @@ const getClassSchedule = async (
   limit = Number(limit) || 10;
   const offset = (page - 1) * limit;
 
-  // const searchValue = `%${searchTerm}%`;
-
   const conditions = [];
   const params = [];
 
   if (teacherId) {
     conditions.push("cs.teacherid=?");
     params.push(teacherId);
+  }
+  if (searchTerm) {
+    conditions.push("(t.teachername LIKE ? OR es.subjdesc LIKE ? )");
+    const searchValue = `%${searchTerm}%`;
+    params.push(searchValue, searchValue);
   }
 
   const whereClause =
@@ -33,7 +36,7 @@ const getClassSchedule = async (
     cs.repeatvalue as repeatValue,
     t.teachername as teacherName,
     ese.examseriesdescription as examSeriesDescription,
-    es.subjDesc as subjDesc,
+    es.subjdesc as subjDesc,
     
     t.teacherid as teacherId,   
     es.examsubjid as examSubjId,
@@ -58,7 +61,8 @@ const getClassSchedule = async (
 
   const [rows] = await pool.execute(query, queryParams);
 
-  const countQuery = `SELECT COUNT(*) AS total FROM classschhd cs  ${whereClause}`;
+  const countQuery = `SELECT COUNT(*) AS total FROM classschhd cs  LEFT JOIN teacher t ON cs.teacherid = t.teacherid
+    LEFT JOIN examsubj es ON cs.examsubjectid= es.examsubjid  ${whereClause}`;
   const [countResult] = await pool.query(countQuery, params);
   const total = countResult[0].total;
 

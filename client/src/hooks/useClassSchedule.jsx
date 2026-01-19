@@ -42,7 +42,7 @@ export const useClassSchedule = () => {
             pageSize: 10,
             totalPages: 1,
             totalItems: 0,
-          }
+          },
         );
         setClassSchedule(data);
         return { success: true, data: data };
@@ -57,7 +57,7 @@ export const useClassSchedule = () => {
         setIsLoading(false);
       }
     },
-    [params, formatClassSchedule]
+    [params, formatClassSchedule],
   );
 
   const getClassScheduleById = useCallback(async (scheduleId) => {
@@ -65,9 +65,8 @@ export const useClassSchedule = () => {
       setIsLoading(true);
       setError(null);
 
-      const response = await classScheduleService.getClassScheduleById(
-        scheduleId
-      );
+      const response =
+        await classScheduleService.getClassScheduleById(scheduleId);
 
       setClassSchedule(response.data);
 
@@ -117,7 +116,7 @@ export const useClassSchedule = () => {
       console.log("ce", classScheduleId);
       const response = await classScheduleService.putClassSchedule(
         classScheduleId,
-        data
+        data,
       );
       toast.success("Schedule added successfully!", { id: toastId });
 
@@ -142,12 +141,11 @@ export const useClassSchedule = () => {
       setError(null);
       toastId = toast.loading("Deleting new schedule...");
 
-      const response = await classScheduleService.deleteClassSchedule(
-        classschhdid
-      );
+      const response =
+        await classScheduleService.deleteClassSchedule(classschhdid);
       toast.success("Schedule delete successfully!", { id: toastId });
       setClassSchedule((prev) =>
-        prev.filter((item) => item.classschhdid !== classschhdid)
+        prev.filter((item) => item.classschhdid !== classschhdid),
       );
       return { success: true, data: response.data };
     } catch (err) {
@@ -176,17 +174,17 @@ export const useClassSchedule = () => {
         page: 1,
       });
     },
-    [params, fetchClassSchedule]
+    [params, fetchClassSchedule],
   );
 
   const onSearch = useCallback(
-    async (search) => {
-      const newParams = { ...params, search };
+    async (searchTerm) => {
+      const newParams = { ...params, searchTerm };
       setParams(newParams);
 
-      return await fetchClassSchedule({ search, page: 1 });
+      return await fetchClassSchedule({ searchTerm, page: 1 });
     },
-    [fetchClassSchedule, setParams, params]
+    [fetchClassSchedule, setParams, params],
   );
 
   const onPageChange = useCallback(
@@ -195,7 +193,7 @@ export const useClassSchedule = () => {
       setParams(newParams);
       return await fetchClassSchedule({ page });
     },
-    [params, fetchClassSchedule]
+    [params, fetchClassSchedule],
   );
 
   const onPageSizeChange = useCallback(
@@ -204,7 +202,7 @@ export const useClassSchedule = () => {
       setParams(newParams);
       return await fetchClassSchedule({ limit, page: 1 });
     },
-    [params, fetchClassSchedule]
+    [params, fetchClassSchedule],
   );
 
   return {

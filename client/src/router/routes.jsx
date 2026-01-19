@@ -20,6 +20,7 @@ import ScheduleDetailPage from "@/components/schedule/ScheduleDetailPage";
 import { ExamSubjectGradePage } from "@/components/subjects";
 import TeacherCalendarPage from "@/pages/TeacherCalendarPage";
 import TeacherScheduleDetailPage from "@/components/teacher/teacherScheduleDetailPage";
+import ClassAttendancePage from "@/pages/ClassAtendancePage";
 
 const teacherPrivateRoutes = {
   path: "/teacher",
@@ -33,6 +34,7 @@ const teacherPrivateRoutes = {
     { path: "schedule", element: <TeacherSchedulesPages /> },
     { path: "scheduledetail/:id", element: <TeacherScheduleDetailPage /> },
     { path: "schedule/calendar", element: <TeacherCalendarPage /> },
+    { path: "class-attendance/:id", element: <ClassAttendancePage /> },
   ],
 };
 

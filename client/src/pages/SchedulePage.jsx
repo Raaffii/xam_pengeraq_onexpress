@@ -11,6 +11,7 @@ export default function SchedulesPages() {
   const {
     fetchClassSchedule,
     deleteClassSchedule,
+    onSearch,
     classSchedule,
     pagination,
     onPageChange,
@@ -93,7 +94,7 @@ export default function SchedulesPages() {
           <span
             className='px-2 py-0.5 text-xs rounded-full
                    bg-blue-50 text-blue-700 border border-blue-200'>
-            {row.endDateTime}
+            {row.endDateTime || row.startDateTime}
           </span>
         </div>
       ),
@@ -116,9 +117,10 @@ export default function SchedulesPages() {
       <div className='mx-auto'>
         <PageHeader
           title='Schedule'
-          subtitle='Manage student records and exam series assignments'
+          subtitle='Manage schedule'
           showSearch={true}
-          searchPlaceholder='Search by name'
+          onSearch={onSearch}
+          searchPlaceholder='Search by teacher name or subject'
           searchMaxLength={50}
           actions2={actions}
           primaryAction={{

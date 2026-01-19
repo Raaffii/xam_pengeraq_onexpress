@@ -17,6 +17,7 @@ const teacherRoute = require("./teacherRoutes");
 const classLocationRoute = require("./classLocationRoutes");
 const classScheduleDetailRoute = require("./classScheduleDetailRoute");
 const studentClassRoute = require("./studentClassRoute");
+const classAttendanceRoute = require("./classAttendance");
 
 const Router = express.Router();
 
@@ -37,5 +38,6 @@ Router.use("/teacher", teacherRoute);
 Router.use("/classlocation", classLocationRoute);
 Router.use("/classscheduledetail", classScheduleDetailRoute);
 Router.use("/studentclass", studentClassRoute);
+Router.use("/classattendance", classAttendanceRoute);
 
 module.exports = Router;

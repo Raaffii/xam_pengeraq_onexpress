@@ -18,7 +18,7 @@ export default function TeacherCalendarPage() {
   const [view, setView] = useState(Views.MONTH);
   const [events, setEvents] = useState();
 
-  const { fetchClassScheduleDetail } = useClassScheduleDetail();
+  const { fetchClassScheduleDetail, onSearch } = useClassScheduleDetail();
 
   const localizer = dateFnsLocalizer({
     format,
@@ -53,17 +53,20 @@ export default function TeacherCalendarPage() {
   const components = {
     event: ({ event }) => {
       if (event?.appointment) {
+        const isPast = new Date() > new Date(event?.start);
+        const today = new Date();
+        const isToday = event.start.toDateString() === today.toDateString();
+
         return (
           <div
-            className={`flex gap-1 p-0.5 rounded-sm text-black ${
-              event.repeatvalue === "daily"
-                ? "bg-red-300"
-                : event.repeatvalue === "weekly"
-                ? "bg-yellow-300"
-                : event.repeatvalue === "monthly"
-                ? "bg-green-300"
-                : ""
-            }`}>
+            className={`flex gap-1 px-0.5 rounded-sm overflow-hidden text-white ${isToday ? "    bg-blue-400 border-2 border-blue-900" : "bg-purple-400 border-2 border-purple-900 "}   font-semibold ${
+              isPast ? "line-through opacity-60 hover:bg-blue-900" : ""
+            }`}
+            onClick={() => {
+              isPast
+                ? navigate(`/teacher/class-attendance/${event?.scheduleid}`)
+                : alert("Class Session Has Not Begun Yet");
+            }}>
             <div className='flex items-center gap-1'>
               {/* <UserIcon className='w-4' /> */}
               <h2>{event?.examsubject} </h2>
@@ -115,6 +118,7 @@ export default function TeacherCalendarPage() {
     const mappedEvents = data.map((item) => ({
       start: new Date(item.classDateTime),
       end: new Date(new Date(item.classDateTime).getTime() + 40 * 60 * 1000),
+      scheduleid: item.classSchDetailsId,
       appointment: true,
       teacher: item.teacherName,
       examseries: item.examSeriesDescription,
@@ -130,8 +134,6 @@ export default function TeacherCalendarPage() {
       const resultOri = await fetchClassScheduleDetail({
         date: new Date().setMonth(new Date().getMonth() + calendarShow + 1),
       });
-
-      console.log("result ori", resultOri);
 
       await handleEvent(resultOri.data);
       setCalendarShow(calendarShow + 1);
@@ -158,7 +160,8 @@ export default function TeacherCalendarPage() {
       <PageHeader
         title='Teacher Schedule'
         subtitle='Your Schedule'
-        showSearch={true}
+        showSearch={false}
+        onSearch={onSearch}
         searchPlaceholder='Search by name'
         searchMaxLength={50}
         actions2={actions}

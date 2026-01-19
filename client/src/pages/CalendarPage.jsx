@@ -55,14 +55,14 @@ export default function CalendarPage() {
       if (event?.appointment) {
         return (
           <div
-            className={`flex gap-1 p-0.5 rounded-sm text-black ${
+            className={`flex gap-1 p-0.5 rounded-sm text-black  ${
               event.repeatvalue === "daily"
                 ? "bg-red-300"
                 : event.repeatvalue === "weekly"
-                ? "bg-yellow-300"
-                : event.repeatvalue === "monthly"
-                ? "bg-green-300"
-                : ""
+                  ? "bg-yellow-300"
+                  : event.repeatvalue === "monthly"
+                    ? "bg-green-300"
+                    : "bg-blue-300"
             }`}>
             <div className='flex items-center gap-1'>
               {/* <UserIcon className='w-4' /> */}
@@ -112,7 +112,6 @@ export default function CalendarPage() {
   };
 
   const handleEvent = async (data) => {
-    console.log("datadata", data);
     const mappedEvents = data.map((item) => ({
       start: new Date(item.classDateTime),
       end: new Date(new Date(item.classDateTime).getTime() + 40 * 60 * 1000),

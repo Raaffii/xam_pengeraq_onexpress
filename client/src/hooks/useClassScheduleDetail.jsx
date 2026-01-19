@@ -43,7 +43,7 @@ export const useClassScheduleDetail = () => {
             pageSize: 10,
             totalPages: 1,
             totalItems: 0,
-          }
+          },
         );
         setClassScheduleDetail(data);
         return { success: true, data: data };
@@ -58,7 +58,34 @@ export const useClassScheduleDetail = () => {
         setIsLoading(false);
       }
     },
-    [params, formatClassSchedule]
+    [params, formatClassSchedule],
+  );
+
+  const fetchClassScheduleDetailById = useCallback(
+    async (classSchDetailsId) => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response =
+          await classScheduleDetailService.getClassScheduleDetailById(
+            classSchDetailsId,
+          );
+
+        setClassScheduleDetail(response.data);
+        return { success: true, data: response.data };
+      } catch (err) {
+        console.error("Error fetching exams:", err);
+
+        setError(err.message);
+        setClassScheduleDetail([]);
+
+        return { success: false, error: err.message };
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [params, formatClassSchedule],
   );
 
   const startClassSession = useCallback(async (classschhdid) => {
@@ -66,18 +93,16 @@ export const useClassScheduleDetail = () => {
     try {
       setIsSubmitting(true);
       setError(null);
-      toastId = toast.loading("Creating new students...");
+      toastId = toast.loading("Checking QR code availability...");
 
-      const response = await classScheduleDetailService.startClassSession(
-        classschhdid
-      );
-      toast.success("Student added successfully!", { id: toastId });
+      const response =
+        await classScheduleDetailService.startClassSession(classschhdid);
+      toast.success("Succes Create QR Code!", { id: toastId });
 
-      console.log("cekceec", response.data);
       return {
         success: true,
-        token: response.data.token,
-        startDateTime: response.data.startDateTime,
+        token: response.data.dataTo.token,
+        startDateTime: response.data.dataTo.startDateTime,
       };
     } catch (err) {
       console.error("Error creating student:", err);
@@ -98,11 +123,8 @@ export const useClassScheduleDetail = () => {
 
       toastId = toast.loading("Checking QR code availability...");
 
-      const response = await classScheduleDetailService.openClassSession(
-        classschhdid
-      );
-
-      console.log("Cecekekcekekcek", response);
+      const response =
+        await classScheduleDetailService.openClassSession(classschhdid);
 
       if (response.data.token) {
         toast.success("QR code is available.", { id: toastId });
@@ -140,17 +162,18 @@ export const useClassScheduleDetail = () => {
         page: 1,
       });
     },
-    [params, fetchClassScheduleDetail]
+    [params, fetchClassScheduleDetail],
   );
 
   const onSearch = useCallback(
-    async (search) => {
-      const newParams = { ...params, search };
+    async (searchTerm) => {
+      console.log("cee", searchTerm);
+      const newParams = { ...params, searchTerm };
       setParams(newParams);
 
-      return await fetchClassScheduleDetail({ search, page: 1 });
+      return await fetchClassScheduleDetail({ searchTerm, page: 1 });
     },
-    [fetchClassScheduleDetail, setParams, params]
+    [fetchClassScheduleDetail, setParams, params],
   );
 
   const onPageChange = useCallback(
@@ -159,7 +182,7 @@ export const useClassScheduleDetail = () => {
       setParams(newParams);
       return await fetchClassScheduleDetail({ page });
     },
-    [params, fetchClassScheduleDetail]
+    [params, fetchClassScheduleDetail],
   );
 
   const onPageSizeChange = useCallback(
@@ -168,11 +191,12 @@ export const useClassScheduleDetail = () => {
       setParams(newParams);
       return await fetchClassScheduleDetail({ limit, page: 1 });
     },
-    [params, fetchClassScheduleDetail]
+    [params, fetchClassScheduleDetail],
   );
 
   return {
     fetchClassScheduleDetail,
+    fetchClassScheduleDetailById,
     onPageChange,
     onPageSizeChange,
     onSearch,

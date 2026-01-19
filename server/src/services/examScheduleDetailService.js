@@ -7,7 +7,7 @@ const getClassScheduleDetail = async (
   date,
   teacherId,
   scheduleId,
-  nowDate
+  nowDate,
 ) => {
   try {
     const result = await ClassScheduleDetail.getClassScheduleDetail(
@@ -17,8 +17,19 @@ const getClassScheduleDetail = async (
       date,
       teacherId,
       scheduleId,
-      nowDate
+      nowDate,
     );
+    return result;
+  } catch (error) {
+    console.error("Service error:", error);
+    throw new Error("Failed to get student by id");
+  }
+};
+
+const getClassScheduleDetailById = async (classSchDetailsId) => {
+  try {
+    const result =
+      await ClassScheduleDetail.getClassScheduleDetailById(classSchDetailsId);
     return result;
   } catch (error) {
     console.error("Service error:", error);
@@ -31,7 +42,7 @@ const startClassSession = async (classschhdid, hashToken, newClass = true) => {
     const result = await ClassScheduleDetail.startClassSession(
       classschhdid,
       hashToken,
-      newClass
+      newClass,
     );
     return result;
   } catch (error) {
@@ -56,7 +67,7 @@ const openClassSession = async (classschhdid, hashToken) => {
   try {
     const result = await ClassScheduleDetail.openClassSession(
       classschhdid,
-      hashToken
+      hashToken,
     );
 
     return result;
@@ -72,4 +83,5 @@ module.exports = {
   startClassSession,
   openClassSession,
   newTokenClassSession,
+  getClassScheduleDetailById,
 };
