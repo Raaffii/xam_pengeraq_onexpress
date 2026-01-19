@@ -85,6 +85,7 @@ const DashboardModel = {
           er.subjgpa as subjGpa,
           er.subjgrade as subjGrade,
           er.subjresults as subjResult,
+          s.subjearncredit AS subjCredit,
           er.retake as isRetake,
           er.createddate as createdDate,
           er.editeddate as editedDate
@@ -122,6 +123,7 @@ const DashboardModel = {
           subjId: row.subjId,
           subjDesc: row.subjDesc,
           subjCode: row.subjCode,
+          subjCredit: row.subjCredit,
           marks: parseFloat(row.marks),
           subjGpa: parseFloat(row.subjGpa),
           subjGrade: row.subjGrade,
