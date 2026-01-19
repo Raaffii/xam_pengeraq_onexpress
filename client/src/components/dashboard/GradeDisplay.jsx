@@ -15,10 +15,10 @@ export const GradeDisplay = ({ grade, marks, gpa, isRetake }) => {
             isRetake === 1 ? "bg-gray-400" : "bg-gray-900"
           } text-white rounded-md font-medium`}
         >
-          {parseFloat(marks)}
+          {marks}
         </span>
         <span className="px-2 py-1 bg-green-600 text-white rounded-md font-medium">
-          {parseFloat(gpa, 2)}
+          {gpa}
         </span>
       </div>
     </div>

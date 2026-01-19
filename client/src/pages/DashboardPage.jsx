@@ -63,21 +63,19 @@ const DashboardPage = () => {
         </div>
       ),
     },
-    ...(seriesSubj.length > 0
-      ? seriesSubj.map((subject) => ({
-          header: (
-            <div className="flex flex-col items-center">
-              <span className="font-bold text-white-900">
-                {subject.subjCode}
-              </span>
-              <span className="text-xs text-gray-300">{subject.subjDesc}</span>
-            </div>
-          ),
-          width: "150px",
-          align: "center",
-          render: (row) => {
-            const result = getResultForSubject(row, subject.subjId);
-            return result ? (
+    ...(seriesSubj.length > 0 ?
+      seriesSubj.map((subject) => ({
+        header: (
+          <div className="flex flex-col items-center">
+            <span className="font-bold text-white-900">{subject.subjCode}</span>
+            <span className="text-xs text-gray-300">{subject.subjDesc}</span>
+          </div>
+        ),
+        width: "150px",
+        align: "center",
+        render: (row) => {
+          const result = getResultForSubject(row, subject.subjId);
+          return result ?
               <div
                 onClick={() => {
                   setModalMode("edit");
@@ -90,8 +88,8 @@ const DashboardPage = () => {
                     examSubjId: result.subjId,
                     subjDesc: result.subjDesc,
                     isRetake: result.isRetake,
-                    marks: result.marks,
-                    subjGpa: result.subjGpa,
+                    marks: Number(result.marks).toFixed(2),
+                    subjGpa: Number(result.subjGpa).toFixed(2),
                     subjResult: result.subjResult,
                     subjGrade: result.subjGrade,
                   });
@@ -100,22 +98,20 @@ const DashboardPage = () => {
               >
                 <GradeDisplay
                   grade={result.subjGrade}
-                  marks={result.marks}
-                  gpa={result.subjGpa}
+                  marks={Number(result.marks).toFixed(2)}
+                  gpa={Number(result.subjGpa).toFixed(2)}
                   isRetake={result.isRetake}
                 />
               </div>
-            ) : (
-              <span className="text-gray-400 text-sm">N/A</span>
-            );
-          },
-        }))
-      : [
-          {
-            header: "No subjects available",
-            className: "text-center",
-          },
-        ]),
+            : <span className="text-gray-400 text-sm">N/A</span>;
+        },
+      }))
+    : [
+        {
+          header: "No subjects available",
+          className: "text-center",
+        },
+      ]),
     {
       header: "Overall",
       width: "150px",
@@ -199,8 +195,9 @@ const DashboardPage = () => {
     });
   };
 
-  const options = Array.isArray(seriesOption)
-    ? seriesOption.map((item) => ({
+  const options =
+    Array.isArray(seriesOption) ?
+      seriesOption.map((item) => ({
         value: item.seriesId,
         label: item.seriesDesc,
       }))
