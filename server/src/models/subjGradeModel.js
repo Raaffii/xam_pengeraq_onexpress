@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const { defaultSubjGrades } = require("../utils/data");
 
 const SubjGradeModel = {
   /**
@@ -248,6 +249,43 @@ const SubjGradeModel = {
 
     const [rows] = await pool.execute(query, [subjId, score, score]);
     return rows.length > 0 ? rows[0] : null;
+  },
+
+  getDefaultGradeForScore(score) {
+    const gradeConfig = defaultSubjGrades.find(
+      (g) =>
+        parseFloat(g.subjmin) <= score &&
+        parseFloat(g.subjmax) >= score &&
+        g.active,
+    );
+
+    if (!gradeConfig) {
+      return null;
+    }
+
+    return {
+      gradeId: null,
+      grade: gradeConfig.subjgrade,
+      gpa: gradeConfig.subjgpa,
+      result: gradeConfig.subjresult,
+      minScore: gradeConfig.subjmin,
+      maxScore: gradeConfig.subjmax,
+    };
+  },
+
+  async getGradeWithFallback(subjId, score) {
+    let grade = await this.getGradeForScore(subjId, score);
+
+    if (!grade) {
+      grade = this.getDefaultGradeForScore(score);
+      if (grade) {
+        grade.isDefaultGrade = true;
+      }
+    } else {
+      grade.isDefaultGrade = false;
+    }
+
+    return grade;
   },
 
   /**
