@@ -3,7 +3,6 @@ import { ExamSeriesFilter } from "@/components/examseries";
 import { DataTable } from "@/components/table";
 import { useDashboard } from "@/hooks/useDashboard";
 import { useEffect, useRef } from "react";
-import { getGradeColor } from "@/utils";
 import { GradeDisplay, SeriesDetailCard } from "@/components/dashboard";
 import { useRowSelection } from "@/hooks";
 import ErrorState from "@/components/common/ErrorState";
@@ -64,6 +63,26 @@ const TranscriptsPage = () => {
         </div>
       ),
     },
+    {
+      header: "OVERALL GPA",
+      width: "200px",
+      align: "center",
+      render: (row) => (
+        <div className="flex flex-col items-center space-y-2">
+          <span className="text-xl font-bold text-blue-500">
+            {Number(row.summary.overallGradePoint).toFixed(2)}
+          </span>
+        </div>
+      ),
+    },
+    {
+      header: "ACHIEVEMENT",
+      width: "200px",
+      align: "center",
+      render: (row) => (
+        <div className="font-semibold">{row.summary.gradeResult}</div>
+      ),
+    },
     ...(seriesSubj.length > 0 ?
       seriesSubj.map((subject) => ({
         header: (
@@ -92,26 +111,6 @@ const TranscriptsPage = () => {
           className: "text-center",
         },
       ]),
-    {
-      header: "Overall",
-      width: "150px",
-      align: "center",
-      render: (row) => (
-        <div className="space-y-1">
-          <div
-            className={`inline-block px-3 py-1 rounded-full text-sm text-white font-semibold ${getGradeColor(
-              row.summary.overallGrade,
-            )}`}
-          >
-            {row.summary.overallGrade}
-          </div>
-          <div className="text-sm text-gray-600">
-            GPA: {Number(row.summary.overallGradePoint).toFixed(2)}
-          </div>
-          <div className="text-xs text-gray-500">{row.summary.gradeResult}</div>
-        </div>
-      ),
-    },
   ];
 
   return (
@@ -145,7 +144,7 @@ const TranscriptsPage = () => {
           valueKey="seriesId"
           labelKey="seriesDesc"
           filterKey="bySeries"
-          placeholder="Filter by Series"
+          placeholder="Select by Series First"
           initialFilters={params}
           onFilterChange={onFilterChange}
           isLoading={isLoading}
