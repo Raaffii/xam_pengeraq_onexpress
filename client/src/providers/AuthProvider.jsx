@@ -2,11 +2,13 @@ import { createContext, useContext, useEffect, useState, useRef } from "react";
 import { authService } from "@/services/authService";
 import api from "@/utils/api";
 import { handleServiceError } from "@/utils/errorHandler";
+import { setupService } from "@/services/setupService";
 
 const AuthContext = createContext();
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [setup, setSetup] = useState(null);
   const [loading, setLoading] = useState(true);
   const logoutTimerRef = useRef(null);
 
@@ -58,6 +60,7 @@ export default function AuthProvider({ children }) {
     const token = authService.getToken();
     if (token && authService.isAuthenticated()) {
       setUser(authService.getUser());
+      setSetup(setupService.getSetupData());
     } else if (token) {
       authService.logout();
     }
@@ -92,7 +95,11 @@ export default function AuthProvider({ children }) {
     try {
       const response = await api.post("/api/auth/login", formData);
       authService.saveLogin(response.data);
+      const detailSetup = await setupService.getSetupById(1);
+      setupService.setSetupData(detailSetup.data);
+
       setUser(authService.getUser());
+      setSetup(setupService.getSetupData());
       return response.data;
     } catch (error) {
       console.error("login error: ", error);
@@ -107,11 +114,13 @@ export default function AuthProvider({ children }) {
       logoutTimerRef.current = null;
     }
     authService.logout();
+    setupService.removeSetupData();
     setUser(null);
+    setSetup(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, setup }}>
       {children}
     </AuthContext.Provider>
   );

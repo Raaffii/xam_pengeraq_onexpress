@@ -123,9 +123,9 @@ export default function StudentsDetailPage() {
           <span
             className={`px-2 py-0.5 text-xs font-medium rounded-full border
         ${
-          isRetake
-            ? "bg-red-100 text-red-700 border-red-200"
-            : "bg-green-100 text-green-700 border-green-200"
+          isRetake ?
+            "bg-red-100 text-red-700 border-red-200"
+          : "bg-green-100 text-green-700 border-green-200"
         }`}
           >
             {isRetake ? "Yes" : "No"}
@@ -152,8 +152,9 @@ export default function StudentsDetailPage() {
     return result.success;
   };
 
-  const options = Array.isArray(studentsExamSeries)
-    ? studentsExamSeries.map((item) => ({
+  const options =
+    Array.isArray(studentsExamSeries) ?
+      studentsExamSeries.map((item) => ({
         value: item.seriesId,
         label: item.seriesDesc,
       }))
@@ -230,8 +231,8 @@ export default function StudentsDetailPage() {
               examSubjId: result.subjId,
               subjDesc: result.subjDesc,
               isRetake: result.isRetake,
-              marks: result.marks,
-              subjGpa: result.subjGpa,
+              marks: Number(result.marks).toFixed(2),
+              subjGpa: Number(result.subjGpa).toFixed(2),
               subjResult: result.subjResult,
               subjGrade: result.subjGrade,
             });

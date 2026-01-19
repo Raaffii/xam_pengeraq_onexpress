@@ -16,6 +16,7 @@ import CalendarPage from "@/pages/CalendarPage";
 import ScheduleDetailPage from "@/components/schedule/ScheduleDetailPage";
 import { ExamSubjectGradePage } from "@/components/subjects";
 import { publicRoutes } from "./publicRoutes";
+import TranscriptsPage from "@/pages/TranscriptsPage";
 
 const privateRoutes = {
   path: "/",
@@ -40,6 +41,7 @@ const privateRoutes = {
     { path: "schedule", element: <SchedulesPages /> },
     { path: "schedule/:id", element: <ScheduleDetailPage /> },
     { path: "schedule/calendar", element: <CalendarPage /> },
+    { path: "transcripts", element: <TranscriptsPage /> },
   ],
 };
 

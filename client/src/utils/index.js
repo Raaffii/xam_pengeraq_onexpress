@@ -64,3 +64,40 @@ export const getGradeColor = (grade) => {
   if (grade.startsWith("D")) return "bg-orange-600";
   return "bg-red-600";
 };
+
+export const formatPeriod = (startDate, endDate) => {
+  if (!startDate || !endDate) return "";
+
+  // Handle YYYY-MM-DD format
+  const parseDate = (dateStr) => {
+    if (dateStr.includes("-")) {
+      const [year, month, day] = dateStr.split("-");
+      return { month, year };
+    } else {
+      const [month, year] = dateStr.split("/");
+      return { month, year };
+    }
+  };
+
+  const start = parseDate(startDate);
+  const end = parseDate(endDate);
+
+  const months = [
+    "Januari",
+    "Februari",
+    "Mac",
+    "April",
+    "Mei",
+    "Jun",
+    "Julai",
+    "Ogos",
+    "September",
+    "Oktober",
+    "November",
+    "Disember",
+  ];
+
+  return `${months[parseInt(start.month) - 1]} ${start.year} - ${
+    months[parseInt(end.month) - 1]
+  } ${end.year}`;
+};

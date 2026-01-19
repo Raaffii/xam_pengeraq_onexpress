@@ -172,6 +172,33 @@ export const useDashboard = () => {
     [params],
   );
 
+  // Fetch all exam series
+  const fetchSeries = useCallback(
+    async (overrideParams = {}) => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const finalParams = { ...params, ...overrideParams };
+        const series = await examSeriesService.getExamSeries(finalParams);
+        const seriesData = series.data || [];
+        setSeriesOption(seriesData);
+
+        return {
+          success: true,
+          data: series.data || [],
+        };
+      } catch (err) {
+        console.error("Error fetching series subjects:", err);
+        setError(err.message);
+        return { success: false, error: err.message };
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [params],
+  );
+
   const clearError = useCallback(() => {
     setError(null);
   }, []);
@@ -292,6 +319,7 @@ export const useDashboard = () => {
     fetchInitialDashboard,
     fetchDashboard,
     fetchSeriesSubj,
+    fetchSeries,
     clearError,
     resetState,
     onPageChange,
