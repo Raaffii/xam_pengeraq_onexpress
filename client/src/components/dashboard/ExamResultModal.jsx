@@ -168,8 +168,6 @@ export const ExamResultModal = ({
         return;
       }
 
-      if (parseFloat(marks) === parseFloat(formData.marks) || isGrading) return;
-
       try {
         const result = await getGradesBySubjIdAndScore(
           subjId,
@@ -198,11 +196,7 @@ export const ExamResultModal = ({
   );
 
   useEffect(() => {
-    const shouldFetch =
-      mode === "create" ||
-      (mode === "edit" && formData.marks !== originalData.marks);
-
-    if (shouldFetch && formData.examSubjId && formData.marks) {
+    if (formData.examSubjId && formData.marks && formData.marks > 0) {
       if (gradingTimeout) {
         clearTimeout(gradingTimeout);
       }
@@ -215,14 +209,8 @@ export const ExamResultModal = ({
 
       return () => clearTimeout(timeout);
     }
-  }, [
-    formData.examSubjId,
-    formData.marks,
-    formData.isRetake,
-    mode,
-    originalData.marks,
-    fetchGrade,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.examSubjId, formData.marks, formData.isRetake, fetchGrade]);
 
   const defaultSeriesOption = useMemo(() => {
     if (initialValues.examSeriesId && initialValues.seriesDesc) {
@@ -430,9 +418,9 @@ export const ExamResultModal = ({
               {mode === "create" ? "Add Student Result" : "Edit Student Result"}
             </DialogTitle>
             <DialogDescription>
-              {mode === "create"
-                ? "Add a new student exam result"
-                : "Update student exam result information"}
+              {mode === "create" ?
+                "Add a new student exam result"
+              : "Update student exam result information"}
             </DialogDescription>
           </DialogHeader>
 
@@ -495,15 +483,15 @@ export const ExamResultModal = ({
               error={errors.studentId}
               isRequired
               placeholder={
-                mode === "create" && studentLoading
-                  ? "Loading students..."
-                  : "Select student..."
+                mode === "create" && studentLoading ?
+                  "Loading students..."
+                : "Select student..."
               }
               searchPlaceholder="Search student..."
               emptyMessage={
-                mode === "create" && studentLoading
-                  ? "Loading..."
-                  : "No students found for this series"
+                mode === "create" && studentLoading ?
+                  "Loading..."
+                : "No students found for this series"
               }
               icon={User}
               defaultOption={defaultStudentOption}
@@ -565,7 +553,7 @@ export const ExamResultModal = ({
 
               <div className="rounded-lg border-2 p-4 text-center">
                 <p className="text-sm text-gray-500">GPA</p>
-                <p className="sm:text-xl text-2xl font-bold text-primaryblue">
+                <p className="sm:text-3xl text-2xl font-bold text-primaryblue">
                   {formData?.subjGpa || "-"}
                 </p>
               </div>
@@ -682,13 +670,13 @@ export const ExamResultModal = ({
                   }
                   className="h-10 bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting
-                    ? mode === "create"
-                      ? "Adding..."
-                      : "Updating..."
-                    : mode === "create"
-                    ? "Add Result"
-                    : "Update Result"}
+                  {isSubmitting ?
+                    mode === "create" ?
+                      "Adding..."
+                    : "Updating..."
+                  : mode === "create" ?
+                    "Add Result"
+                  : "Update Result"}
                 </Button>
               </div>
             </div>
