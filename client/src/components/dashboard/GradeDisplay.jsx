@@ -12,7 +12,7 @@ export const GradeDisplay = ({ grade, marks, gpa, isRetake }) => {
 
         <span
           className={`px-2 py-1 ${
-            isRetake === 1 ? "bg-gray-400" : "bg-gray-900"
+            isRetake ? "bg-gray-400" : "bg-gray-900"
           } text-white rounded-md font-medium`}
         >
           {marks}
