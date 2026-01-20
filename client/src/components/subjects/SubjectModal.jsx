@@ -101,7 +101,15 @@ export const SubjectModal = ({
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, label } = e.target;
+
+    if (name === "seriesId" && label !== undefined) {
+      setFormData((prev) => ({
+        ...prev,
+        seriesDesc: label || "",
+      }));
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (errors[name]) {
@@ -139,17 +147,6 @@ export const SubjectModal = ({
     onSubmit(dataToSubmit);
   };
 
-  const handleSeriesChange = (value, label) => {
-    setFormData((prev) => ({
-      ...prev,
-      seriesId: value,
-      seriesDesc: label || "",
-    }));
-    if (errors.seriesId) {
-      setErrors((prev) => ({ ...prev, seriesId: null }));
-    }
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -158,9 +155,9 @@ export const SubjectModal = ({
             {mode === "create" ? "Create New Subject" : "Edit Subject"}
           </DialogTitle>
           <DialogDescription>
-            {mode === "create"
-              ? "Add a new exam subject"
-              : "Update subject information"}
+            {mode === "create" ?
+              "Add a new exam subject"
+            : "Update subject information"}
           </DialogDescription>
         </DialogHeader>
 
@@ -232,10 +229,13 @@ export const SubjectModal = ({
             </div>
           </div>
 
+          {/* Exam Series */}
           <SearchableDropdown
+            id="seriesId"
+            name="seriesId"
             label="Exam Series"
             value={formData.seriesId}
-            onChange={handleSeriesChange}
+            onChange={handleChange}
             options={examSeriesOptions}
             isLoading={isLoadingSeries}
             disabled={optionDisabled || isSubmitting}
@@ -271,13 +271,13 @@ export const SubjectModal = ({
               disabled={isSubmitting || (mode === "edit" && !hasChanges)}
               className="h-10 bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting
-                ? mode === "create"
-                  ? "Creating..."
-                  : "Updating..."
-                : mode === "create"
-                ? "Create Subject"
-                : "Update Subject"}
+              {isSubmitting ?
+                mode === "create" ?
+                  "Creating..."
+                : "Updating..."
+              : mode === "create" ?
+                "Create Subject"
+              : "Update Subject"}
             </Button>
           </div>
         </div>

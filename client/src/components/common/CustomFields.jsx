@@ -105,17 +105,17 @@ export const InputField = ({
 
   const inputType = type === "number" ? "text" : type;
   const inputMode =
-    type === "number"
-      ? step && parseFloat(step) < 1
-        ? "decimal"
-        : "numeric"
-      : undefined;
+    type === "number" ?
+      step && parseFloat(step) < 1 ?
+        "decimal"
+      : "numeric"
+    : undefined;
   const pattern =
-    type === "number"
-      ? step && parseFloat(step) < 1
-        ? "[0-9]*\\.?[0-9]*"
-        : "[0-9]*"
-      : undefined;
+    type === "number" ?
+      step && parseFloat(step) < 1 ?
+        "[0-9]*\\.?[0-9]*"
+      : "[0-9]*"
+    : undefined;
 
   return (
     <div className={`space-y-2 ${className}`}>
@@ -175,9 +175,9 @@ export const InputRadio = ({
   };
 
   const layoutClass =
-    optionsLayout === "horizontal"
-      ? "flex flex-wrap gap-4"
-      : "flex flex-col space-y-3";
+    optionsLayout === "horizontal" ?
+      "flex flex-wrap gap-4"
+    : "flex flex-col space-y-3";
 
   return (
     <div className={`space-y-2 ${className}`} onBlur={handleBlur}>
@@ -294,6 +294,8 @@ export const InputTextArea = ({
 };
 
 export const SearchableDropdown = ({
+  id,
+  name,
   label,
   value,
   onChange,
@@ -378,10 +380,16 @@ export const SearchableDropdown = ({
     const selectedOption = filteredOptions.find(
       (opt) => opt.value === selectedValue,
     );
-    onChange(
-      selectedValue === value ? null : selectedValue,
-      selectedValue === value ? null : selectedOption?.label,
-    );
+
+    const syntheticEvent = {
+      target: {
+        name: name,
+        value: selectedValue === value ? null : selectedValue,
+        label: selectedValue === value ? null : selectedOption?.label,
+      },
+    };
+
+    onChange(syntheticEvent);
     setOpen(false);
     setSearchTerm("");
     setHasSearched(false);
@@ -392,7 +400,16 @@ export const SearchableDropdown = ({
 
   const handleClear = (e) => {
     e.stopPropagation();
-    onChange(null, null);
+
+    const syntheticEvent = {
+      target: {
+        name: name,
+        value: null,
+        label: null,
+      },
+    };
+
+    onChange(syntheticEvent);
     setSearchTerm("");
     setHasSearched(false);
     if (searchTimeoutRef.current) {
@@ -438,7 +455,7 @@ export const SearchableDropdown = ({
   return (
     <div className="space-y-2 w-full">
       {label && (
-        <Label className="text-sm font-medium text-gray-700">
+        <Label htmlFor={id} className="text-sm font-medium text-gray-700">
           {label}
           {isRequired && <span className="text-red-500 ml-1">*</span>}
         </Label>
@@ -447,6 +464,7 @@ export const SearchableDropdown = ({
       <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <Button
+            id={id}
             variant="outline"
             role="combobox"
             aria-expanded={open}
@@ -495,12 +513,12 @@ export const SearchableDropdown = ({
               />
             </div>
 
-            {isLoading ? (
+            {isLoading ?
               <div className="px-4 py-8 text-center text-gray-500">
                 <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-gray-700"></div>
                 <p className="mt-2 text-sm">Loading...</p>
               </div>
-            ) : filteredOptions.length > 0 ? (
+            : filteredOptions.length > 0 ?
               <ScrollArea
                 className="max-h-[200px] overflow-y-auto"
                 onWheel={(e) => {
@@ -529,12 +547,11 @@ export const SearchableDropdown = ({
                   ))}
                 </div>
               </ScrollArea>
-            ) : (
-              <div className="px-4 py-8 text-center text-gray-500">
+            : <div className="px-4 py-8 text-center text-gray-500">
                 <Search className="w-8 h-8 mx-auto mb-2 text-gray-400" />
                 <p className="text-sm">{getEmptyMessage()}</p>
               </div>
-            )}
+            }
           </div>
         </PopoverContent>
       </Popover>

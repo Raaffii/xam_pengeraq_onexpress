@@ -150,7 +150,23 @@ export const SeriesModal = ({
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, label } = e.target;
+
+    if (name === "examId" && label !== undefined) {
+      setFormData((prev) => ({
+        ...prev,
+        examName: label || "",
+      }));
+      setImportSeriesId(null);
+      if (errors.importSeriesId) {
+        setErrors((prev) => ({ ...prev, importSeriesId: null }));
+      }
+    }
+
+    if (name === "importSeriesId") {
+      setImportSeriesId(value);
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (errors[name]) {
@@ -213,28 +229,6 @@ export const SeriesModal = ({
     onSubmit(dataToSubmit);
   };
 
-  const handleExamChange = (value, label) => {
-    setFormData((prev) => ({
-      ...prev,
-      examId: value,
-      examName: label || "",
-    }));
-    setImportSeriesId(null);
-    if (errors.examId) {
-      setErrors((prev) => ({ ...prev, examId: null }));
-    }
-    if (errors.importSeriesId) {
-      setErrors((prev) => ({ ...prev, importSeriesId: null }));
-    }
-  };
-
-  const handleImportSeriesChange = (value) => {
-    setImportSeriesId(value);
-    if (errors.importSeriesId) {
-      setErrors((prev) => ({ ...prev, importSeriesId: null }));
-    }
-  };
-
   const handleIsImportSeriesChange = (value) => {
     setIsImportSeries(value);
     if (value === "no") {
@@ -259,18 +253,20 @@ export const SeriesModal = ({
             {mode === "create" ? "Create New Exam Series" : "Edit Exam Series"}
           </DialogTitle>
           <DialogDescription>
-            {mode === "create"
-              ? "Add a new exam series"
-              : "Update exam series information"}
+            {mode === "create" ?
+              "Add a new exam series"
+            : "Update exam series information"}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           {/* Exam Dropdown */}
           <SearchableDropdown
+            id="examId"
+            name="examId"
             label="Exam"
             value={formData.examId}
-            onChange={handleExamChange}
+            onChange={handleChange}
             options={examOptions}
             disabled={optionDisabled || isSubmitting}
             error={errors.examId}
@@ -391,24 +387,25 @@ export const SeriesModal = ({
           {/* Series Selection - Show when "Yes" is selected and exam is chosen */}
           {mode === "create" && isImportSeries === "yes" && (
             <>
-              {!formData.examId ? (
+              {!formData.examId ?
                 <p className="text-sm text-blue-700">
                   Please select an exam first to see available series for import
                 </p>
-              ) : (
-                <>
+              : <>
                   <SearchableDropdown
+                    id="importSeriesId"
+                    name="importSeriesId"
                     label="Select Series to Import"
                     value={importSeriesId}
-                    onChange={handleImportSeriesChange}
+                    onChange={handleChange}
                     options={seriesOptions}
                     disabled={isSubmitting || isLoading}
                     error={errors.importSeriesId}
                     isRequired
                     placeholder={
-                      isLoading
-                        ? "Loading series..."
-                        : "Select a series to import data from..."
+                      isLoading ? "Loading series..." : (
+                        "Select a series to import data from..."
+                      )
                     }
                     searchPlaceholder="Search series..."
                     emptyMessage={
@@ -423,7 +420,7 @@ export const SeriesModal = ({
                     the selected series
                   </p>
                 </>
-              )}
+              }
             </>
           )}
 
@@ -450,13 +447,13 @@ export const SeriesModal = ({
               disabled={isSubmitting || (mode === "edit" && !hasChanges)}
               className="h-10 bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting
-                ? mode === "create"
-                  ? "Creating..."
-                  : "Updating..."
-                : mode === "create"
-                ? "Create Series"
-                : "Update Series"}
+              {isSubmitting ?
+                mode === "create" ?
+                  "Creating..."
+                : "Updating..."
+              : mode === "create" ?
+                "Create Series"
+              : "Update Series"}
             </Button>
           </div>
         </div>

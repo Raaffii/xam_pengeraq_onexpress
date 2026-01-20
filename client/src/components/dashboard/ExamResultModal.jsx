@@ -299,7 +299,36 @@ export const ExamResultModal = ({
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, label } = e.target;
+
+    if (name === "examSeriesId" && label !== undefined) {
+      setFormData((prev) => ({
+        ...prev,
+        seriesDesc: label || "",
+        examSubjId: null,
+        subjDesc: "",
+        ...(mode === "create" &&
+          !lockStudent && {
+            studentId: null,
+            studentName: "",
+          }),
+      }));
+    }
+
+    if (name === "studentId" && label !== undefined) {
+      setFormData((prev) => ({
+        ...prev,
+        studentName: label || "",
+      }));
+    }
+
+    if (name === "examSubjId" && label !== undefined) {
+      setFormData((prev) => ({
+        ...prev,
+        subjDesc: label || "",
+      }));
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (errors[name]) {
@@ -349,51 +378,6 @@ export const ExamResultModal = ({
     onSubmit(dataToSubmit);
   };
 
-  const handleSeriesChange = (value, label) => {
-    setFormData((prev) => ({
-      ...prev,
-      examSeriesId: value,
-      seriesDesc: label || "",
-      examSubjId: null,
-      subjDesc: "",
-      ...(mode === "create" &&
-        !lockStudent && {
-          studentId: null,
-          studentName: "",
-        }),
-    }));
-
-    if (errors.examSeriesId) {
-      setErrors((prev) => ({ ...prev, examSeriesId: null }));
-    }
-
-    if (!lockStudent && errors.studentId) {
-      setErrors((prev) => ({ ...prev, studentId: null }));
-    }
-  };
-
-  const handleStudentChange = (value, label) => {
-    setFormData((prev) => ({
-      ...prev,
-      studentId: value,
-      studentName: label || "",
-    }));
-    if (errors.studentId) {
-      setErrors((prev) => ({ ...prev, studentId: null }));
-    }
-  };
-
-  const handleSubjectChange = (value, label) => {
-    setFormData((prev) => ({
-      ...prev,
-      examSubjId: value,
-      subjDesc: label || "",
-    }));
-    if (errors.examSubjId) {
-      setErrors((prev) => ({ ...prev, examSubjId: null }));
-    }
-  };
-
   const handleRetakeChange = (value) => {
     setFormData((prev) => ({
       ...prev,
@@ -440,9 +424,11 @@ export const ExamResultModal = ({
             <div className="grid md:grid-cols-2 gap-4">
               {/* Exam Series Dropdown */}
               <SearchableDropdown
+                id="examSeriesId"
+                name="examSeriesId"
                 label="Exam Series"
                 value={formData.examSeriesId}
-                onChange={handleSeriesChange}
+                onChange={handleChange}
                 options={seriesOptions}
                 disabled={optionDisabled || isSubmitting}
                 error={errors.examSeriesId}
@@ -458,9 +444,11 @@ export const ExamResultModal = ({
 
               {/* Subject Dropdown */}
               <SearchableDropdown
-                label="Subject"
+                id="examSubjId"
+                name="examSubjId"
+                label={"Subject"}
                 value={formData.examSubjId}
-                onChange={handleSubjectChange}
+                onChange={handleChange}
                 options={subjectOptions}
                 disabled={optionDisabled || isSubmitting || subjLoad}
                 error={errors.examSubjId}
@@ -482,9 +470,11 @@ export const ExamResultModal = ({
 
             {/* Student Dropdown */}
             <SearchableDropdown
+              id="studentId"
+              name="studentId"
               label="Student"
               value={formData.studentId}
-              onChange={handleStudentChange}
+              onChange={handleChange}
               options={studentOptions}
               disabled={
                 lockStudent ||
