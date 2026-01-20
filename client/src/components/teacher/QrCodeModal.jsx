@@ -4,6 +4,7 @@ import { Modal } from "../custom";
 import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
 import CountDown from "./CountDown";
 import PropTypes from "prop-types";
+import { RefreshCcw } from "lucide-react";
 
 const AttendanceQRCodeModal = ({
   open,
@@ -49,7 +50,7 @@ const AttendanceQRCodeModal = ({
   };
 
   return (
-    <Modal open={open} onClose={handleClose} size='xl'>
+    <Modal open={open} onClose={handleClose} size='xl' title={"Qr Code"}>
       {!classStarted ? (
         <div className='flex justify-center'>
           <div className='bg-white rounded-sm shadow-sm border w-full max-w-md p-6 text-center'>
@@ -115,18 +116,19 @@ const AttendanceQRCodeModal = ({
                 This QR code is only valid for the current class session
               </p>
 
-              <div className='flex justify-center mt-6'>
+              <div className='flex justify-center mt-6 gap-2'>
                 <button
                   type='button'
-                  className='px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700'
+                  className='px-4 py-2 rounded-sm bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2'
                   onClick={handleStartClass}>
-                  Refresh
+                  <RefreshCcw width={15} />
+                  Renew
                 </button>
                 <button
                   type='button'
                   className='px-4 py-2 rounded-md border text-red-600 hover:bg-red-50'
                   onClick={handleClose}>
-                  End Class
+                  Close
                 </button>
               </div>
             </div>
@@ -140,10 +142,9 @@ const AttendanceQRCodeModal = ({
 AttendanceQRCodeModal.propTypes = {
   open: PropTypes.bool.isRequired,
   setOpen: PropTypes.func.isRequired,
-  subjectName: PropTypes.string.isRequired,
-  teacherName: PropTypes.string.isRequired,
-  classschhdid: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-    .isRequired,
+  subjectName: PropTypes.string,
+  teacherName: PropTypes.string,
+  classschhdid: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default AttendanceQRCodeModal;

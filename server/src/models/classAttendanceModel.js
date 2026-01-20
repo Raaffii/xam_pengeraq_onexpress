@@ -16,10 +16,25 @@ const getClassAttendance = async (
   const conditions = [];
   const params = [];
 
+  if (searchTerm) {
+    const searchValue = `%${searchTerm}%`;
+    conditions.push("s.studentname LIKE ?");
+    params.push(searchValue);
+  }
+
   if (classSchDetailsId) {
     conditions.push("csd.classschdetailsid=?");
     params.push(classSchDetailsId);
   }
+
+  // if (attend) { for filter
+  //   if (attend == "ATTEND") {
+  //     conditions.push("sa.attend IS NULL");
+  //   } else if (attend == "NOT_ATTEND") {
+  //     conditions.push("sa.attend IS NOT NULL");
+  //   } else {
+  //   }
+  // }
 
   const whereClause =
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
@@ -27,6 +42,8 @@ const getClassAttendance = async (
   let query = `
     SELECT 
     s.studentname AS studentName,
+    s.studentidno AS studentIdNo,
+    
     (sa.attend IS NOT NULL) AS attend,
     sa.checkindatetime AS checkInDateTime
     FROM studentclass sc
@@ -50,9 +67,14 @@ const getClassAttendance = async (
 
   const [rows] = await pool.execute(query, queryParams);
 
-  console.log("rpwssss", rows);
-
-  const countQuery = `SELECT COUNT(*) AS total FROM studentclass sc LEFT JOIN classschdetails csd ON sc.classschhdid = csd.classschhdid ${whereClause}`;
+  const countQuery = `SELECT COUNT(*) AS total FROM studentclass sc
+    LEFT JOIN classschdetails csd 
+    ON sc.classschhdid = csd.classschhdid
+    LEFT JOIN studattendstat sa 
+    ON csd.classschdetailsid = sa.classschdetailsid
+    AND sc.studentid = sa.studentid
+    LEFT JOIN students s 
+    ON sc.studentid = s.studentid ${whereClause}`;
   const [countResult] = await pool.query(countQuery, params);
   const total = countResult[0].total;
 

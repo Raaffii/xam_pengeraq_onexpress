@@ -8,9 +8,10 @@ import {
   SearchableDropdown,
   Checkbox,
 } from "@/components/custom";
+import { User, Columns2, Book, School, Repeat2 } from "lucide-react";
 
 import { useExamSeries } from "@/hooks/useExamsSeries";
-import { useSubject } from "@/hooks/useSubject";
+
 import { useTeacher } from "@/hooks/useTeacher";
 import { useClassLocation } from "@/hooks/useClassLocation";
 import { useClassSchedule } from "@/hooks/useClassSchedule";
@@ -29,7 +30,7 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
   });
 
   const { fetchExamSeries, examSeries } = useExamSeries();
-  const { fetchSubjectByExamSeriesId, subject } = useSubject();
+
   const { fetchSubjects, examSubj } = useExamSubject();
   const { fetchTeacher, teacher } = useTeacher();
   const { fetchClassLocation, classLocation } = useClassLocation();
@@ -143,16 +144,18 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
               value={formData.teacherId}
               placeholder='Select Teacher...'
               onChange={handlechange}
+              icon={User}
             />
           </FormField>
-          <FormField label='Exam Series' required className='w-full'>
+          <FormField label='Series' required className='w-full'>
             <SearchableDropdown
               id='examSeries'
               name='examSeriesId'
               options={optionsExamSeries}
               value={formData.examSeriesId}
-              placeholder='Select exam series...'
+              placeholder='Select series...'
               onChange={handlechange}
+              icon={Columns2}
             />
           </FormField>
         </div>
@@ -170,6 +173,7 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
               }
               onChange={handlechange}
               disabled={formData.examSeriesId ? false : true}
+              icon={Book}
             />
           </FormField>
           <FormField label='Location' required className='w-full'>
@@ -180,6 +184,7 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
               value={formData.locationId}
               placeholder='Select classLocation...'
               onChange={handlechange}
+              icon={School}
             />
           </FormField>
         </div>
@@ -221,6 +226,7 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
                 value={formData.repeatValue}
                 placeholder='Select repeat...'
                 onChange={handlechange}
+                icon={Repeat2}
               />
             </FormField>
 
@@ -241,10 +247,10 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
 AddSchedule.propTypes = {
   open: PropTypes.bool.isRequired,
   setOpen: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func,
   fields: PropTypes.arrayOf(
     PropTypes.shape({
-      name: PropTypes.string.isRequired,
+      name: PropTypes.string,
       label: PropTypes.string,
       type: PropTypes.string,
       required: PropTypes.bool,
@@ -256,16 +262,16 @@ AddSchedule.propTypes = {
         PropTypes.number,
         PropTypes.bool,
       ]),
-    })
-  ).isRequired,
+    }),
+  ),
   dropdowns: PropTypes.objectOf(
     PropTypes.arrayOf(
       PropTypes.shape({
         value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
           .isRequired,
         label: PropTypes.string.isRequired,
-      })
-    )
+      }),
+    ),
   ),
   title: PropTypes.string,
   validateForm: PropTypes.func,

@@ -1,23 +1,26 @@
 import { useParams } from "react-router-dom";
 import { useClassAttendance } from "@/hooks/useClassAttendance";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { DataTable } from "@/components/table";
 import PageHeader from "@/components/common/PageHeader";
 import { useNavigate } from "react-router-dom";
 import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
 import { AlertTriangle } from "lucide-react";
+import { Undo2 } from "lucide-react";
 
 export default function ClassAttendancePage() {
   const { id } = useParams();
-
+  const hasFetchedData = useRef(false);
   const navigate = useNavigate();
 
-  const { fetchClassAttendance, classAttendance, pagination } =
+  const { fetchClassAttendance, classAttendance, pagination, onSearch } =
     useClassAttendance();
 
   const { fetchClassScheduleDetailById, classScheduleDetail } =
     useClassScheduleDetail();
   useEffect(() => {
+    if (hasFetchedData.current) return;
+    hasFetchedData.current = true;
     const fetchData = async () => {
       await fetchClassAttendance({ classSchDetailsId: id });
       await fetchClassScheduleDetailById(id);
@@ -31,6 +34,11 @@ export default function ClassAttendancePage() {
     {
       accessorKey: "studentName",
       header: <div className='text-left w-full'>Student Name</div>,
+      cellClassName: "text-left",
+    },
+    {
+      accessorKey: "studentIdNo",
+      header: <div className='text-left w-full'>Student IdNo</div>,
       cellClassName: "text-left",
     },
 
@@ -64,7 +72,8 @@ export default function ClassAttendancePage() {
 
   const actions = [
     {
-      label: "<- back",
+      icon: Undo2,
+      label: "back",
       onClick: () => navigate("/teacher/schedule/calendar"),
     },
   ];
@@ -98,6 +107,8 @@ export default function ClassAttendancePage() {
     </div>
   );
 
+  console.log("cekce", classAttendance);
+
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='mx-auto'>
@@ -105,6 +116,7 @@ export default function ClassAttendancePage() {
           title={classDetail}
           subtitle={`Teacher: ${classScheduleDetail?.teacherName} • Subject: ${classScheduleDetail?.subjDesc}`}
           showSearch={true}
+          onSearch={onSearch}
           searchPlaceholder='Search student name...'
           searchMaxLength={50}
           actions2={actions}

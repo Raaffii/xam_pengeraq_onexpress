@@ -1,13 +1,13 @@
 import { DataTable } from "@/components/table";
 import { useClassSchedule } from "@/hooks/useClassSchedule";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import PageHeader from "@/components/common/PageHeader";
 import { useNavigate } from "react-router-dom";
 import AddSchedule from "@/components/schedule/AddSchedule";
 import EditSchedule from "@/components/schedule/EditSchedule";
 import Delete_modal from "@/components/modals/Delete_modal";
 
-import { QrCode, Flag } from "lucide-react";
+import { QrCode, Flag, Table, Calendar } from "lucide-react";
 import QrCodeModal from "@/components/teacher/QrCodeModal";
 
 export default function TeacherSchedulesPages() {
@@ -27,9 +27,12 @@ export default function TeacherSchedulesPages() {
   const [selectedSchedule, setSelectedSchedule] = useState();
   const [isOpenQrCode, setIsOpenQrCode] = useState(false);
   const [selectedClass, setSelectedClass] = useState({});
-
+  const hasFetchedData = useRef(false);
   const navigate = useNavigate();
+
   useEffect(() => {
+    if (hasFetchedData.current) return;
+    hasFetchedData.current = true;
     const fetchData = async () => {
       await fetchClassSchedule();
     };
@@ -145,10 +148,12 @@ export default function TeacherSchedulesPages() {
 
   const actions = [
     {
+      icon: Table,
       label: "table",
       onClick: () => navigate("/teacher/schedule"),
     },
     {
+      icon: Calendar,
       label: "calendar",
       onClick: () => navigate("/teacher/schedule/calendar"),
     },
@@ -172,7 +177,7 @@ export default function TeacherSchedulesPages() {
       render: (row) => {
         const canStart = isClassToday(row);
         return (
-          <button>
+          <div>
             {canStart ? (
               <div className='relative bg-green-200 rounded-lg p-1'>
                 {/* Flag Badge */}
@@ -191,7 +196,7 @@ export default function TeacherSchedulesPages() {
                 <QrCode size={18} />
               </div>
             )}
-          </button>
+          </div>
         );
       },
     },
@@ -204,7 +209,7 @@ export default function TeacherSchedulesPages() {
           title='Teacher Schedules'
           subtitle='Your Schedule'
           showSearch={true}
-          searchPlaceholder='Search by subject'
+          searchPlaceholder='Search by subject...'
           searchMaxLength={50}
           actions2={actions}
           onSearch={onSearch}
@@ -213,12 +218,9 @@ export default function TeacherSchedulesPages() {
         <DataTable
           data={classSchedule}
           columns={columns}
-          onDelete={openDeleteModal}
-          onEdit={openEditModal}
           onPageChange={onPageChange}
           onSizeChange={onPageSizeChange}
           pagination={pagination}
-          detailPage='teacher/scheduledetail'
           idAccessor='classschhdid'
           additionalActions={startClassAction}
         />

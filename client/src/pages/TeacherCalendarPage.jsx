@@ -1,10 +1,11 @@
 import { Calendar, Views, dateFnsLocalizer } from "react-big-calendar";
+import { Table, Calendar as Cldr } from "lucide-react";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { enUS } from "date-fns/locale";
 import PageHeader from "@/components/common/PageHeader";
 import { useNavigate } from "react-router-dom";
 import { monthsAndYear } from "@/utils/monthsYear";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
 import { useEffect } from "react";
@@ -17,7 +18,7 @@ export default function TeacherCalendarPage() {
   const [calendarShow, setCalendarShow] = useState(0);
   const [view, setView] = useState(Views.MONTH);
   const [events, setEvents] = useState();
-
+  const hasFetchedData = useRef(false);
   const { fetchClassScheduleDetail, onSearch } = useClassScheduleDetail();
 
   const localizer = dateFnsLocalizer({
@@ -29,6 +30,8 @@ export default function TeacherCalendarPage() {
   });
 
   useEffect(() => {
+    if (hasFetchedData.current) return;
+    hasFetchedData.current = true;
     const fetchData = async () => {
       const result = await fetchClassScheduleDetail({
         date: new Date().setMonth(new Date().getMonth() + calendarShow),
@@ -41,10 +44,12 @@ export default function TeacherCalendarPage() {
 
   const actions = [
     {
+      icon: Table,
       label: "table",
       onClick: () => navigate("/teacher/schedule"),
     },
     {
+      icon: Cldr,
       label: "calendar",
       onClick: () => navigate("/teacher/schedule/calendar"),
     },
@@ -145,6 +150,11 @@ export default function TeacherCalendarPage() {
       await handleEvent(resultOri.data);
       setCalendarShow(calendarShow - 1);
     } else {
+      const resultOri = await fetchClassScheduleDetail({
+        date: new Date().setMonth(new Date().getMonth()),
+      });
+
+      await handleEvent(resultOri.data);
       setCalendarShow(0);
     }
   };
@@ -158,7 +168,7 @@ export default function TeacherCalendarPage() {
   return (
     <div>
       <PageHeader
-        title='Teacher Schedule'
+        title='Teacher Schedules'
         subtitle='Your Schedule'
         showSearch={false}
         onSearch={onSearch}
@@ -196,17 +206,17 @@ export default function TeacherCalendarPage() {
             <button
               size='sm'
               onClick={() => handleViewChange(Views.DAY)}
-              className='p-1.5  bg-blue-600 transition-colors border border-white text-white'>
-              Day
+              className='p-1.5  bg-blue-600 transition-colors border border-white text-white hover:bg-blue-900'>
+              Today Agenda
             </button>
             <button
               onClick={() => handleViewChange(Views.MONTH)}
-              className='p-1.5  bg-blue-600  transition-colors border border-white text-white'>
+              className='p-1.5  bg-blue-600  transition-colors border border-white text-white hover:bg-blue-900'>
               Month
             </button>
             <button
               onClick={() => handleViewChange(Views.AGENDA)}
-              className='p-1.5  bg-blue-600  transition-colors border border-white text-white'>
+              className='p-1.5  bg-blue-600  transition-colors border border-white text-white hover:bg-blue-900'>
               Agenda
             </button>
           </div>
@@ -218,8 +228,10 @@ export default function TeacherCalendarPage() {
         startAccessor='start'
         endAccessor='end'
         style={{ height: 500 }}
+        onView={handleViewChange}
         view={view}
         date={new Date().setMonth(new Date().getMonth() + calendarShow)}
+        onNavigate={handleChangeCalendar}
         toolbar={false}
         components={components}
       />

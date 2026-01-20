@@ -144,7 +144,6 @@ const getClassScheduleDetailById = async (classSchDetailsId) => {
 
   const [rows] = await pool.execute(query, [classSchDetailsId]);
 
-  console.log("cekckece", rows[0]);
   return { data: rows[0] };
 };
 

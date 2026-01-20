@@ -9,11 +9,12 @@ export const useClassSchedule = () => {
   const [error, setError] = useState(null);
 
   const [pagination, setPagination] = useState({
-    page: 1,
+    currentPage: 1,
     pageSize: 10,
     totalPages: 1,
     totalItems: 0,
   });
+
   const [params, setParams] = useState({ page: 1, limit: 10 });
 
   const formatClassSchedule = useCallback((rawExams) => {
@@ -36,6 +37,7 @@ export const useClassSchedule = () => {
 
         const response = await classScheduleService.getClassSchedule(apiParams);
         const data = formatClassSchedule(response.data);
+
         setPagination(
           response.pagination || {
             currentPage: 1,

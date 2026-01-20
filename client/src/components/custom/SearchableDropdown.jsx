@@ -13,6 +13,7 @@ export default function SearchableDropdown({
   disabled = false,
   required = false,
   name,
+  icon: Icon = Search,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -27,8 +28,8 @@ export default function SearchableDropdown({
   useEffect(() => {
     setFilteredOptions(
       options.filter((o) =>
-        o.label.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+        o.label.toLowerCase().includes(searchTerm.toLowerCase()),
+      ),
     );
     setHighlightedIndex(-1);
   }, [searchTerm, options]);
@@ -113,7 +114,10 @@ export default function SearchableDropdown({
       focus:ring-2
       focus:ring-gray-500
     '>
-        <span className={selectedOption ? "" : "text-gray-400"}>
+        <span
+          className={`flex items-center gap-2
+          ${selectedOption ? "" : "text-gray-400 "}}`}>
+          <Icon className='w-5 h-5 shrink-0 text-gray-600' />
           {selectedOption?.label || placeholder}
         </span>
         <ChevronDown className='absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
@@ -202,7 +206,7 @@ SearchableDropdown.propTypes = {
       value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
         .isRequired,
       label: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onChange: PropTypes.func.isRequired,

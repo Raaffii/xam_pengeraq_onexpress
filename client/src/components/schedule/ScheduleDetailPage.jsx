@@ -31,6 +31,7 @@ export default function ScheduleDetailPage() {
     pagination: paginationStudents,
     onPageChange,
     onPageSizeChange,
+    onSearch,
   } = useStudents();
 
   useEffect(() => {
@@ -41,6 +42,19 @@ export default function ScheduleDetailPage() {
 
     fetchData();
   }, [fetchStudentClass, id, getClassScheduleById]);
+
+  useEffect(() => {
+    if (!students?.length) return;
+
+    const array = students.flatMap((student) =>
+      student.studentClass.flatMap((sc) =>
+        id == sc.classSchedule ? [sc.classStudent] : [],
+      ),
+    );
+
+    setSelectedRows(array);
+    setCurentEnroled(array);
+  }, [students, id]);
 
   const columns = [
     {
@@ -60,7 +74,6 @@ export default function ScheduleDetailPage() {
     },
   ];
 
-  console.log("classschedule", classSchedule);
   const columnStudent = [
     {
       accessorKey: "studentIdNo",
@@ -98,11 +111,11 @@ export default function ScheduleDetailPage() {
     } else {
       setEnrolledMode(bool);
       const result = await fetchStudents();
-
+      console.log("result", result);
       const array = result.data.flatMap((student) =>
         student.studentClass.flatMap((sc) =>
-          id == sc.classSchedule ? [sc.classStudent] : []
-        )
+          id == sc.classSchedule ? [sc.classStudent] : [],
+        ),
       );
       setSelectedRows(array);
       setCurentEnroled(array);
@@ -152,22 +165,24 @@ export default function ScheduleDetailPage() {
       if (prev.includes(row)) {
         return prev.filter((r) => r !== row);
       }
-
       return [...prev, row];
     });
   };
 
   const options = [
     { value: "selected", label: "Selected" },
-    { value: "unselected", label: "Unselected" },
+    { value: "unselected", label: "All" },
   ];
 
   const handleChange = async (val) => {
     setValue(val);
     if (val == "selected") {
-      await fetchStudents({ enrolledClass: id });
+      await fetchStudents({ enrolledClass: id, enrolledSelected: "SELECTED" });
     } else {
-      await fetchStudents({ enrolledClass: null });
+      await fetchStudents({
+        enrolledClass: id,
+        enrolledSelected: "NOT_SELECTED",
+      });
     }
   };
 
@@ -178,6 +193,7 @@ export default function ScheduleDetailPage() {
           title={`Class Details - ${classSchedule?.subjDesc || "Loading..."}`}
           subtitle={`teacher: ${classSchedule?.teacherName || ""}`}
           showSearch={true}
+          onSearch={onSearch}
           actions2={actions}
         />
 

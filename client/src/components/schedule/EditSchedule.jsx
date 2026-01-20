@@ -10,11 +10,12 @@ import {
 } from "@/components/custom";
 
 import { useExamSeries } from "@/hooks/useExamsSeries";
-import { useSubject } from "@/hooks/useSubject";
+
 import { useTeacher } from "@/hooks/useTeacher";
 import { useClassLocation } from "@/hooks/useClassLocation";
 import { useClassSchedule } from "@/hooks/useClassSchedule";
 import { useExamSubject } from "@/hooks/useExamSubj";
+import { User, Columns2, Book, School, Repeat2 } from "lucide-react";
 
 export default function EditSchedule({
   open,
@@ -36,13 +37,13 @@ export default function EditSchedule({
   });
 
   const { fetchExamSeries, examSeries } = useExamSeries();
-  const { fetchSubjectByExamSeriesId, subject } = useSubject();
+
   const { fetchTeacher, teacher } = useTeacher();
   const { fetchClassLocation, classLocation } = useClassLocation();
   const { fetchSubjects, examSubj } = useExamSubject();
   const { putClassSchedule, isSubmitting } = useClassSchedule();
   const [repeatCheck, setRepeatCheck] = useState(
-    selectedSchedule?.repeatFreq ? true : false
+    selectedSchedule?.repeatFreq ? true : false,
   );
 
   const hasFetchedData = useRef(false);
@@ -61,7 +62,7 @@ export default function EditSchedule({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("repea", repeatCheck);
+
     const dataToSubmit = {
       teacherId: formData.teacherId,
       examSeriesId: formData.examSeriesId,
@@ -75,7 +76,7 @@ export default function EditSchedule({
 
     const result = await putClassSchedule(
       selectedSchedule.classschhdid,
-      dataToSubmit
+      dataToSubmit,
     );
     if (result.success) {
       fetchClassSchedule({ page: 1 });
@@ -132,7 +133,6 @@ export default function EditSchedule({
     }
   };
 
-  console.log("enda", selectedSchedule);
   return (
     <Modal
       open={open}
@@ -157,6 +157,7 @@ export default function EditSchedule({
               value={formData.teacherId}
               placeholder='Select Teacher...'
               onChange={handlechange}
+              icon={User}
             />
           </FormField>
           <FormField label='Exam Series' required className='w-full'>
@@ -167,6 +168,7 @@ export default function EditSchedule({
               value={formData.examSeriesId}
               placeholder='Select exam series...'
               onChange={handlechange}
+              icon={Columns2}
             />
           </FormField>
         </div>
@@ -184,6 +186,7 @@ export default function EditSchedule({
               }
               onChange={handlechange}
               disabled={formData.examSeriesId ? false : true}
+              icon={Book}
             />
           </FormField>
           <FormField label='Location' required className='w-full'>
@@ -194,6 +197,7 @@ export default function EditSchedule({
               value={formData.locationId}
               placeholder='Select classLocation...'
               onChange={handlechange}
+              icon={School}
             />
           </FormField>
         </div>
@@ -236,6 +240,7 @@ export default function EditSchedule({
                 value={formData.repeatValue}
                 placeholder='Select repeat...'
                 onChange={handlechange}
+                icon={Repeat2}
               />
             </FormField>
 
@@ -257,7 +262,7 @@ export default function EditSchedule({
 EditSchedule.propTypes = {
   open: PropTypes.bool.isRequired,
   setOpen: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func,
   fields: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
@@ -272,16 +277,16 @@ EditSchedule.propTypes = {
         PropTypes.number,
         PropTypes.bool,
       ]),
-    })
-  ).isRequired,
+    }),
+  ),
   dropdowns: PropTypes.objectOf(
     PropTypes.arrayOf(
       PropTypes.shape({
         value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
           .isRequired,
         label: PropTypes.string.isRequired,
-      })
-    )
+      }),
+    ),
   ),
   title: PropTypes.string,
   validateForm: PropTypes.func,

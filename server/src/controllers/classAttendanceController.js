@@ -2,7 +2,6 @@ const ClassAttendanceService = require("../services/classAttendanceService");
 
 const getClassAttendance = async (req, res) => {
   try {
-    console.log("cek");
     let { page, limit, searchTerm } = req.query;
     const filter = req.query;
 

@@ -33,6 +33,8 @@ export const useClassAttendance = () => {
           ...finalParams,
         };
 
+        setParams(finalParams);
+
         const response =
           await ClassAttendanceService.getClassAttendance(apiParams);
         const data = formatClassSchedule(response.data);
@@ -78,11 +80,11 @@ export const useClassAttendance = () => {
   );
 
   const onSearch = useCallback(
-    async (search) => {
-      const newParams = { ...params, search };
+    async (searchTerm) => {
+      const newParams = { ...params, searchTerm };
       setParams(newParams);
 
-      return await fetchClassAttendance({ search, page: 1 });
+      return await fetchClassAttendance({ searchTerm, page: 1 });
     },
     [fetchClassAttendance, setParams, params],
   );

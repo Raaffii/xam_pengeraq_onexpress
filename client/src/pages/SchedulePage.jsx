@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import AddSchedule from "@/components/schedule/AddSchedule";
 import EditSchedule from "@/components/schedule/EditSchedule";
 import Delete_modal from "@/components/modals/Delete_modal";
+import { Table, Calendar } from "lucide-react";
 
 export default function SchedulesPages() {
   const {
@@ -103,10 +104,12 @@ export default function SchedulesPages() {
 
   const actions = [
     {
+      icon: Table,
       label: "table",
       onClick: () => alert("cek1"),
     },
     {
+      icon: Calendar,
       label: "calendar",
       onClick: () => navigate("/schedule/calendar"),
     },
@@ -167,7 +170,7 @@ export default function SchedulesPages() {
             onSubmit={handleScheduleDelete}
             entityData={selectedSchedule}
             title='Delete Student'
-            confirmationText={`Are you sure you want to delete student "${selectedSchedule.classschhdid}"? This action cannot be undone.`}
+            confirmationText={`Are you sure you want to delete schedule "${selectedSchedule.classschhdid}"? This action cannot be undone.`}
           />
         )}
       </div>
