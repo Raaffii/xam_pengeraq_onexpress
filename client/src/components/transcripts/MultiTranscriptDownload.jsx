@@ -40,7 +40,7 @@ export const MultiTranscriptDownload = ({
               <TranscriptPDF
                 setup={setup}
                 data={pdfData}
-                overallGPA={pdfData.summary.overallGrade}
+                overallGPA={pdfData.summary.overallGradePoint}
                 achievement={pdfData.summary.gradeResult}
                 selectedSeries={selectedSeries}
               />,

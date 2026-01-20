@@ -287,14 +287,16 @@ export const TranscriptPDF = ({
                 <Text style={styles.gradeColumn}>
                   {course.subjGrade || "-"}
                 </Text>
-                <Text style={styles.gpaColumn}>{course.subjGpa || "-"}</Text>
+                <Text style={styles.gpaColumn}>
+                  {Number(course.subjGpa).toFixed(2) || "-"}
+                </Text>
               </View>
             ))}
           </View>
         </View>
         <View style={styles.tableSummaryRow}>
           <Text style={styles.summaryLeftColumn}>
-            GPA KESELURUHAN: {overallGPA}
+            GPA KESELURUHAN: {Number(overallGPA).toFixed(2)}
           </Text>
           <Text style={styles.summaryRightColumn}>
             PENCAPAIAN: {achievement}
