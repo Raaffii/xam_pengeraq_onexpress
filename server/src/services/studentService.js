@@ -3,24 +3,16 @@ const Students = require("../models/studentModel");
 const StudentExam = require("../models/studentExamModel");
 
 const getStudent = async (page, limit, searchTerm) => {
-  try {
-    const result = await Students.getStudent(page, limit, searchTerm);
-    return result;
-  } catch (error) {
-    console.error("Service error:", error);
-    throw new Error("Failed to get student by id");
-  }
+  return await Students.getStudent(page, limit, searchTerm);
 };
 
 const getStudentById = async (studentId) => {
-  try {
-    const result = await Students.getStudentById(studentId);
-
-    return result;
-  } catch (error) {
-    console.error("Service error:", error);
-    throw new Error("Failed to get student by id");
+  const result = await Students.getStudentById(studentId);
+  if (!result) {
+    throw new Error("Student not found");
   }
+
+  return result;
 };
 
 const postStudent = async (data, userId) => {

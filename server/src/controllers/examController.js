@@ -35,6 +35,11 @@ const getExamById = async (req, res) => {
     });
   } catch (error) {
     console.error("get exam error:", error);
+    if (error.message.includes("not found")) {
+      return res.status(404).json({
+        message: error.message,
+      });
+    }
 
     res.status(500).json({
       message: "Failed to fetch exam",
