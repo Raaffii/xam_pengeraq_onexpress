@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useStudentsExamSeries } from "@/hooks/useStudentsExamSeries";
 import { useExamSubject } from "@/hooks/useExamSubj";
 import { useExamsResult } from "@/hooks/useExamResult";
@@ -46,6 +46,7 @@ export const ExamResultModal = ({
   const [studentOptions, setStudentOptions] = useState([]);
   const [gradingTimeout, setGradingTimeout] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const isInitialEditMount = useRef(false);
 
   const { fetchSubjects, isLoading: subjLoad } = useExamSubject();
   const { getGradesBySubjIdAndScore, isLoading: isGrading } = useExamSubject();
@@ -89,7 +90,11 @@ export const ExamResultModal = ({
     setErrors({});
     setSubjectOptions([]);
     setStudentOptions([]);
-  }, [initialValues, open]);
+
+    if (mode === "edit" && open) {
+      isInitialEditMount.current = true;
+    }
+  }, [initialValues, open, mode]);
 
   // Fetch subjects when exam series is selected
   useEffect(() => {
@@ -196,6 +201,13 @@ export const ExamResultModal = ({
   );
 
   useEffect(() => {
+    if (!open) return;
+
+    if (mode === "edit" && isInitialEditMount.current) {
+      isInitialEditMount.current = false;
+      return;
+    }
+
     if (formData.examSubjId && formData.marks && formData.marks > 0) {
       if (gradingTimeout) {
         clearTimeout(gradingTimeout);
@@ -564,68 +576,6 @@ export const ExamResultModal = ({
                   {formData?.subjResult || "-"}
                 </p>
               </div>
-              {/* <div className="relative">
-                <InputField
-                  id="subjGrade"
-                  name="subjGrade"
-                  label="Grade"
-                  value={formData.subjGrade}
-                  onChange={handleChange}
-                  placeholder="Grade"
-                  isRequired
-                  error={errors.subjGrade}
-                  onError={(error) =>
-                    setErrors((prev) => ({ ...prev, subjGrade: error }))
-                  }
-                  disabled={true}
-                  inputClassName="pl-10 bg-gray-100"
-                />
-                <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
-                  <Award className="w-5 h-5" />
-                </div>
-              </div>
-
-              <div className="relative">
-                <InputField
-                  id="subjGpa"
-                  name="subjGpa"
-                  label="GPA"
-                  value={formData.subjGpa}
-                  onChange={handleChange}
-                  placeholder="GPA"
-                  isRequired
-                  error={errors.subjGpa}
-                  onError={(error) =>
-                    setErrors((prev) => ({ ...prev, subjGpa: error }))
-                  }
-                  disabled={true}
-                  inputClassName="pl-10 bg-gray-100"
-                />
-                <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
-                  <TrendingUp className="w-5 h-5" />
-                </div>
-              </div>
-
-              <div className="relative">
-                <InputField
-                  id="subjResult"
-                  name="subjResult"
-                  label="Result"
-                  value={formData.subjResult}
-                  onChange={handleChange}
-                  placeholder="Result"
-                  isRequired
-                  error={errors.subjResult}
-                  onError={(error) =>
-                    setErrors((prev) => ({ ...prev, subjResult: error }))
-                  }
-                  disabled={true}
-                  inputClassName="pl-10 bg-gray-100"
-                />
-                <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
-                  <CheckCircle className="w-5 h-5" />
-                </div>
-              </div> */}
             </div>
 
             {mode === "edit" && !hasChanges && (
