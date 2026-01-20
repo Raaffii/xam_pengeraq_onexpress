@@ -9,9 +9,12 @@ import Delete_modal from "../modals/Delete_modal";
 import { DetailsInfoCard } from "../common";
 import { ExamResultModal } from "../dashboard";
 import { ExamSeriesFilter } from "../examseries";
+import { usePageTitle } from "@/hooks/usePageTitle";
+import { ResourceNotFound } from "../layout";
+import { CheckCircle2Icon, XCircleIcon } from "lucide-react";
 
 export default function StudentsDetailPage() {
-  const { id } = useParams();
+  const { studentId } = useParams();
   const hasFetchedData = useRef(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("create");
@@ -21,7 +24,7 @@ export default function StudentsDetailPage() {
   const [selectedExamsResult, setSelectedExamsResult] = useState();
   const { fetchStudentExamSeriesById, studentsExamSeries } =
     useStudentsExamSeries();
-  const { getStudentById, students, isLoading: loadStudent } = useStudents();
+  const { getStudentById, student, isLoading: loadStudent } = useStudents();
   const {
     fetchExamsResult,
     examsResult,
@@ -38,33 +41,33 @@ export default function StudentsDetailPage() {
     setParams,
     params,
   } = useExamsResult();
+  usePageTitle(student ? `${student?.studentName}` : "");
 
   useEffect(() => {
     if (hasFetchedData.current) return;
     hasFetchedData.current = true;
     const fetchData = async () => {
-      try {
-        const student = await getStudentById(id);
+      const response = await getStudentById(studentId);
 
-        if (!student?.data?.studentId) return;
+      if (response.success) {
         setParams((prev) => ({
           ...prev,
-          studentId: student.data.studentId,
+          studentId: studentId,
           page: 1,
         }));
-        await fetchStudentExamSeriesById(id);
-
-        await fetchExamsResult({ studentId: student.data.studentId, page: 1 });
-      } catch (error) {
-        console.error("Failed to fetch student data:", error);
+        await fetchStudentExamSeriesById(studentId);
+        await fetchExamsResult({
+          studentId: studentId,
+          page: 1,
+        });
       }
     };
 
-    if (id) {
+    if (studentId) {
       fetchData();
     }
   }, [
-    id,
+    studentId,
     getStudentById,
     fetchStudentExamSeriesById,
     fetchExamsResult,
@@ -84,52 +87,45 @@ export default function StudentsDetailPage() {
   const columns = [
     {
       accessorKey: "subjCode",
-      header: <div className="text-left w-full">Subject Code</div>,
-      cellClassName: "text-left",
+      header: "Subject Code",
+      align: "center",
+      cellClassName: "font-semibold",
     },
     {
       accessorKey: "subjDesc",
-      header: <div className="text-left w-full">Subject</div>,
+      header: "Subject",
       cellClassName: "text-left",
     },
     {
       accessorKey: "marks",
-      header: <div className="text-left w-full">Marks</div>,
-      cellClassName: "text-left",
+      header: "Mark",
     },
     {
       accessorKey: "subjGpa",
-      header: <div className="text-left w-full">GPA</div>,
-      cellClassName: "text-left",
+      header: "GPA",
+      align: "center",
     },
     {
       accessorKey: "subjGrade",
-      header: <div className="text-left w-full">Grade</div>,
-      cellClassName: "text-left",
+      header: "Grade",
+      align: "center",
     },
     {
       accessorKey: "subjResult",
-      header: <div className="text-left w-full">Rank</div>,
+      header: "Result",
       cellClassName: "text-left",
     },
     {
       accessorKey: "isRetake",
-      header: <div className="text-left w-full">Retake</div>,
-      cellClassName: "text-left",
+      header: "Retake",
+      align: "center",
       render: (row) => {
-        const isRetake = row.isRetake === "Yes";
-
         return (
-          <span
-            className={`px-2 py-0.5 text-xs font-medium rounded-full border
-        ${
-          isRetake ?
-            "bg-red-100 text-red-700 border-red-200"
-          : "bg-green-100 text-green-700 border-green-200"
-        }`}
-          >
-            {isRetake ? "Yes" : "No"}
-          </span>
+          <div className="flex justify-center">
+            {row.isRetake ?
+              <CheckCircle2Icon className="text-green-800" />
+            : <XCircleIcon className="text-red-800" />}
+          </div>
         );
       },
     },
@@ -160,19 +156,31 @@ export default function StudentsDetailPage() {
       }))
     : [];
 
+  if (!loadStudent && !student) {
+    return (
+      <ResourceNotFound
+        title="Student Not Found"
+        message={`No student found with ID: ${studentId}. It may have been deleted or the ID is incorrect.`}
+        backTo="/students"
+      />
+    );
+  }
+
+  console.log(examsResult);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto">
         <PageHeader
-          title={`Student Details - ${students.studentName || "Loading..."}`}
-          subtitle={`Student ID: ${students.studentIdNo || ""}`}
+          title={`Student Details - ${student?.studentName || "Loading..."}`}
+          subtitle={`Student ID: ${student?.studentIdNo || ""}`}
           primaryAction={{
             label: "Add Grades",
             onClick: () => {
               setModalMode("create");
               setInitialFormValues({
-                studentId: students.studentId,
-                studentName: students.studentName,
+                studentId: student?.studentId,
+                studentName: student?.studentName,
               });
               setIsModalOpen(true);
             },
@@ -184,11 +192,11 @@ export default function StudentsDetailPage() {
           fields={[
             {
               label: "Student ID",
-              value: students.studentIdNo,
+              value: student?.studentIdNo,
             },
             {
               label: "Student Name",
-              value: students.studentName,
+              value: student?.studentName,
             },
           ]}
           columnSize={2}
@@ -224,8 +232,8 @@ export default function StudentsDetailPage() {
             setModalMode("edit");
             setInitialFormValues({
               resultId: result.resultId,
-              studentId: students.studentId,
-              studentName: students.studentName,
+              studentId: student?.studentId,
+              studentName: student?.studentName,
               examSeriesId: result.seriesId,
               seriesDesc: result.seriesDesc,
               examSubjId: result.subjId,

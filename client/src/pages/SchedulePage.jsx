@@ -6,8 +6,10 @@ import { useNavigate } from "react-router-dom";
 import AddSchedule from "@/components/schedule/AddSchedule";
 import EditSchedule from "@/components/schedule/EditSchedule";
 import Delete_modal from "@/components/modals/Delete_modal";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export default function SchedulesPages() {
+  usePageTitle("Schedules");
   const {
     fetchClassSchedule,
     deleteClassSchedule,
@@ -53,46 +55,48 @@ export default function SchedulesPages() {
   const columns = [
     {
       accessorKey: "teacherName",
-      header: <div className='text-left w-full'>Teacher Name</div>,
+      header: <div className="text-left w-full">Teacher Name</div>,
       cellClassName: "text-left",
     },
     {
       accessorKey: "subjDesc",
-      header: <div className='text-left w-full'>Subject</div>,
+      header: <div className="text-left w-full">Subject</div>,
       cellClassName: "text-left",
     },
     {
       accessorKey: "examSeriesDescription",
-      header: <div className='text-left w-full'>Exam Series</div>,
+      header: <div className="text-left w-full">Exam Series</div>,
       cellClassName: "text-left",
     },
     {
       accessorKey: "startDateTime",
-      header: <div className='text-left w-full'>Start Date</div>,
+      header: <div className="text-left w-full">Start Date</div>,
       cellClassName: "text-left",
     },
     {
       accessorKey: "repeatValue",
-      header: <div className='text-left w-full'>Repeat Value</div>,
+      header: <div className="text-left w-full">Repeat Value</div>,
       cellClassName: "text-left",
       render: (row) => (
-        <div className='flex flex-wrap gap-1'>
+        <div className="flex flex-wrap gap-1">
           <span
-            className='px-2 py-0.5 text-xs rounded-full
-                   bg-blue-50 text-blue-700 border border-blue-200'>
+            className="px-2 py-0.5 text-xs rounded-full
+                   bg-blue-50 text-blue-700 border border-blue-200"
+          >
             {row.repeatValue || "No"}
           </span>
         </div>
       ),
     },
     {
-      header: <div className='text-left w-full'>End Date</div>,
+      header: <div className="text-left w-full">End Date</div>,
       cellClassName: "text-left",
       render: (row) => (
-        <div className='flex flex-wrap gap-1'>
+        <div className="flex flex-wrap gap-1">
           <span
-            className='px-2 py-0.5 text-xs rounded-full
-                   bg-blue-50 text-blue-700 border border-blue-200'>
+            className="px-2 py-0.5 text-xs rounded-full
+                   bg-blue-50 text-blue-700 border border-blue-200"
+          >
             {row.endDateTime}
           </span>
         </div>
@@ -112,13 +116,13 @@ export default function SchedulesPages() {
   ];
 
   return (
-    <div className='min-h-screen bg-gray-50'>
-      <div className='mx-auto'>
+    <div className="min-h-screen bg-gray-50">
+      <div className="mx-auto">
         <PageHeader
-          title='Schedule'
-          subtitle='Manage student records and exam series assignments'
+          title="Schedule"
+          subtitle="Manage student records and exam series assignments"
           showSearch={true}
-          searchPlaceholder='Search by name'
+          searchPlaceholder="Search by name"
           searchMaxLength={50}
           actions2={actions}
           primaryAction={{
@@ -135,15 +139,15 @@ export default function SchedulesPages() {
           onPageChange={onPageChange}
           onSizeChange={onPageSizeChange}
           pagination={pagination}
-          detailPage='schedule'
-          idAccessor='classschhdid'
+          detailPage="schedule"
+          idAccessor="classschhdid"
         />
 
         {isModalOpen && (
           <AddSchedule
             open={isModalOpen}
             setOpen={setIsModalOpen}
-            title='Add New Student'
+            title="Add New Student"
             fetchClassSchedule={fetchClassSchedule}
           />
         )}
@@ -152,7 +156,7 @@ export default function SchedulesPages() {
           <EditSchedule
             open={isEditModalOpen}
             setOpen={setIsEditModalOpen}
-            title='Add New Student'
+            title="Add New Student"
             fetchClassSchedule={fetchClassSchedule}
             selectedSchedule={selectedSchedule}
           />
@@ -164,7 +168,7 @@ export default function SchedulesPages() {
             setOpen={setIsDeleteModalOpen}
             onSubmit={handleScheduleDelete}
             entityData={selectedSchedule}
-            title='Delete Student'
+            title="Delete Student"
             confirmationText={`Are you sure you want to delete student "${selectedSchedule.classschhdid}"? This action cannot be undone.`}
           />
         )}

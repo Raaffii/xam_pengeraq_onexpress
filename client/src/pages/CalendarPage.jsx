@@ -8,8 +8,11 @@ import { useState } from "react";
 
 import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
 import { useEffect } from "react";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export default function CalendarPage() {
+  usePageTitle("Calendar");
+
   const locales = {
     "en-US": enUS,
   };
@@ -56,15 +59,13 @@ export default function CalendarPage() {
         return (
           <div
             className={`flex gap-1 p-0.5 rounded-sm text-black ${
-              event.repeatvalue === "daily"
-                ? "bg-red-300"
-                : event.repeatvalue === "weekly"
-                ? "bg-yellow-300"
-                : event.repeatvalue === "monthly"
-                ? "bg-green-300"
-                : ""
-            }`}>
-            <div className='flex items-center gap-1'>
+              event.repeatvalue === "daily" ? "bg-red-300"
+              : event.repeatvalue === "weekly" ? "bg-yellow-300"
+              : event.repeatvalue === "monthly" ? "bg-green-300"
+              : ""
+            }`}
+          >
+            <div className="flex items-center gap-1">
               {/* <UserIcon className='w-4' /> */}
               <h2>{event?.teacher} </h2>
             </div>
@@ -72,12 +73,12 @@ export default function CalendarPage() {
               <>
                 <h2>
                   {" "}
-                  <span className='font-semibold'>Series :</span>
+                  <span className="font-semibold">Series :</span>
                   {event?.examseries}
                 </h2>
                 <h2>
                   {" "}
-                  <span className='font-semibold'>Subject:</span>
+                  <span className="font-semibold">Subject:</span>
                   {event?.examsubject}
                 </h2>
               </>
@@ -97,12 +98,13 @@ export default function CalendarPage() {
       return (
         <div
           className={`relative w-full h-full border border-gray-200/60 cursor-pointer transition-all duration-200 hover:bg-purple-50/40 ${
-            isToday
-              ? "bg-gradient-to-br from-purple-100 to-purple-50 border-purple-400 shadow-inner"
-              : ""
-          }`}>
+            isToday ?
+              "bg-gradient-to-br from-purple-100 to-purple-50 border-purple-400 shadow-inner"
+            : ""
+          }`}
+        >
           {isToday && (
-            <span className='absolute top-1 left-1 text-[10px] font-bold text-purple-700 px-2 py-0.5 rounded-md shadow-sm'>
+            <span className="absolute top-1 left-1 text-[10px] font-bold text-purple-700 px-2 py-0.5 rounded-md shadow-sm">
               Today
             </span>
           )}
@@ -157,54 +159,60 @@ export default function CalendarPage() {
   return (
     <div>
       <PageHeader
-        title='Schedule'
-        subtitle='Manage student records and exam series assignments'
+        title="Schedule"
+        subtitle="Manage student records and exam series assignments"
         showSearch={true}
-        searchPlaceholder='Search by name'
+        searchPlaceholder="Search by name"
         searchMaxLength={50}
         actions2={actions}
       />
-      <div className='flex justify-between m-2'>
-        <div className='flex gap-3 items-center'>
-          <h1 className='text-black font-semibold'>
+      <div className="flex justify-between m-2">
+        <div className="flex gap-3 items-center">
+          <h1 className="text-black font-semibold">
             {monthYear.nowMonth} {monthYear.nowYear}
           </h1>
 
           <button
             // variant='outline'
-            size='sm'
+            size="sm"
             onClick={() => handleChangeCalendar("now")}
-            className='p-1.5 bg-blue-600 rounded-md transition-colors text-white'>
+            className="p-1.5 bg-blue-600 rounded-md transition-colors text-white"
+          >
             Now
           </button>
           <button
             onClick={() => handleChangeCalendar("prev")}
-            className='p-1.5  text-black rounded-md transition-colors'>
+            className="p-1.5  text-black rounded-md transition-colors"
+          >
             Prev
           </button>
           <button
             onClick={() => handleChangeCalendar("next")}
-            className='p-1.5 text-black rounded-md transition-colors'>
+            className="p-1.5 text-black rounded-md transition-colors"
+          >
             next
           </button>
         </div>
 
-        <div className='flex gap-3 items-center'>
-          <div className='rounded-lg overflow-hidden'>
+        <div className="flex gap-3 items-center">
+          <div className="rounded-lg overflow-hidden">
             <button
-              size='sm'
+              size="sm"
               onClick={() => handleViewChange(Views.DAY)}
-              className='p-1.5  bg-blue-600 transition-colors border border-white text-white'>
+              className="p-1.5  bg-blue-600 transition-colors border border-white text-white"
+            >
               Day
             </button>
             <button
               onClick={() => handleViewChange(Views.MONTH)}
-              className='p-1.5  bg-blue-600  transition-colors border border-white text-white'>
+              className="p-1.5  bg-blue-600  transition-colors border border-white text-white"
+            >
               Month
             </button>
             <button
               onClick={() => handleViewChange(Views.AGENDA)}
-              className='p-1.5  bg-blue-600  transition-colors border border-white text-white'>
+              className="p-1.5  bg-blue-600  transition-colors border border-white text-white"
+            >
               Agenda
             </button>
           </div>
@@ -213,8 +221,8 @@ export default function CalendarPage() {
       <Calendar
         localizer={localizer}
         events={events}
-        startAccessor='start'
-        endAccessor='end'
+        startAccessor="start"
+        endAccessor="end"
         style={{ height: 500 }}
         view={view}
         date={new Date().setMonth(new Date().getMonth() + calendarShow)}

@@ -4,6 +4,7 @@ import { DataTable } from "@/components/table";
 import Delete_modal from "@/components/modals/Delete_modal";
 import { useExams } from "@/hooks/useExams";
 import { ExamModal } from "@/components/exam";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const ExamsPage = () => {
   const hasFetchedData = useRef(false);
@@ -12,6 +13,7 @@ const ExamsPage = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [initialFormValues, setInitialFormValues] = useState({});
   const [selectedExam, setSelectedExam] = useState(null);
+  usePageTitle("Exams");
 
   const {
     createExams,

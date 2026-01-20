@@ -8,9 +8,12 @@ import { useRowSelection } from "@/hooks";
 import ErrorState from "@/components/common/ErrorState";
 import { MultiTranscriptDownload } from "@/components/transcripts";
 import { useAuth } from "@/providers/AuthProvider";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const TranscriptsPage = () => {
   const hasFetchedData = useRef(false);
+  usePageTitle("Transcripts");
+
   const {
     dashboardData,
     seriesOption,
@@ -117,8 +120,8 @@ const TranscriptsPage = () => {
     <div className="min-h-screen bg-gray-50 mx-auto">
       {/* Page Header */}
       <PageHeader
-        title="Dashboard"
-        subtitle="Manage dashboard data"
+        title="Transcripts"
+        subtitle="Manage and export student transcripts"
         showSearch={true}
         searchPlaceholder="Search by student name or id"
         onSearch={onSearch}

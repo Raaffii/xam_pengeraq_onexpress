@@ -9,6 +9,8 @@ import { useExams } from "@/hooks/useExams";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SubjectSection from "../subjects/SubjectSection";
 import GradeSections from "./GradeSections";
+import { usePageTitle } from "@/hooks/usePageTitle";
+import { ResourceNotFound } from "../layout";
 
 export default function ExamSeriesDetailPage() {
   const { id } = useParams();
@@ -22,8 +24,9 @@ export default function ExamSeriesDetailPage() {
     isSubmitting,
   } = useExamSeries();
   const { fetchExams, exams } = useExams();
-
   const [isSeriesModalOpen, setIsSeriesModalOpen] = useState(false);
+
+  usePageTitle(seriesDetail ? `Series - ${seriesDetail?.seriesDesc}` : "");
 
   useEffect(() => {
     if (hasFetchedData.current) return;
@@ -73,12 +76,23 @@ export default function ExamSeriesDetailPage() {
     }
   };
 
-  const examOptions = Array.isArray(exams)
-    ? exams.map((item) => ({
+  const examOptions =
+    Array.isArray(exams) ?
+      exams.map((item) => ({
         value: item.examId,
         label: item.examName,
       }))
     : [];
+
+  if (!isLoading && !seriesDetail) {
+    return (
+      <ResourceNotFound
+        title="Exam Series Not Found"
+        message={`No exam series found with ID: ${id}. It may have been deleted or the ID is incorrect.`}
+        backTo="/series"
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen">

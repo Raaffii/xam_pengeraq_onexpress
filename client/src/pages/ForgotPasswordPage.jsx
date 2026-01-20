@@ -6,8 +6,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ForgotPasswordForm } from "@/components/auth";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const ForgotPasswordPage = () => {
+  usePageTitle("Forgot Password");
+
   return (
     <div className="bg-gray-900 h-full">
       <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

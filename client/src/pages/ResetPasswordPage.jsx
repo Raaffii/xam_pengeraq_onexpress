@@ -7,8 +7,11 @@ import {
 } from "@/components/ui/card";
 import { ResetPasswordForm } from "@/components/auth";
 import { Navigate, useSearchParams } from "react-router-dom";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const ResetPasswordPage = () => {
+  usePageTitle("Reset Password");
+
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
 

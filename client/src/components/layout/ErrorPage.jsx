@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { HomeIcon, ArrowLeftIcon } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { HomeIcon, ArrowLeftIcon, SearchIcon } from "lucide-react";
 
 export const UnauthorizedPage = () => {
   return (
@@ -66,6 +66,48 @@ export const NotFoundPage = () => {
               </Link>
             </Button>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const ResourceNotFound = ({
+  title = "Resource Not Found",
+  message = "The requested resource could not be found.",
+  showBackButton = true,
+  backTo = null,
+  backToLabel = "Go Back",
+}) => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="h-screen w-full flex flex-col items-center justify-center bg-gray-50">
+      <div className="container px-4 mx-auto">
+        <div className="max-w-lg mx-auto text-center">
+          <div className="mb-8">
+            <SearchIcon className="mx-auto h-16 w-16 text-gray-400 mb-4" />
+            <p className="text-2xl font-semibold text-gray-800 mb-2">{title}</p>
+            <p className="text-gray-600">{message}</p>
+          </div>
+
+          {showBackButton && (
+            <div className="flex gap-4 justify-center">
+              <Button
+                variant="outline"
+                onClick={() => (backTo ? navigate(backTo) : navigate(-1))}
+              >
+                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                {backToLabel}
+              </Button>
+              <Button asChild>
+                <Link to="/">
+                  <HomeIcon className="mr-2 h-4 w-4" />
+                  Return Home
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -2,12 +2,15 @@ import PageHeader from "@/components/common/PageHeader";
 import Delete_modal from "@/components/modals/Delete_modal";
 import { DataTable } from "@/components/table";
 import { UserFilter, UserForm } from "@/components/users";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { useUser } from "@/hooks/useUsers";
 import { CheckCircle2Icon, XCircleIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const UsersPage = () => {
   const hasFetchedData = useRef(false);
+  usePageTitle("Users");
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -53,11 +56,9 @@ const UsersPage = () => {
       align: "center",
       cell: (row) => (
         <div className="flex justify-center">
-          {row.studentId && row.studentName ? (
+          {row.studentId && row.studentName ?
             <CheckCircle2Icon className="text-green-800" />
-          ) : (
-            <XCircleIcon className="text-red-800" />
-          )}
+          : <XCircleIcon className="text-red-800" />}
         </div>
       ),
     },

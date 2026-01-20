@@ -10,6 +10,7 @@ import {
   SeriesDetailCard,
 } from "@/components/dashboard";
 import { useExamsResult } from "@/hooks/useExamResult";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const DashboardPage = () => {
   const hasFetchedData = useRef(false);
@@ -34,6 +35,7 @@ const DashboardPage = () => {
     setParams,
   } = useDashboard();
   const { postExamResult, putExamResult, isSubmitting } = useExamsResult();
+  usePageTitle("Dashboard");
 
   useEffect(() => {
     if (hasFetchedData.current) return;
