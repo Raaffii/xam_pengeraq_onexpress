@@ -13,6 +13,7 @@ import { useStudentsExamSeries } from "@/hooks/useStudentsExamSeries";
 import { useExamSubject } from "@/hooks/useExamSubj";
 import { useExamsResult } from "@/hooks/useExamResult";
 import Delete_modal from "@/components/modals/Delete_modal";
+import { Alert, AlertDescription } from "../ui/alert";
 
 export const ExamResultModal = ({
   open = false,
@@ -42,17 +43,30 @@ export const ExamResultModal = ({
   });
   const [originalData, setOriginalData] = useState({});
   const [errors, setErrors] = useState({});
+  const [errorMsg, setErrorMsg] = useState(null);
   const [subjectOptions, setSubjectOptions] = useState([]);
   const [studentOptions, setStudentOptions] = useState([]);
   const [gradingTimeout, setGradingTimeout] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const isInitialEditMount = useRef(false);
 
-  const { fetchSubjects, isLoading: subjLoad } = useExamSubject();
-  const { getGradesBySubjIdAndScore, isLoading: isGrading } = useExamSubject();
-  const { fetchStudentsExamSeries, isLoading: studentLoading } =
-    useStudentsExamSeries();
-  const { isSubmitting: isDeleting, deleteExamResult } = useExamsResult();
+  const {
+    fetchSubjects,
+    getGradesBySubjIdAndScore,
+    isGrading,
+    isLoading: subjLoad,
+    error: subjError,
+  } = useExamSubject();
+  const {
+    fetchStudentsExamSeries,
+    isLoading: studentLoading,
+    error: seriesError,
+  } = useStudentsExamSeries();
+  const {
+    isSubmitting: isDeleting,
+    deleteExamResult,
+    error: resultError,
+  } = useExamsResult();
 
   const hasChanges = useMemo(() => {
     if (mode === "create") return true;
@@ -95,6 +109,10 @@ export const ExamResultModal = ({
       isInitialEditMount.current = true;
     }
   }, [initialValues, open, mode]);
+
+  useEffect(() => {
+    setErrorMsg(resultError || subjError || seriesError);
+  }, [resultError, subjError, seriesError]);
 
   // Fetch subjects when exam series is selected
   useEffect(() => {
@@ -170,6 +188,11 @@ export const ExamResultModal = ({
           subjGrade: "",
           subjResult: "",
         }));
+        return;
+      }
+
+      if (marks > 100) {
+        setErrorMsg("Marks must not exceed 100");
         return;
       }
 
@@ -301,6 +324,10 @@ export const ExamResultModal = ({
   const handleChange = (e) => {
     const { name, value, label } = e.target;
 
+    if (errorMsg) {
+      setErrorMsg(null);
+    }
+
     if (name === "examSeriesId" && label !== undefined) {
       setFormData((prev) => ({
         ...prev,
@@ -421,6 +448,11 @@ export const ExamResultModal = ({
           </DialogHeader>
 
           <div className="space-y-4">
+            {errorMsg && (
+              <Alert variant="destructive">
+                <AlertDescription>{errorMsg}</AlertDescription>
+              </Alert>
+            )}
             <div className="grid md:grid-cols-2 gap-4">
               {/* Exam Series Dropdown */}
               <SearchableDropdown
@@ -533,6 +565,7 @@ export const ExamResultModal = ({
                 max="100"
                 step="0.01"
                 decimalPlaces={2}
+                maxLength={5}
               />
               <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
                 <Hash className="w-5 h-5" />

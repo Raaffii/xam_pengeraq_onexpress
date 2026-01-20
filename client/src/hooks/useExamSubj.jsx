@@ -8,6 +8,7 @@ export const useExamSubject = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGrading, setIsGrading] = useState(false);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     pageSize: 10,
@@ -256,7 +257,7 @@ export const useExamSubject = () => {
   const getGradesBySubjIdAndScore = useCallback(
     async (subjId, score, isRetake) => {
       try {
-        setIsLoading(true);
+        setIsGrading(true);
         setError(null);
 
         const queryParams = isRetake ? { isRetake: true } : {};
@@ -274,7 +275,7 @@ export const useExamSubject = () => {
 
         return { success: false, error: err.message };
       } finally {
-        setIsLoading(false);
+        setIsGrading(false);
       }
     },
     [],
@@ -344,6 +345,7 @@ export const useExamSubject = () => {
     isSubmitting,
     pagination,
     params,
+    isGrading,
 
     // Actions
     fetchSubjects,

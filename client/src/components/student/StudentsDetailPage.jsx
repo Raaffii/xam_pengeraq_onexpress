@@ -166,8 +166,6 @@ export default function StudentsDetailPage() {
     );
   }
 
-  console.log(examsResult);
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto">

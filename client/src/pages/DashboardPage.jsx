@@ -205,8 +205,6 @@ const DashboardPage = () => {
       }))
     : [];
 
-  console.log(dashboardData);
-
   return (
     <div className="min-h-screen bg-gray-50 mx-auto">
       {/* Page Header */}

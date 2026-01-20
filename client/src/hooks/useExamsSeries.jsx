@@ -36,7 +36,6 @@ export const useExamSeries = () => {
         };
 
         const response = await examSeriesService.getExamSeries(apiParams);
-        console.log(response.data);
         const data = formaExamSeriesData(response.data);
 
         setPagination(
