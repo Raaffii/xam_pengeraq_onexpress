@@ -116,9 +116,29 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const resetUserPassword = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { password } = req.body;
+
+    await userService.resetPassword(userId, password);
+
+    res.status(200).json({
+      message: "Password resetted successfully",
+    });
+  } catch (error) {
+    console.error("Failed to reset user password:", error.message);
+    if (error.message === "User not found") {
+      return res.status(404).json({ message: error.message });
+    }
+    res.status(500).json({ message: "Failed to reset user password" });
+  }
+};
+
 module.exports = {
   fetchUsers,
   createUser,
   updateUser,
   deleteUser,
+  resetUserPassword,
 };

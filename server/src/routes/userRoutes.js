@@ -12,12 +12,14 @@ const {
   createUser,
   deleteUser,
   updateUser,
+  resetUserPassword,
 } = require("../controllers/userController");
 const {
   fetchUsersQuerySchema,
   createUserSchema,
   userIdParamsSchema,
   updateUserSchema,
+  resetPasswordSchema,
 } = require("../schemas/userSchema");
 
 router.use(authenticateToken);
@@ -32,6 +34,15 @@ router.put(
   }),
   updateUser,
 );
+router.put(
+  "/:userId/reset-password",
+  validateMultiple({
+    params: userIdParamsSchema,
+    body: resetPasswordSchema,
+  }),
+  resetUserPassword,
+);
+
 router.delete("/:userId", validateParams(userIdParamsSchema), deleteUser);
 
 module.exports = router;

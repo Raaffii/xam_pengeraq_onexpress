@@ -35,7 +35,6 @@ export const useUser = () => {
           ...(finalParams.byRole && { byRole: finalParams.byRole }),
         };
         const response = await userService.getUsers(apiParams);
-        console.log("response: ", response);
         const data = formatUserData(response.data);
 
         setUsers(data);
@@ -128,6 +127,30 @@ export const useUser = () => {
     }
   }, []);
 
+  const resetUserPassword = useCallback(async (userId, userData) => {
+    if (!userId) return;
+    let toastId;
+    try {
+      setIsSubmitting(true);
+      setError(null);
+      toastId = toast.loading("Resetting user...");
+      await userService.resetUser(userId, userData);
+      toast.success("User resetted successfully", { id: toastId });
+
+      return { success: true };
+    } catch (err) {
+      console.error("Error updating user:", err);
+      toast.error(err.message || "Failed to update approval", {
+        id: toastId,
+      });
+      setError(err.message);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, []);
+
   const clearError = useCallback(() => {
     setError(null);
   }, []);
@@ -207,5 +230,6 @@ export const useUser = () => {
     setUserDetail,
     setUsers,
     updateDetails,
+    resetUserPassword,
   };
 };

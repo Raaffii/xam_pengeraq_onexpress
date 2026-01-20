@@ -1,10 +1,18 @@
+import { ResetUserPassword } from "@/components/auth";
+import { ActionItem } from "@/components/common/ActionItem";
 import PageHeader from "@/components/common/PageHeader";
 import Delete_modal from "@/components/modals/Delete_modal";
 import { DataTable } from "@/components/table";
 import { UserFilter, UserForm } from "@/components/users";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { useUser } from "@/hooks/useUsers";
-import { CheckCircle2Icon, XCircleIcon } from "lucide-react";
+import {
+  CheckCircle2Icon,
+  LockOpen,
+  Pencil,
+  Trash2,
+  XCircleIcon,
+} from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const UsersPage = () => {
@@ -13,6 +21,7 @@ const UsersPage = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isResetModalOpen, setResetModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalMode, setModalMode] = useState("create");
 
@@ -62,18 +71,43 @@ const UsersPage = () => {
         </div>
       ),
     },
+    {
+      header: "Actions",
+      align: "center",
+      cell: (row) => (
+        <div className="flex items-center justify-center gap-1">
+          <ActionItem
+            label="Edit"
+            icon={Pencil}
+            onClick={() => {
+              setSelectedUser(row);
+              setModalMode("edit");
+              setIsModalOpen(true);
+            }}
+            className="text-amber-600 hover:bg-amber-100"
+          />
+          <ActionItem
+            label="Reset Password"
+            icon={LockOpen}
+            onClick={() => {
+              setSelectedUser(row);
+              setResetModalOpen(true);
+            }}
+            className="text-gray-600 hover:bg-gray-200"
+          />
+          <ActionItem
+            label="Delete"
+            icon={Trash2}
+            onClick={() => {
+              setSelectedUser(row);
+              setIsDeleteModalOpen(true);
+            }}
+            className="text-red-600 hover:bg-red-100"
+          />
+        </div>
+      ),
+    },
   ];
-
-  const openEditModal = (data) => {
-    setSelectedUser(data);
-    setModalMode("edit");
-    setIsModalOpen(true);
-  };
-
-  const openDeleteModal = (data) => {
-    setSelectedUser(data);
-    setIsDeleteModalOpen(true);
-  };
 
   const initialFormValues = useMemo(() => {
     if (modalMode === "edit" && selectedUser) {
@@ -158,8 +192,7 @@ const UsersPage = () => {
         onPageChange={onPageChange}
         onSizeChange={onPageSizeChange}
         pagination={pagination}
-        onEdit={openEditModal}
-        onDelete={openDeleteModal}
+        showActions={false}
       />
       <UserForm
         open={isModalOpen}
@@ -169,6 +202,14 @@ const UsersPage = () => {
         isSubmitting={isSubmitting}
         mode={modalMode}
       />
+      <ResetUserPassword
+        isOpen={isResetModalOpen}
+        onOpenChange={() => {
+          setResetModalOpen(false);
+          setSelectedUser(null);
+        }}
+        userId={selectedUser?.id}
+      />
 
       {isDeleteModalOpen && selectedUser && (
         <Delete_modal
@@ -177,7 +218,7 @@ const UsersPage = () => {
           onSubmit={handleDelete}
           entityData={selectedUser}
           title="Delete User"
-          confirmationText={`Are you sure you want to delete user "${selectedUser.userName}"? This action cannot be undone.`}
+          confirmationText={`Are you sure you want to delete user "${selectedUser?.userName}"? This action cannot be undone.`}
         />
       )}
     </div>

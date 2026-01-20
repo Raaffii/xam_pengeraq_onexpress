@@ -98,6 +98,16 @@ const updateProfileSchema = z
     "At least one field must be provided",
   );
 
+const resetPasswordSchema = z
+  .object({
+    password: passwordSchema,
+    confirmPassword: passwordSchema,
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords must match",
+    path: ["confirmPassword"],
+  });
+
 module.exports = {
   createUserSchema,
   updateUserSchema,
@@ -105,4 +115,5 @@ module.exports = {
   updateProfileSchema,
   userIdParamsSchema,
   changePasswordSchema,
+  resetPasswordSchema,
 };

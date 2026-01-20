@@ -41,4 +41,16 @@ export const userService = {
       handleServiceError(error, "Failed to delete user");
     }
   },
+
+  resetUser: async (userId, userData) => {
+    try {
+      const response = await api.put(
+        `${BASE_URL}/${userId}/reset-password`,
+        userData,
+      );
+      return response.data;
+    } catch (error) {
+      handleServiceError(error, `Failed to update user with ID ${userId}`);
+    }
+  },
 };

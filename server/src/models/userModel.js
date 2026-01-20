@@ -297,6 +297,15 @@ const UserModel = {
 
     return true;
   },
+
+  async findUserById(userId) {
+    const [rows] = await pool.execute(
+      `SELECT user_id, name, email, password, role
+       FROM users WHERE user_id = ? AND active = true`,
+      [userId],
+    );
+    return rows[0];
+  },
 };
 
 module.exports = UserModel;
