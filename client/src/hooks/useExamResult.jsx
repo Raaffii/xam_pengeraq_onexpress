@@ -19,8 +19,7 @@ export const useExamsResult = () => {
   const formatExamsData = useCallback((rawExams) => {
     return rawExams.map((item) => ({
       ...item,
-      id: item.userId,
-      retake: item.retake ? "Yes" : "No",
+      id: item.resultId,
     }));
   }, []);
 

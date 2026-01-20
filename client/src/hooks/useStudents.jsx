@@ -3,6 +3,7 @@ import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
 export const useStudents = () => {
   const [students, setStudents] = useState([]);
+  const [student, setStudent] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -41,7 +42,7 @@ export const useStudents = () => {
             pageSize: 10,
             totalPages: 1,
             totalItems: 0,
-          }
+          },
         );
 
         return { success: true, data: data };
@@ -56,7 +57,7 @@ export const useStudents = () => {
         setIsLoading(false);
       }
     },
-    [params, formatStudentData]
+    [params, formatStudentData],
   );
 
   const getStudentById = useCallback(async (studentId) => {
@@ -66,14 +67,13 @@ export const useStudents = () => {
 
       const response = await studentService.getStudentsById(studentId);
 
-      setStudents(response.data);
+      setStudent(response.data);
 
       return { success: true, data: response.data };
     } catch (err) {
       console.error("Error fetching Student:", err);
 
       setError(err.message);
-      setStudents([]);
 
       return { success: false, error: err.message };
     } finally {
@@ -155,7 +155,7 @@ export const useStudents = () => {
 
       return await fetchStudents({ searchTerm, page: 1 });
     },
-    [fetchStudents, setParams, params]
+    [fetchStudents, setParams, params],
   );
 
   const onPageChange = useCallback(
@@ -165,7 +165,7 @@ export const useStudents = () => {
       setParams(newParams);
       return await fetchStudents({ page });
     },
-    [params, fetchStudents]
+    [params, fetchStudents],
   );
 
   const onPageSizeChange = useCallback(
@@ -174,7 +174,7 @@ export const useStudents = () => {
       setParams(newParams);
       return await fetchStudents({ limit, page: 1 });
     },
-    [params, fetchStudents]
+    [params, fetchStudents],
   );
   return {
     fetchStudents,
@@ -192,5 +192,7 @@ export const useStudents = () => {
     pagination,
     params,
     setParams,
+    student,
+    setStudent,
   };
 };

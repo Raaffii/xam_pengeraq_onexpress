@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 
 export const useExams = () => {
   const [exams, setExams] = useState([]);
-  const [examDetails, setExamDetails] = useState([]);
+  const [examDetails, setExamDetails] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);

@@ -78,7 +78,6 @@ export const useExamSubject = () => {
       console.error("Error fetching examSubj:", err);
 
       setError(err.message);
-      setExamSubj([]);
 
       return { success: false, error: err.message };
     } finally {
@@ -236,9 +235,8 @@ export const useExamSubject = () => {
       setIsLoading(true);
       setError(null);
 
-      const response = await subjectService.getSubjectByExamSeriesId(
-        examSeriesId,
-      );
+      const response =
+        await subjectService.getSubjectByExamSeriesId(examSeriesId);
 
       setExamSubj(response.data);
 
