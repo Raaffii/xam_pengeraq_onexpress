@@ -300,8 +300,8 @@ const UserModel = {
 
   async findUserById(userId) {
     const [rows] = await pool.execute(
-      `SELECT user_id, name, email, password, role
-       FROM users WHERE user_id = ? AND active = true`,
+      `SELECT userid, name, emailaddress as email, password, role
+       FROM users WHERE userid = ? AND active = true`,
       [userId],
     );
     return rows[0];
