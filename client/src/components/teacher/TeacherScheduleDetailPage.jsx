@@ -4,14 +4,15 @@ import PageHeader from "../common/PageHeader";
 import { useStudentClass } from "@/hooks/useStudentClass";
 import { DataTable } from "../table";
 import { useEffect } from "react";
-import AddStudentClass from "./AddStudenctClass";
+import AddStudentClass from "../schedule/AddStudenctClass";
 import { useClassSchedule } from "@/hooks/useClassSchedule";
+import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
 import { useStudents } from "@/hooks/useStudents";
 import { Button } from "../custom";
 import toast from "react-hot-toast";
 import { SearchableDropdown } from "../common";
 
-export default function ScheduleDetailPage() {
+export default function TeacherScheduleDetailPage() {
   const { id } = useParams();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -23,6 +24,9 @@ export default function ScheduleDetailPage() {
   const { fetchStudentClass, assignStudentClass, studenctClass, pagination } =
     useStudentClass();
 
+  const { fetchClassScheduleDetail, classScheduleDetail } =
+    useClassScheduleDetail();
+
   const { getClassScheduleById, classSchedule } = useClassSchedule();
 
   const {
@@ -31,30 +35,17 @@ export default function ScheduleDetailPage() {
     pagination: paginationStudents,
     onPageChange,
     onPageSizeChange,
-    onSearch,
   } = useStudents();
 
   useEffect(() => {
     const fetchData = async () => {
       await fetchStudentClass({ schedule: id });
+      await fetchClassScheduleDetail({ schedule: id });
       await getClassScheduleById(id);
     };
 
     fetchData();
   }, [fetchStudentClass, id, getClassScheduleById]);
-
-  useEffect(() => {
-    if (!students?.length) return;
-
-    const array = students.flatMap((student) =>
-      student.studentClass.flatMap((sc) =>
-        id == sc.classSchedule ? [sc.classStudent] : [],
-      ),
-    );
-
-    setSelectedRows(array);
-    setCurentEnroled(array);
-  }, [students, id]);
 
   const columns = [
     {
@@ -111,11 +102,11 @@ export default function ScheduleDetailPage() {
     } else {
       setEnrolledMode(bool);
       const result = await fetchStudents();
-      console.log("result", result);
+
       const array = result.data.flatMap((student) =>
         student.studentClass.flatMap((sc) =>
-          id == sc.classSchedule ? [sc.classStudent] : [],
-        ),
+          id == sc.classSchedule ? [sc.classStudent] : []
+        )
       );
       setSelectedRows(array);
       setCurentEnroled(array);
@@ -165,35 +156,33 @@ export default function ScheduleDetailPage() {
       if (prev.includes(row)) {
         return prev.filter((r) => r !== row);
       }
+
       return [...prev, row];
     });
   };
 
   const options = [
     { value: "selected", label: "Selected" },
-    { value: "unselected", label: "All" },
+    { value: "unselected", label: "Unselected" },
   ];
 
   const handleChange = async (val) => {
     setValue(val);
-    if (val.target.value == "selected") {
-      await fetchStudents({ enrolledClass: id, enrolledSelected: "SELECTED" });
+    if (val == "selected") {
+      await fetchStudents({ enrolledClass: id });
     } else {
-      await fetchStudents({
-        enrolledClass: id,
-        enrolledSelected: "NOT_SELECTED",
-      });
+      await fetchStudents({ enrolledClass: null });
     }
   };
 
+  console.log("clas", classScheduleDetail);
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='mx-auto'>
         <PageHeader
-          title={`Class Details - ${classSchedule?.subjDesc || "Loading..."}`}
+          title={`Class Schedule - ${classSchedule?.subjDesc || "Loading..."}`}
           subtitle={`teacher: ${classSchedule?.teacherName || ""}`}
           showSearch={true}
-          onSearch={onSearch}
           actions2={actions}
         />
 

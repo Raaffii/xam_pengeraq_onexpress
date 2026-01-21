@@ -2,10 +2,11 @@ const express = require("express");
 const { authenticateToken } = require("../middlewares/authMiddleware");
 const {
   getClassScheduleDetail,
-  postClassSchedule,
+  getClassScheduleDetailById,
+  openClassSession,
   deleteClassSchedule,
-  putClassSchedule,
-} = require("../controllers/examScheduleDetailController");
+  startClassSession,
+} = require("../controllers/classScheduleDetailController");
 
 const {
   validateQuery,
@@ -18,13 +19,35 @@ const {
   createClassScheduleSchema,
   updateClassScheduleSchema,
   idParamsSchema,
-  classScheduleQuerySchema,
-} = require("../schemas/classScheduleSchema");
+  classScheduleDetailQuerySchema,
+} = require("../schemas/classScheduleDetailSchema");
 
 const router = express.Router();
 
 router.use(authenticateToken);
 
-router.get("/", getClassScheduleDetail); //console.log class schedule detail
+router.get(
+  "/",
+  validateQuery(classScheduleDetailQuerySchema),
+  getClassScheduleDetail,
+); //console.log class schedule detail
+
+router.get(
+  "/:id",
+  validateQuery(classScheduleDetailQuerySchema),
+  getClassScheduleDetailById,
+);
+
+router.put(
+  "/classsession/:id",
+  validateQuery(classScheduleDetailQuerySchema),
+  startClassSession,
+); //console.log class schedule detail
+
+router.get(
+  "/classsession/:id",
+  validateQuery(classScheduleDetailQuerySchema),
+  openClassSession,
+); //console.log class schedule detail
 
 module.exports = router;

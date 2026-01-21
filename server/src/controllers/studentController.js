@@ -3,7 +3,14 @@ const studentService = require("../services/studentService");
 const getStudent = async (req, res) => {
   try {
     let { page, limit, searchTerm } = req.query;
-    const result = await studentService.getStudent(page, limit, searchTerm);
+    const filter = req.query;
+
+    const result = await studentService.getStudent(
+      page,
+      limit,
+      searchTerm,
+      filter
+    );
     res.status(200).json({
       data: result.data,
       pagination: {

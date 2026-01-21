@@ -11,16 +11,33 @@ const getStudentClass = async (page, limit, searchTerm, schedule) => {
     return result;
   } catch (error) {
     console.error("Service error:", error);
-    throw new Error("Get exam failed");
+    throw new Error("Get student class failed");
   }
 };
 
-const postStudentClass = async (data) => {
+const putStudentClass = async (data) => {
   try {
-    const result = await StudentClass.postStudentClass(data);
+    let addResult = null;
+    let removeResult = null;
 
-    await result;
-    return result;
+    if (Array.isArray(data.addStudents) && data.addStudents.length > 0) {
+      addResult = await StudentClass.postStudentClass(
+        data.scheduleId,
+        data.addStudents
+      );
+    }
+
+    if (Array.isArray(data.removeStudents) && data.removeStudents.length > 0) {
+      removeResult = await StudentClass.removeStudentFromClass(
+        data.scheduleId,
+        data.removeStudents
+      );
+    }
+
+    return {
+      added: addResult,
+      removed: removeResult,
+    };
   } catch (error) {
     console.error("Service error:", error);
     throw error;
@@ -30,5 +47,5 @@ const postStudentClass = async (data) => {
 
 module.exports = {
   getStudentClass,
-  postStudentClass,
+  putStudentClass,
 };

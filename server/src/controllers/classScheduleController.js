@@ -3,12 +3,17 @@ const classScheduleService = require("../services/examScheduleService");
 const getClassSchedule = async (req, res) => {
   try {
     let { page, limit, searchTerm, date } = req.query;
+
+    const { teacherId } = req.user;
+
     const result = await classScheduleService.getClassSchedule(
       page,
       limit,
       searchTerm,
-      date
+      date,
+      teacherId
     );
+
     res.status(200).json({
       data: result.data,
       pagination: {
@@ -31,9 +36,9 @@ const getClassSchedule = async (req, res) => {
 
 const postClassSchedule = async (req, res) => {
   try {
-    console.log("cekc", req.body);
     const { userId } = req.user;
     const data = await classScheduleService.postClassSchedule(req.body, userId);
+
     res.status(200).json(data);
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {
@@ -50,12 +55,14 @@ const postClassSchedule = async (req, res) => {
   }
 };
 
-const getStudentById = async (req, res) => {
+const getClassScheduleById = async (req, res) => {
   try {
-    const studentId = req.params.id;
-    const result = await studentService.getStudentById(studentId);
+    const id = req.params.id;
+
+    const result = await classScheduleService.getScheduleById(id);
+
     res.status(200).json({
-      data: result.data,
+      data: result,
     });
   } catch (error) {
     console.error("get student error:", error);
@@ -116,5 +123,5 @@ module.exports = {
   postClassSchedule,
   putClassSchedule,
   deleteClassSchedule,
-  getStudentById,
+  getClassScheduleById,
 };

@@ -41,9 +41,7 @@ export default function AuthProvider({ children }) {
       }, timeUntilExpiry);
 
       console.log(
-        `Auto logout scheduled in ${Math.round(
-          timeUntilExpiry / 1000,
-        )} seconds`,
+        `Auto logout scheduled in ${Math.round(timeUntilExpiry / 1000)} seconds`
       );
     };
 
@@ -86,7 +84,7 @@ export default function AuthProvider({ children }) {
           }, 100);
         }
         return Promise.reject(error);
-      },
+      }
     );
     return () => api.interceptors.response.eject(interceptor);
   }, []);

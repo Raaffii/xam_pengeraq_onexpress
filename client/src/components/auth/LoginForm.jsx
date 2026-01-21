@@ -81,10 +81,15 @@ export const LoginForm = () => {
 
     try {
       toastId = toast.loading("Verifying..");
-      await login(formData);
+      const result = await login(formData);
+
       toast.success("Login Successful!", { id: toastId });
 
-      navigate("/", { replace: true });
+      if (result.data.user.role === "teacher") {
+        navigate("/teacher/schedule", { replace: true });
+      } else if (result.data.user.role === "admin") {
+        navigate("/", { replace: true });
+      }
     } catch (error) {
       console.error("Login failed:", error);
       const errorMessage =

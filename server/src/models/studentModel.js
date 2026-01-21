@@ -1,22 +1,48 @@
 const pool = require("../config/db");
 
-const getStudent = async (page, limit, searchTerm = "") => {
+const getStudent = async (page, limit, searchTerm = "", filter = {}) => {
   page = Number(page) || 1;
   limit = Number(limit) || 10;
   const offset = (page - 1) * limit;
 
-  const searchValue = searchTerm ? `%${searchTerm}%` : "%";
+  const { enrolledClass, enrolledSelected } = filter;
+
+  const conditions = [];
+  const params = [];
+
+  if (enrolledSelected === "SELECTED") {
+    conditions.push("sc.classschhdid = ? ");
+    params.push(enrolledClass);
+  } else if (enrolledSelected === "NOT_SELECTED") {
+    // conditions.push("sc.classschhdid <> ? ");
+    // params.push(enrolledClass);
+  }
+
+  if (searchTerm) {
+    const searchValue = searchTerm ? `%${searchTerm}%` : "%";
+    conditions.push("studentname LIKE ?");
+    params.push(searchValue);
+  }
+
+  const whereClause =
+    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
   const studentIdQuery = `
-    SELECT studentid
-    FROM students
-    WHERE studentname LIKE ?
-    ORDER BY createddate DESC
+    SELECT s.studentid
+     FROM students s
+    LEFT JOIN studentexamseries se
+      ON s.studentid = se.studentid
+    LEFT JOIN examseries es
+      ON se.examseriesid = es.examseriesid
+    LEFT JOIN studentclass sc
+      ON s.studentid = sc.studentid
+   
+    ${whereClause}
     LIMIT ? OFFSET ?
   `;
 
   const [studentIds] = await pool.query(studentIdQuery, [
-    searchValue,
+    ...params,
     limit,
     offset,
   ]);
@@ -27,16 +53,21 @@ const getStudent = async (page, limit, searchTerm = "") => {
 
   const ids = studentIds.map((row) => row.studentid);
 
+  let orderBy = "ORDER BY s.createddate DESC";
+  const orderParams = [];
+
   const detailQuery = `
     SELECT
       s.studentid AS studentId,
       s.studentname AS studentName,
       s.studentidno AS studentIdNo,
+
       se.examseriesid AS examSeriesId,
       es.examseriesdescription AS examSeriesDescription,
+
       sc.studentclassid AS studentClassId,
-      sc.classschhdid as classSchedule,
-      sc.studentid as classStudent
+      sc.classschhdid AS classSchedule,
+      sc.studentid AS classStudent
 
     FROM students s
     LEFT JOIN studentexamseries se
@@ -47,10 +78,10 @@ const getStudent = async (page, limit, searchTerm = "") => {
       ON s.studentid = sc.studentid
 
     WHERE s.studentid IN (?)
-    ORDER BY s.createddate DESC
+    ${orderBy}
   `;
 
-  const [rows] = await pool.query(detailQuery, [ids]);
+  const [rows] = await pool.query(detailQuery, [ids, ...orderParams]);
 
   const map = new Map();
 
@@ -85,16 +116,22 @@ const getStudent = async (page, limit, searchTerm = "") => {
 
   const countQuery = `
     SELECT COUNT(*) AS total
-    FROM students
-    WHERE studentname LIKE ?
+    FROM students s
+    LEFT JOIN studentexamseries se
+      ON s.studentid = se.studentid
+    LEFT JOIN examseries es
+      ON se.examseriesid = es.examseriesid
+    LEFT JOIN studentclass sc
+      ON s.studentid = sc.studentid
+   
+    ${whereClause}
   `;
 
-  const [countResult] = await pool.query(countQuery, [searchValue]);
-  const total = countResult[0].total;
+  const [countResult] = await pool.query(countQuery, [...params]);
 
   return {
     data: formattedRows,
-    total,
+    total: countResult[0].total,
   };
 };
 

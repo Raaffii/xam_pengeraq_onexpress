@@ -2,8 +2,9 @@ const pool = require("../config/db");
 const Students = require("../models/studentModel");
 const StudentExam = require("../models/studentExamModel");
 
-const getStudent = async (page, limit, searchTerm) => {
-  return await Students.getStudent(page, limit, searchTerm);
+const getStudent = async (page, limit, searchTerm, filter) => {
+  console.log("filter", filter);
+  return await Students.getStudent(page, limit, searchTerm, filter);
 };
 
 const getStudentById = async (studentId) => {

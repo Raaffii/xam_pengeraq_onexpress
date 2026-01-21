@@ -46,6 +46,8 @@ const authService = {
       userId: user.userid,
       userName: user.name,
       email: user.email,
+      role: user.role,
+      teacherId: user.teacherid,
     });
 
     return {
@@ -55,6 +57,7 @@ const authService = {
         name: user.name,
         email: user.email,
         phone: user.phone,
+        role: user.role,
       },
     };
   },

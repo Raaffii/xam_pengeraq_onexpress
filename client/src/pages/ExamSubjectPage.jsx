@@ -117,12 +117,12 @@ const ExamSubjectPage = () => {
     : [];
 
   return (
-    <div className="min-h-screen">
+    <div className='min-h-screen'>
       <PageHeader
-        title="Subjects"
-        subtitle="Manage available exam subjects"
+        title='Subjects'
+        subtitle='Manage available exam subjects'
         showSearch={true}
-        searchPlaceholder="Search by subject code or description"
+        searchPlaceholder='Search by subject code or description'
         onSearch={onSearch}
         searchMaxLength={50}
         primaryAction={{
@@ -149,8 +149,8 @@ const ExamSubjectPage = () => {
         data={examSubj}
         isLoading={isLoading}
         columns={columns}
-        idAccessor="subjId"
-        detailPage="subjects"
+        idAccessor='subjId'
+        detailPage='subjects'
         onPageChange={onPageChange}
         onSizeChange={onPageSizeChange}
         pagination={pagination}
@@ -182,7 +182,7 @@ const ExamSubjectPage = () => {
           setOpen={setIsDeleteModalOpen}
           onSubmit={handleDelete}
           entityData={selectedSubj}
-          title="Delete Subject"
+          title='Delete Subject'
           confirmationText={`Are you sure you want to delete "${selectedSubj.subjDesc}"? This action cannot be undone.`}
         />
       )}

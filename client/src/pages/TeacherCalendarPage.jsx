@@ -1,19 +1,16 @@
 import { Calendar, Views, dateFnsLocalizer } from "react-big-calendar";
+import { Table, Calendar as Cldr } from "lucide-react";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { enUS } from "date-fns/locale";
 import PageHeader from "@/components/common/PageHeader";
 import { useNavigate } from "react-router-dom";
 import { monthsAndYear } from "@/utils/monthsYear";
-import { useState } from "react";
-import { Calendar as Cldr, Table } from "lucide-react";
+import { useState, useRef } from "react";
+
 import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
 import { useEffect } from "react";
-import CalendarDetailPage from "@/components/calendar/CalendarDetailPage";
-import { usePageTitle } from "@/hooks/usePageTitle";
 
-export default function CalendarPage() {
-  usePageTitle("Calendar");
-
+export default function TeacherCalendarPage() {
   const locales = {
     "en-US": enUS,
   };
@@ -21,9 +18,8 @@ export default function CalendarPage() {
   const [calendarShow, setCalendarShow] = useState(0);
   const [view, setView] = useState(Views.MONTH);
   const [events, setEvents] = useState();
-  const [openDetailDate, setOpenDetailDate] = useState(false);
-  const [selectedDate, setSelectedDate] = useState();
-  const { fetchClassScheduleDetail } = useClassScheduleDetail();
+  const hasFetchedData = useRef(false);
+  const { fetchClassScheduleDetail, onSearch } = useClassScheduleDetail();
 
   const localizer = dateFnsLocalizer({
     format,
@@ -34,6 +30,8 @@ export default function CalendarPage() {
   });
 
   useEffect(() => {
+    if (hasFetchedData.current) return;
+    hasFetchedData.current = true;
     const fetchData = async () => {
       const result = await fetchClassScheduleDetail({
         date: new Date().setMonth(new Date().getMonth() + calendarShow),
@@ -48,34 +46,35 @@ export default function CalendarPage() {
     {
       icon: Table,
       label: "table",
-      onClick: () => navigate("/schedule"),
+      onClick: () => navigate("/teacher/schedule"),
     },
     {
       icon: Cldr,
       label: "calendar",
-      onClick: () => navigate("/schedule/calendar"),
+      onClick: () => navigate("/teacher/schedule/calendar"),
     },
   ];
 
   const components = {
     event: ({ event }) => {
       if (event?.appointment) {
+        const isPast = new Date() > new Date(event?.start);
+        const today = new Date();
+        const isToday = event.start.toDateString() === today.toDateString();
+
         return (
           <div
-            onClick={() => handleDetailDate(event)}
-            className={`flex gap-1 p-0.5 rounded-sm text-black hover:bg-white ${
-              event.repeatvalue === "daily"
-                ? "bg-red-300 border-2 border-red-500"
-                : event.repeatvalue === "weekly"
-                  ? "bg-yellow-300 border-2 border-yellow-500"
-                  : event.repeatvalue === "monthly"
-                    ? "bg-green-300 border-2 border-green-500"
-                    : "bg-blue-300 border-2 border-blue-500"
-            }`}>
-            <div className=' gap-1'>
+            className={`flex gap-1 px-0.5 rounded-sm overflow-hidden text-white ${isToday ? "    bg-blue-400 border-2 border-blue-900" : "bg-purple-400 border-2 border-purple-900 "}   font-semibold ${
+              isPast ? "line-through opacity-60 hover:bg-blue-900" : ""
+            }`}
+            onClick={() => {
+              isPast
+                ? navigate(`/teacher/class-attendance/${event?.scheduleid}`)
+                : alert("Class Session Has Not Begun Yet");
+            }}>
+            <div className='flex items-center gap-1'>
               {/* <UserIcon className='w-4' /> */}
-              <h2 className='text-sm font-semibold'>{event?.teacher} </h2>
-              <h3 className='text-xs'>{event?.examsubject}</h3>
+              <h2>{event?.examsubject} </h2>
             </div>
             {view === "agenda" && (
               <>
@@ -124,6 +123,7 @@ export default function CalendarPage() {
     const mappedEvents = data.map((item) => ({
       start: new Date(item.classDateTime),
       end: new Date(new Date(item.classDateTime).getTime() + 40 * 60 * 1000),
+      scheduleid: item.classSchDetailsId,
       appointment: true,
       teacher: item.teacherName,
       examseries: item.examSeriesDescription,
@@ -150,6 +150,11 @@ export default function CalendarPage() {
       await handleEvent(resultOri.data);
       setCalendarShow(calendarShow - 1);
     } else {
+      const resultOri = await fetchClassScheduleDetail({
+        date: new Date().setMonth(new Date().getMonth()),
+      });
+
+      await handleEvent(resultOri.data);
       setCalendarShow(0);
     }
   };
@@ -160,17 +165,13 @@ export default function CalendarPage() {
 
   const monthYear = monthsAndYear(calendarShow);
 
-  const handleDetailDate = (date) => {
-    setOpenDetailDate(true);
-    setSelectedDate(date.start);
-  };
-
   return (
     <div>
       <PageHeader
-        title='Schedule'
-        subtitle='Manage Schedule'
+        title='Teacher Schedules'
+        subtitle='Your Schedule'
         showSearch={false}
+        onSearch={onSearch}
         searchPlaceholder='Search by name'
         searchMaxLength={50}
         actions2={actions}
@@ -190,13 +191,13 @@ export default function CalendarPage() {
           </button>
           <button
             onClick={() => handleChangeCalendar("prev")}
-            className='p-1.5  text-black rounded-md transition-colors font-bold hover:text-blue-500'>
+            className='p-1.5  text-black rounded-md transition-colors'>
             Prev
           </button>
           <button
             onClick={() => handleChangeCalendar("next")}
-            className='p-1.5 text-black rounded-md transition-colors font-bold hover:text-blue-500'>
-            Next
+            className='p-1.5 text-black rounded-md transition-colors'>
+            next
           </button>
         </div>
 
@@ -205,17 +206,17 @@ export default function CalendarPage() {
             <button
               size='sm'
               onClick={() => handleViewChange(Views.DAY)}
-              className='p-1.5  bg-blue-600 transition-colors border border-white text-white hover:bg-blue-800'>
+              className='p-1.5  bg-blue-600 transition-colors border border-white text-white hover:bg-blue-900'>
               Today Agenda
             </button>
             <button
               onClick={() => handleViewChange(Views.MONTH)}
-              className='p-1.5  bg-blue-600  transition-colors border border-white text-white hover:bg-blue-800'>
+              className='p-1.5  bg-blue-600  transition-colors border border-white text-white hover:bg-blue-900'>
               Month
             </button>
             <button
               onClick={() => handleViewChange(Views.AGENDA)}
-              className='p-1.5  bg-blue-600  transition-colors border border-white text-white hover:bg-blue-800'>
+              className='p-1.5  bg-blue-600  transition-colors border border-white text-white hover:bg-blue-900'>
               Agenda
             </button>
           </div>
@@ -227,43 +228,13 @@ export default function CalendarPage() {
         startAccessor='start'
         endAccessor='end'
         style={{ height: 500 }}
+        onView={handleViewChange}
         view={view}
         date={new Date().setMonth(new Date().getMonth() + calendarShow)}
-        toolbar={false}
-        selectable
-        onSelectSlot={handleDetailDate}
-        components={components}
-        onView={handleViewChange}
         onNavigate={handleChangeCalendar}
+        toolbar={false}
+        components={components}
       />
-
-      <CalendarDetailPage
-        open={openDetailDate}
-        setOpen={setOpenDetailDate}
-        data={events}
-        selectedDate={selectedDate}
-      />
-      <div className='flex flex-wrap gap-3 my-3 text-sm'>
-        <div className='flex items-center gap-2'>
-          <span className='w-4 h-4 bg-red-400 border border-red-600 rounded'></span>
-          <span>Daily Schedule</span>
-        </div>
-
-        <div className='flex items-center gap-2'>
-          <span className='w-4 h-4 bg-yellow-400 border border-yellow-600 rounded'></span>
-          <span>Weekly Schedule</span>
-        </div>
-
-        <div className='flex items-center gap-2'>
-          <span className='w-4 h-4 bg-green-400 border border-green-600 rounded'></span>
-          <span>Monthly Schedule</span>
-        </div>
-
-        <div className='flex items-center gap-2'>
-          <span className='w-4 h-4 bg-blue-400 border border-blue-600 rounded'></span>
-          <span>No Repetition Schedule</span>
-        </div>
-      </div>
     </div>
   );
 }

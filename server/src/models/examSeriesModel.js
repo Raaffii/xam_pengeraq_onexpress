@@ -39,7 +39,6 @@ const SeriesModel = {
       LEFT JOIN exam e ON es.examid = e.examid   
       ${whereClause}
       ORDER BY es.createddate DESC
-
     `;
 
     const queryParams = [...params];

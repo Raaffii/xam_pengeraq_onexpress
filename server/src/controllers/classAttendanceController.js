@@ -1,14 +1,15 @@
-const classScheduleDetailService = require("../services/examScheduleDetailService");
+const ClassAttendanceService = require("../services/classAttendanceService");
 
-const getClassScheduleDetail = async (req, res) => {
+const getClassAttendance = async (req, res) => {
   try {
-    let { page, limit, searchTerm, date } = req.query;
+    let { page, limit, searchTerm } = req.query;
+    const filter = req.query;
 
-    const result = await classScheduleDetailService.getClassScheduleDetail(
+    const result = await ClassAttendanceService.getClassAttendance(
       page,
       limit,
       searchTerm,
-      date
+      filter,
     );
     res.status(200).json({
       data: result.data,
@@ -31,5 +32,5 @@ const getClassScheduleDetail = async (req, res) => {
 };
 
 module.exports = {
-  getClassScheduleDetail,
+  getClassAttendance,
 };

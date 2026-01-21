@@ -9,11 +9,12 @@ export const useClassSchedule = () => {
   const [error, setError] = useState(null);
 
   const [pagination, setPagination] = useState({
-    page: 1,
+    currentPage: 1,
     pageSize: 10,
     totalPages: 1,
     totalItems: 0,
   });
+
   const [params, setParams] = useState({ page: 1, limit: 10 });
 
   const formatClassSchedule = useCallback((rawExams) => {
@@ -36,13 +37,14 @@ export const useClassSchedule = () => {
 
         const response = await classScheduleService.getClassSchedule(apiParams);
         const data = formatClassSchedule(response.data);
+
         setPagination(
           response.pagination || {
             currentPage: 1,
             pageSize: 10,
             totalPages: 1,
             totalItems: 0,
-          }
+          },
         );
         setClassSchedule(data);
         return { success: true, data: data };
@@ -57,23 +59,46 @@ export const useClassSchedule = () => {
         setIsLoading(false);
       }
     },
-    [params, formatClassSchedule]
+    [params, formatClassSchedule],
   );
+
+  const getClassScheduleById = useCallback(async (scheduleId) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response =
+        await classScheduleService.getClassScheduleById(scheduleId);
+
+      setClassSchedule(response.data);
+
+      return { success: true, data: response.data };
+    } catch (err) {
+      console.error("Error fetching Student:", err);
+
+      setError(err.message);
+      setClassSchedule([]);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const postClassSchedule = useCallback(async (data) => {
     let toastId;
     try {
       setIsSubmitting(true);
       setError(null);
-      toastId = toast.loading("Creating new exam result...");
+      toastId = toast.loading("Creating new Schedule...");
 
       const response = await classScheduleService.postClassSchedule(data);
-      toast.success("Exam Result added successfully!", { id: toastId });
+      toast.success("Schedule added successfully!", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating exam result:", err);
-      toast.error(err.message || "Failed to create exam result", {
+      console.error("Error creating schedul:", err);
+      toast.error(err.message || "Failed to create schedule", {
         id: toastId,
       });
       setError(err.message);
@@ -89,18 +114,18 @@ export const useClassSchedule = () => {
     try {
       setIsSubmitting(true);
       setError(null);
-      toastId = toast.loading("Creating new exam result...");
+      toastId = toast.loading("Creating new schedule...");
       console.log("ce", classScheduleId);
       const response = await classScheduleService.putClassSchedule(
         classScheduleId,
-        data
+        data,
       );
-      toast.success("Exam Result added successfully!", { id: toastId });
+      toast.success("Schedule added successfully!", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating exam result:", err);
-      toast.error(err.message || "Failed to create exam result", {
+      console.error("Error creating Schedule:", err);
+      toast.error(err.message || "Failed to create schedule", {
         id: toastId,
       });
       setError(err.message);
@@ -118,12 +143,11 @@ export const useClassSchedule = () => {
       setError(null);
       toastId = toast.loading("Deleting new schedule...");
 
-      const response = await classScheduleService.deleteClassSchedule(
-        classschhdid
-      );
+      const response =
+        await classScheduleService.deleteClassSchedule(classschhdid);
       toast.success("Schedule delete successfully!", { id: toastId });
       setClassSchedule((prev) =>
-        prev.filter((item) => item.classschhdid !== classschhdid)
+        prev.filter((item) => item.classschhdid !== classschhdid),
       );
       return { success: true, data: response.data };
     } catch (err) {
@@ -152,17 +176,17 @@ export const useClassSchedule = () => {
         page: 1,
       });
     },
-    [params, fetchClassSchedule]
+    [params, fetchClassSchedule],
   );
 
   const onSearch = useCallback(
-    async (search) => {
-      const newParams = { ...params, search };
+    async (searchTerm) => {
+      const newParams = { ...params, searchTerm };
       setParams(newParams);
 
-      return await fetchClassSchedule({ search, page: 1 });
+      return await fetchClassSchedule({ searchTerm, page: 1 });
     },
-    [fetchClassSchedule, setParams, params]
+    [fetchClassSchedule, setParams, params],
   );
 
   const onPageChange = useCallback(
@@ -171,7 +195,7 @@ export const useClassSchedule = () => {
       setParams(newParams);
       return await fetchClassSchedule({ page });
     },
-    [params, fetchClassSchedule]
+    [params, fetchClassSchedule],
   );
 
   const onPageSizeChange = useCallback(
@@ -180,7 +204,7 @@ export const useClassSchedule = () => {
       setParams(newParams);
       return await fetchClassSchedule({ limit, page: 1 });
     },
-    [params, fetchClassSchedule]
+    [params, fetchClassSchedule],
   );
 
   return {
@@ -193,6 +217,7 @@ export const useClassSchedule = () => {
     onFilterChange,
     deleteClassSchedule,
     putClassSchedule,
+    getClassScheduleById,
     isSubmitting,
     classSchedule,
     isLoading,

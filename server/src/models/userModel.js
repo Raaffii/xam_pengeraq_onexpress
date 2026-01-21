@@ -104,9 +104,9 @@ const UserModel = {
 
   async findUserByEmail(email) {
     const [rows] = await pool.query(
-      `SELECT userid, name, emailaddress as email, password, active 
+      `SELECT userid, name, emailaddress as email, password,role, teacherid, active 
      FROM users WHERE emailaddress = ? AND active = true`,
-      [email],
+      [email]
     );
     return rows[0];
   },
@@ -205,7 +205,7 @@ const UserModel = {
      FROM users u
      LEFT JOIN students s ON s.studentid = u.studentid
      WHERE u.userid = ? AND u.active = true`,
-      [userId],
+      [userId]
     );
 
     return rows[0];

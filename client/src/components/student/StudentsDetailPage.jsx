@@ -87,6 +87,7 @@ export default function StudentsDetailPage() {
   const columns = [
     {
       accessorKey: "subjCode",
+
       header: "Subject Code",
       align: "center",
       cellClassName: "font-semibold",
@@ -94,10 +95,12 @@ export default function StudentsDetailPage() {
     {
       accessorKey: "subjDesc",
       header: "Subject",
+
       cellClassName: "text-left",
     },
     {
       accessorKey: "marks",
+
       header: "Mark",
     },
     {
@@ -119,12 +122,15 @@ export default function StudentsDetailPage() {
       accessorKey: "isRetake",
       header: "Retake",
       align: "center",
+
       render: (row) => {
         return (
-          <div className="flex justify-center">
-            {row.isRetake ?
-              <CheckCircle2Icon className="text-green-800" />
-            : <XCircleIcon className="text-red-800" />}
+          <div className='flex justify-center'>
+            {row.isRetake ? (
+              <CheckCircle2Icon className='text-green-800' />
+            ) : (
+              <XCircleIcon className='text-red-800' />
+            )}
           </div>
         );
       },
@@ -148,9 +154,8 @@ export default function StudentsDetailPage() {
     return result.success;
   };
 
-  const options =
-    Array.isArray(studentsExamSeries) ?
-      studentsExamSeries.map((item) => ({
+  const options = Array.isArray(studentsExamSeries)
+    ? studentsExamSeries.map((item) => ({
         value: item.seriesId,
         label: item.seriesDesc,
       }))
@@ -159,16 +164,16 @@ export default function StudentsDetailPage() {
   if (!loadStudent && !student) {
     return (
       <ResourceNotFound
-        title="Student Not Found"
+        title='Student Not Found'
         message={`No student found with ID: ${studentId}. It may have been deleted or the ID is incorrect.`}
-        backTo="/students"
+        backTo='/students'
       />
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto">
+    <div className='min-h-screen bg-gray-50'>
+      <div className='mx-auto'>
         <PageHeader
           title={`Student Details - ${student?.studentName || "Loading..."}`}
           subtitle={`Student ID: ${student?.studentIdNo || ""}`}
@@ -186,7 +191,7 @@ export default function StudentsDetailPage() {
         />
 
         <DetailsInfoCard
-          title="Student Information"
+          title='Student Information'
           fields={[
             {
               label: "Student ID",
@@ -199,23 +204,22 @@ export default function StudentsDetailPage() {
           ]}
           columnSize={2}
           isLoading={loadStudent}
-          className="mb-6"
+          className='mb-6'
         />
 
         <PageHeader
-          title=""
-          subtitle=""
+          title=''
+          subtitle=''
           showSearch={true}
-          searchPlaceholder="Search exam result..."
+          searchPlaceholder='Search exam result...'
           onSearch={onSearch}
-          searchMaxLength={50}
-        >
+          searchMaxLength={50}>
           <ExamSeriesFilter
             data={studentsExamSeries}
-            valueKey="seriesId"
-            labelKey="seriesDesc"
-            filterKey="bySeries"
-            placeholder="Filter by Series"
+            valueKey='seriesId'
+            labelKey='seriesDesc'
+            filterKey='bySeries'
+            placeholder='Filter by Series'
             initialFilters={params}
             onFilterChange={onFilterChange}
             isLoading={isLoading}
@@ -225,7 +229,7 @@ export default function StudentsDetailPage() {
         <DataTable
           data={examsResult}
           columns={columns}
-          idAccessor="resultId"
+          idAccessor='resultId'
           onEdit={(result) => {
             setModalMode("edit");
             setInitialFormValues({
@@ -270,7 +274,7 @@ export default function StudentsDetailPage() {
             setOpen={setIsDeleteModalOpen}
             onSubmit={handleExamResultDelete}
             entityData={selectedExamsResult}
-            title="Delete Exam Result"
+            title='Delete Exam Result'
             confirmationText={`Are you sure you want to delete exam result "${selectedExamsResult.subjDesc}"? This action cannot be undone.`}
           />
         )}

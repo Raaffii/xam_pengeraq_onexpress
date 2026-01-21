@@ -14,7 +14,8 @@ const getStudentClass = async (page, limit, searchTerm = "", schedule) => {
     SELECT 
     s.studentname as studentName,
     sc.studentclassid as studentClassId,
-    s.studentidno as studentIdNo
+    s.studentidno as studentIdNo,
+    sc.createddate as enteredDate
 
     FROM studentclass sc 
     LEFT JOIN students s ON sc.studentid = s.studentid
@@ -32,11 +33,9 @@ const getStudentClass = async (page, limit, searchTerm = "", schedule) => {
   return { data: rows, total };
 };
 
-const postStudentClass = async (data, userId) => {
-  console.log("data", data);
-
+const postStudentClass = async (scheduleId, data) => {
   try {
-    const values = data.map((item) => [item.studentId, item.scheduleId]);
+    const values = data.map((item) => [item, scheduleId]);
 
     const placeholders = data.map(() => "(?, ?)").join(", ");
 
@@ -51,7 +50,31 @@ const postStudentClass = async (data, userId) => {
   }
 };
 
+const removeStudentFromClass = async (scheduleId, studentIds) => {
+  try {
+    if (!Array.isArray(studentIds) || studentIds.length === 0) {
+      return { affectedRows: 0 };
+    }
+
+    const placeholders = studentIds.map(() => "?").join(", ");
+
+    const sql = `
+      DELETE FROM studentclass
+      WHERE classschhdid = ?
+      AND studentid IN (${placeholders})
+    `;
+
+    const values = [scheduleId, ...studentIds];
+
+    const [result] = await pool.query(sql, values);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
 module.exports = {
   getStudentClass,
   postStudentClass,
+  removeStudentFromClass,
 };

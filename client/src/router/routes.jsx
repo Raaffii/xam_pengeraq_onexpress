@@ -9,22 +9,42 @@ import ExamSeriesDetailPage from "@/components/examseries/ExamSeriesDetailPage";
 import ExamDetailPage from "@/components/exam/ExamDetailPage";
 import ExamSubjectPage from "@/pages/ExamSubjectPage";
 import SchedulesPages from "@/pages/SchedulePage";
+import TeacherSchedulesPages from "@/pages/TeacherSchedulePage";
 import CalendarPage from "@/pages/CalendarPage";
 import ScheduleDetailPage from "@/components/schedule/ScheduleDetailPage";
 import { ExamSubjectGradePage } from "@/components/subjects";
+
+import TeacherCalendarPage from "@/pages/TeacherCalendarPage";
+import TeacherScheduleDetailPage from "@/components/teacher/teacherScheduleDetailPage";
+import ClassAttendancePage from "@/pages/ClassAtendancePage";
+
 import { publicRoutes } from "./publicRoutes";
 import TranscriptsPage from "@/pages/TranscriptsPage";
 import { NotFoundPage, ProtectedRoute } from "@/components/layout";
 
-const privateRoutes = {
-  path: "/",
+const teacherPrivateRoutes = {
+  path: "/teacher",
   element: (
-    <ProtectedRoute>
+    <ProtectedRoute roles={["teacher"]}>
       <Layout />
     </ProtectedRoute>
   ),
   children: [
-    { index: true, element: <DashboardPage /> },
+    { path: "schedule", element: <TeacherSchedulesPages /> },
+    { path: "scheduledetail/:id", element: <TeacherScheduleDetailPage /> },
+    { path: "schedule/calendar", element: <TeacherCalendarPage /> },
+    { path: "class-attendance/:id", element: <ClassAttendancePage /> },
+  ],
+};
+
+const adminPrivateRoutes = {
+  path: "/",
+  element: (
+    <ProtectedRoute roles={["admin"]}>
+      <Layout />
+    </ProtectedRoute>
+  ),
+  children: [
     { path: "dashboard", element: <DashboardPage /> },
     { path: "exams", element: <ExamsPage /> },
     { path: "exams/:id", element: <ExamDetailPage /> },
@@ -42,8 +62,20 @@ const privateRoutes = {
   ],
 };
 
+const adminAndTeacherRoute = {
+  path: "/",
+  element: (
+    <ProtectedRoute roles={["admin", "teacher"]}>
+      <Layout />
+    </ProtectedRoute>
+  ),
+  children: [{ index: true, element: <DashboardPage /> }],
+};
+
 export const routes = [
   ...publicRoutes,
-  privateRoutes,
+  teacherPrivateRoutes,
+  adminPrivateRoutes,
+  adminAndTeacherRoute,
   { path: "*", element: <NotFoundPage /> },
 ];

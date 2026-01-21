@@ -43,7 +43,7 @@ export const useClassScheduleDetail = () => {
             pageSize: 10,
             totalPages: 1,
             totalItems: 0,
-          }
+          },
         );
         setClassScheduleDetail(data);
         return { success: true, data: data };
@@ -58,8 +58,96 @@ export const useClassScheduleDetail = () => {
         setIsLoading(false);
       }
     },
-    [params, formatClassSchedule]
+    [params, formatClassSchedule],
   );
+
+  const fetchClassScheduleDetailById = useCallback(
+    async (classSchDetailsId) => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response =
+          await classScheduleDetailService.getClassScheduleDetailById(
+            classSchDetailsId,
+          );
+
+        setClassScheduleDetail(response.data);
+        return { success: true, data: response.data };
+      } catch (err) {
+        console.error("Error fetching exams:", err);
+
+        setError(err.message);
+        setClassScheduleDetail([]);
+
+        return { success: false, error: err.message };
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [params, formatClassSchedule],
+  );
+
+  const startClassSession = useCallback(async (classschhdid) => {
+    let toastId;
+    try {
+      setIsSubmitting(true);
+      setError(null);
+      toastId = toast.loading("Checking QR code availability...");
+
+      const response =
+        await classScheduleDetailService.startClassSession(classschhdid);
+      toast.success("Succes Create QR Code!", { id: toastId });
+
+      return {
+        success: true,
+        token: response.data.dataTo.token,
+        startDateTime: response.data.dataTo.startDateTime,
+      };
+    } catch (err) {
+      console.error("Error creating student:", err);
+      toast.error(err.message || "Failed to create student", { id: toastId });
+      setError(err.message);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, []);
+
+  const openClassSession = useCallback(async (classschhdid) => {
+    let toastId;
+    try {
+      setIsSubmitting(true);
+      setError(null);
+
+      toastId = toast.loading("Checking QR code availability...");
+
+      const response =
+        await classScheduleDetailService.openClassSession(classschhdid);
+
+      if (response.data.token) {
+        toast.success("QR code is available.", { id: toastId });
+      } else {
+        toast.dismiss(toastId);
+      }
+
+      return {
+        success: true,
+        token: response.data.token,
+        startDateTime: response.data.startDateTime,
+        classDateTime: response.data.classDateTime,
+      };
+    } catch (err) {
+      console.error("Error creating student:", err);
+      toast.error("Failed to get QrCode information", { id: toastId });
+      setError(err.message);
+
+      return { success: false, error: err.message };
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, []);
 
   const onFilterChange = useCallback(
     async (filters) => {
@@ -74,17 +162,18 @@ export const useClassScheduleDetail = () => {
         page: 1,
       });
     },
-    [params, fetchClassScheduleDetail]
+    [params, fetchClassScheduleDetail],
   );
 
   const onSearch = useCallback(
-    async (search) => {
-      const newParams = { ...params, search };
+    async (searchTerm) => {
+      console.log("cee", searchTerm);
+      const newParams = { ...params, searchTerm };
       setParams(newParams);
 
-      return await fetchClassScheduleDetail({ search, page: 1 });
+      return await fetchClassScheduleDetail({ searchTerm, page: 1 });
     },
-    [fetchClassScheduleDetail, setParams, params]
+    [fetchClassScheduleDetail, setParams, params],
   );
 
   const onPageChange = useCallback(
@@ -93,7 +182,7 @@ export const useClassScheduleDetail = () => {
       setParams(newParams);
       return await fetchClassScheduleDetail({ page });
     },
-    [params, fetchClassScheduleDetail]
+    [params, fetchClassScheduleDetail],
   );
 
   const onPageSizeChange = useCallback(
@@ -102,18 +191,19 @@ export const useClassScheduleDetail = () => {
       setParams(newParams);
       return await fetchClassScheduleDetail({ limit, page: 1 });
     },
-    [params, fetchClassScheduleDetail]
+    [params, fetchClassScheduleDetail],
   );
 
   return {
     fetchClassScheduleDetail,
+    fetchClassScheduleDetailById,
     onPageChange,
     onPageSizeChange,
     onSearch,
     setParams,
-
+    startClassSession,
     onFilterChange,
-
+    openClassSession,
     isSubmitting,
     classScheduleDetail,
     isLoading,

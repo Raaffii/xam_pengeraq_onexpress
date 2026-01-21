@@ -1,19 +1,18 @@
 const pool = require("../config/db");
 
-const Students = require("../models/studentModel");
-
 const ClassSchedule = require("../models/classScheduleModel");
 const ClassScheduleDetail = require("../models/classScheduleDetailsModel");
 
 const addDateByRepeat = require("../utils/addDateByRepeat");
 
-const getClassSchedule = async (page, limit, searchTerm, date) => {
+const getClassSchedule = async (page, limit, searchTerm, date, teacherId) => {
   try {
     const result = await ClassSchedule.getClassSchedule(
       page,
       limit,
       searchTerm,
-      date
+      date,
+      teacherId,
     );
     return result;
   } catch (error) {
@@ -27,12 +26,10 @@ const postClassSchedule = async (data, userId) => {
   try {
     await connection.beginTransaction();
 
-    console.log("data", data);
-
     const resultId = await ClassSchedule.postClassSchedule(
       connection,
       data,
-      userId
+      userId,
     );
 
     //start making loop
@@ -67,7 +64,7 @@ const postClassSchedule = async (data, userId) => {
 
     const result = await ClassScheduleDetail.bulkInsertScheduleDetail(
       connection,
-      dataForBulk
+      dataForBulk,
     );
 
     await connection.commit();
@@ -81,9 +78,9 @@ const postClassSchedule = async (data, userId) => {
   }
 };
 
-const getStudentById = async (studentId) => {
+const getScheduleById = async (scheduleId) => {
   try {
-    const result = await Students.getStudentById(studentId);
+    const result = await ClassSchedule.getScheduleById(scheduleId);
 
     return result;
   } catch (error) {
@@ -134,7 +131,7 @@ const putClassSchedule = async (id, data, userId) => {
 
     const result = await ClassScheduleDetail.bulkInsertScheduleDetail(
       connection,
-      dataForBulk
+      dataForBulk,
     );
 
     // change ig only date change ---------------------------------------
@@ -175,5 +172,5 @@ module.exports = {
   postClassSchedule,
   putClassSchedule,
   deleteClassSchedule,
-  getStudentById,
+  getScheduleById,
 };

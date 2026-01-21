@@ -95,7 +95,7 @@ export default function PageHeader({
       </div>
 
       {/* Filters and Search Section */}
-      {(children || showSearch) && (
+      {(children || showSearch || actions2) && (
         <div className='flex flex-wrap items-center gap-2 flex-shrink-0 justify-end'>
           <div className='flex-1 min-w-0'>
             {children}
