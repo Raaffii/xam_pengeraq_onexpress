@@ -107,8 +107,6 @@ export default function ClassAttendancePage() {
     </div>
   );
 
-  console.log("cekce", classAttendance);
-
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='mx-auto'>

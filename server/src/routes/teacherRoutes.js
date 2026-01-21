@@ -7,7 +7,13 @@ const {
   validateBody,
   validateParams,
 } = require("../middlewares/validateSchema");
-const { getTeacher } = require("../controllers/teacherController");
+const {
+  getTeacher,
+  postTeacher,
+  getTeacherById,
+  putTeacher,
+  deleteTeacher,
+} = require("../controllers/teacherController");
 const {
   fetchSubjectsQuerySchema,
   createSubjectSchema,
@@ -18,5 +24,9 @@ const {
 router.use(authenticateToken);
 
 router.get("/", getTeacher);
+router.get("/:id", getTeacherById);
+router.post("/", postTeacher);
+router.put("/:id", putTeacher);
+router.delete("/:id", deleteTeacher);
 
 module.exports = router;

@@ -17,7 +17,7 @@ import { ExamSubjectGradePage } from "@/components/subjects";
 import TeacherCalendarPage from "@/pages/TeacherCalendarPage";
 import TeacherScheduleDetailPage from "@/components/teacher/teacherScheduleDetailPage";
 import ClassAttendancePage from "@/pages/ClassAtendancePage";
-
+import TeacherPage from "@/pages/TeacherPage";
 import { publicRoutes } from "./publicRoutes";
 import TranscriptsPage from "@/pages/TranscriptsPage";
 import { NotFoundPage, ProtectedRoute } from "@/components/layout";
@@ -55,6 +55,7 @@ const adminPrivateRoutes = {
     { path: "students", element: <StudentsPage /> },
     { path: "students/:studentId", element: <StudentsDetailPage /> },
     { path: "users", element: <UsersPage /> },
+    { path: "teachers", element: <TeacherPage /> },
     { path: "schedule", element: <SchedulesPages /> },
     { path: "schedule/:id", element: <ScheduleDetailPage /> },
     { path: "schedule/calendar", element: <CalendarPage /> },

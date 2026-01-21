@@ -24,6 +24,7 @@ export const Sidebar = ({ isOpen, setIsOpen }) => {
         { name: "Dashboard", href: "/", icon: Home },
         { name: "Schedule", href: "/schedule", icon: Calendar },
         { name: "Students", href: "/students", icon: Users },
+        { name: "Teacher", href: "/teachers", icon: GraduationCap },
         { name: "Exams", href: "/exams", icon: ClipboardList },
         { name: "Series", href: "/series", icon: Folder },
         { name: "Subjects", href: "/subjects", icon: FileText },
