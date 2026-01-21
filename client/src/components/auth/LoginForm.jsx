@@ -171,11 +171,9 @@ export const LoginForm = () => {
             className="absolute right-3 top-[14px] text-gray-400 hover:text-gray-600"
             disabled={isLoading}
           >
-            {showPassword ? (
+            {showPassword ?
               <EyeOff className="w-5 h-5" />
-            ) : (
-              <Eye className="w-5 h-5" />
-            )}
+            : <Eye className="w-5 h-5" />}
           </button>
         </div>
       </div>
@@ -186,17 +184,16 @@ export const LoginForm = () => {
         disabled={isLoading}
         className="w-full h-12 text-white font-medium text-base disabled:opacity-50 disabled:cursor-not-allowed bg-blue-700"
       >
-        {isLoading ? (
+        {isLoading ?
           <>
             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 " />
             Loading...
           </>
-        ) : (
-          <>
+        : <>
             <LogIn className="w-5 h-5 mr-2" />
             Login
           </>
-        )}
+        }
       </Button>
     </form>
   );
