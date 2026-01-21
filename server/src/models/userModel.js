@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const crypto = require("crypto");
 
 const UserModel = {
   async findAll(options = {}) {
@@ -207,6 +208,102 @@ const UserModel = {
       [userId]
     );
 
+    return rows[0];
+  },
+
+  async createOrUpdatePasswordResetToken(connection, userId) {
+    const resetToken = crypto.randomUUID();
+
+    const hashToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    const expiryMinutes = parseInt(process.env.RESET_TOKEN_EXP_TIME || 30);
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + expiryMinutes);
+
+    // Check if a reset token already exists for this user
+    const [existing] = await connection.execute(
+      `SELECT id FROM password_resets WHERE userId = ?`,
+      [userId],
+    );
+
+    if (existing.length > 0) {
+      // Update existing record
+      await connection.execute(
+        `UPDATE password_resets 
+         SET resetPasswordToken = ?, 
+             resetPasswordExpires = ?,
+             updatedAt = NOW()
+         WHERE userId = ?`,
+        [hashToken, expiresAt, userId],
+      );
+    } else {
+      // Insert new record
+      await connection.execute(
+        `INSERT INTO password_resets 
+         (userId, resetPasswordToken, resetPasswordExpires, createdAt, updatedAt) 
+         VALUES (?, ?, ?, NOW(), NOW())`,
+        [userId, hashToken, expiresAt],
+      );
+    }
+
+    return {
+      token: resetToken,
+      expiresAt,
+      expiryMinutes,
+    };
+  },
+
+  async verifyResetToken(connection, token) {
+    const hashToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    const [rows] = await connection.execute(
+      `SELECT pr.userId, u.emailaddress as email 
+       FROM password_resets pr
+       JOIN users u ON pr.userId = u.userid
+       WHERE pr.resetPasswordToken = ? 
+       AND pr.resetPasswordExpires > NOW()`,
+      [hashToken],
+    );
+
+    if (rows.length === 0) {
+      return null;
+    }
+
+    return {
+      userId: rows[0].userId,
+      email: rows[0].email,
+    };
+  },
+
+  async resetUserPasswordAndClearToken(connection, userId, hashedPassword) {
+    // Update user password
+    await connection.execute(
+      `UPDATE users 
+       SET password = ?, 
+           editeddate = NOW()
+       WHERE userid = ?`,
+      [hashedPassword, userId],
+    );
+
+    // Delete the used reset token
+    await connection.execute(
+      `DELETE FROM password_resets 
+       WHERE userId = ?`,
+      [userId],
+    );
+
+    return true;
+  },
+
+  async findUserById(userId) {
+    const [rows] = await pool.execute(
+      `SELECT userid, name, emailaddress as email, password, role
+       FROM users WHERE userid = ? AND active = true`,
+      [userId],
+    );
     return rows[0];
   },
 };

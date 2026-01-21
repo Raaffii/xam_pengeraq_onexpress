@@ -165,17 +165,6 @@ export const GradeModal = ({
     onSubmit(dataToSubmit);
   };
 
-  const handleExamChange = (value, label) => {
-    setFormData((prev) => ({
-      ...prev,
-      seriesId: value,
-      seriesDesc: label || "",
-    }));
-    if (errors.seriesId) {
-      setErrors((prev) => ({ ...prev, seriesId: null }));
-    }
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -184,9 +173,9 @@ export const GradeModal = ({
             {mode === "create" ? "Create New Exam Series" : "Edit Exam Series"}
           </DialogTitle>
           <DialogDescription>
-            {mode === "create"
-              ? "Add a new exam series"
-              : "Update exam series information"}
+            {mode === "create" ?
+              "Add a new exam series"
+            : "Update exam series information"}
           </DialogDescription>
         </DialogHeader>
 
@@ -301,9 +290,11 @@ export const GradeModal = ({
           </div>
 
           <SearchableDropdown
+            id={"seriesId"}
+            name={"seriesId"}
             label="Exam Series"
             value={formData.seriesId}
-            onChange={handleExamChange}
+            onChange={handleChange}
             options={examOptions}
             disabled={optionDisabled || isSubmitting}
             error={errors.seriesId}
@@ -338,13 +329,13 @@ export const GradeModal = ({
               disabled={isSubmitting || (mode === "edit" && !hasChanges)}
               className="h-10 bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting
-                ? mode === "create"
-                  ? "Creating..."
-                  : "Updating..."
-                : mode === "create"
-                ? "Create Series"
-                : "Update Series"}
+              {isSubmitting ?
+                mode === "create" ?
+                  "Creating..."
+                : "Updating..."
+              : mode === "create" ?
+                "Create Series"
+              : "Update Series"}
             </Button>
           </div>
         </div>

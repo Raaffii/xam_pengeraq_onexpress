@@ -9,6 +9,8 @@ import { SeriesModal } from "../examseries";
 import { Edit } from "lucide-react";
 import { DetailsInfoCard } from "../common";
 import { ExamModal } from "./ExamModal";
+import { usePageTitle } from "@/hooks/usePageTitle";
+import { ResourceNotFound } from "../layout";
 
 export default function ExamDetailPage() {
   const { id } = useParams();
@@ -42,6 +44,8 @@ export default function ExamDetailPage() {
     updateExams,
     isSubmitting: examSubmit,
   } = useExams();
+
+  usePageTitle(examDetails ? `Exam - ${examDetails?.examName}` : "");
 
   useEffect(() => {
     if (hasFetchedData.current) return;
@@ -107,6 +111,17 @@ export default function ExamDetailPage() {
     }
     return result.success;
   };
+
+  if (!isLoading && !examDetails) {
+    return (
+      <ResourceNotFound
+        title="Exam Not Found"
+        message={`No exam found with ID: ${id}. It may have been deleted or the ID is incorrect.`}
+        backTo="/exams"
+        backToLabel="Back to Exams"
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

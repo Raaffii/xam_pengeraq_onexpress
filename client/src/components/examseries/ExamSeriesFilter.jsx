@@ -12,6 +12,7 @@ export const ExamSeriesFilter = ({
   initialFilters = {},
   onFilterChange,
   isLoading,
+  showClearBtn = true,
 }) => {
   const [value, setValue] = useState(initialFilters[filterKey] ?? null);
 
@@ -22,18 +23,19 @@ export const ExamSeriesFilter = ({
   }, [initialFilters, filterKey]);
 
   const options = useMemo(() => {
-    return Array.isArray(data)
-      ? data.map((item) => ({
-          value: String(item[valueKey]),
+    return Array.isArray(data) ?
+        data.map((item) => ({
+          value: item[valueKey],
           label: item[labelKey],
         }))
       : [];
   }, [data, valueKey, labelKey]);
 
-  const handleChange = (val) => {
-    setValue(val);
+  const handleChange = (e) => {
+    const { value } = e.target;
+    setValue(value);
     onFilterChange({
-      [filterKey]: val === null ? null : val,
+      [filterKey]: value === null ? null : value,
     });
   };
 
@@ -63,6 +65,8 @@ export const ExamSeriesFilter = ({
     <div className="flex items-center gap-2">
       <div className="w-full md:min-w-[200px] md:w-auto">
         <SearchableDropdown
+          id={filterKey}
+          name={filterKey}
           value={value}
           onChange={handleChange}
           options={options}
@@ -76,8 +80,7 @@ export const ExamSeriesFilter = ({
           isLoading={isLoading}
         />
       </div>
-
-      {hasActiveFilter && (
+      {showClearBtn && hasActiveFilter && (
         <Button
           variant="ghost"
           onClick={handleClear}

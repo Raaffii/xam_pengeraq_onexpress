@@ -147,7 +147,7 @@ const getStudentById = async (studentId) => {
     WHERE s.studentid = ?`;
   const [rows] = await pool.query(query, [studentId]);
 
-  return { data: rows[0] };
+  return rows[0];
 };
 
 const postStudent = async (conn, data, userId) => {

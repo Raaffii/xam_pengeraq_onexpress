@@ -1,11 +1,11 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "@/providers/AuthProvider";
+import { authService } from "@/services/authService";
 
 export const PublicRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) return null;
-  if (user) return <Navigate to="/" replace />;
+  const token = authService.getToken();
+  if (token && authService.isAuthenticated()) {
+    return <Navigate to='/' replace />;
+  }
 
   return children;
 };

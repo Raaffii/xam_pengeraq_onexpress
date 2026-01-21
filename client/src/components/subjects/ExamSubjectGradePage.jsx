@@ -8,6 +8,8 @@ import { SubjectGradeModal, SubjectModal } from ".";
 import { useExamSeries } from "@/hooks/useExamsSeries";
 import Delete_modal from "../modals/Delete_modal";
 import { DetailsInfoCard } from "../common";
+import { usePageTitle } from "@/hooks/usePageTitle";
+import { ResourceNotFound } from "../layout";
 
 export const ExamSubjectGradePage = () => {
   const hasFetchedData = useRef(false);
@@ -34,6 +36,11 @@ export const ExamSubjectGradePage = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("create");
+  usePageTitle(
+    examSubjDetail ?
+      `Subject - ${examSubjDetail?.subjDesc} (${examSubjDetail?.subjCode}) `
+    : "",
+  );
 
   useEffect(() => {
     if (hasFetchedData.current) return;
@@ -116,8 +123,9 @@ export const ExamSubjectGradePage = () => {
     },
   ];
 
-  const seriesOptions = Array.isArray(examSeries)
-    ? examSeries.map((item) => ({
+  const seriesOptions =
+    Array.isArray(examSeries) ?
+      examSeries.map((item) => ({
         value: item.seriesId,
         label: item.seriesDesc,
       }))
@@ -161,6 +169,16 @@ export const ExamSubjectGradePage = () => {
       setSelectedGrade(null);
     }
   };
+
+  if (!isLoading && !examSubjDetail) {
+    return (
+      <ResourceNotFound
+        title="Exam Subject Not Found"
+        message={`No exam subject found with ID: ${subjectId}. It may have been deleted or the ID is incorrect.`}
+        backTo="/subjects"
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen">

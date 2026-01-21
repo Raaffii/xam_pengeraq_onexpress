@@ -1,27 +1,30 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useStudents } from "@/hooks/useStudents";
 import { useExamsResult } from "@/hooks/useExamResult";
 import { DataTable } from "@/components/table";
 import PageHeader from "../common/PageHeader";
-import AddExamsGrades from "../modals/addExamGrades";
-import EditExamsGrades from "../modals/editExamGrades";
-import TableHeader from "../common/TableHeader";
 import { useStudentsExamSeries } from "@/hooks/useStudentsExamSeries";
 import Delete_modal from "../modals/Delete_modal";
 import { DetailsInfoCard } from "../common";
+import { ExamResultModal } from "../dashboard";
+import { ExamSeriesFilter } from "../examseries";
+import { usePageTitle } from "@/hooks/usePageTitle";
+import { ResourceNotFound } from "../layout";
+import { CheckCircle2Icon, XCircleIcon } from "lucide-react";
 
 export default function StudentsDetailPage() {
-  const { id } = useParams();
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { studentId } = useParams();
+  const hasFetchedData = useRef(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState("create");
+  const [initialFormValues, setInitialFormValues] = useState({});
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedSeries, setSelectedSeries] = useState("all");
   const [selectedExamsResult, setSelectedExamsResult] = useState();
-  const [searchKeyword, setSearchKeyword] = useState("");
   const { fetchStudentExamSeriesById, studentsExamSeries } =
     useStudentsExamSeries();
-  const { getStudentById, students, isLoading: loadStudent } = useStudents();
+  const { getStudentById, student, isLoading: loadStudent } = useStudents();
   const {
     fetchExamsResult,
     examsResult,
@@ -32,51 +35,44 @@ export default function StudentsDetailPage() {
     onFilterChange,
     deleteExamResult,
     isLoading,
+    postExamResult,
+    putExamResult,
+    isSubmitting,
+    setParams,
+    params,
   } = useExamsResult();
+  usePageTitle(student ? `${student?.studentName}` : "");
 
   useEffect(() => {
+    if (hasFetchedData.current) return;
+    hasFetchedData.current = true;
     const fetchData = async () => {
-      try {
-        const student = await getStudentById(id);
+      const response = await getStudentById(studentId);
 
-        if (!student?.data?.studentId) return;
-        // setParams({ studentId: id });
-        await fetchStudentExamSeriesById(id);
-        await fetchExamsResult({ studentId: student.data.studentId });
-      } catch (error) {
-        console.error("Failed to fetch student data:", error);
+      if (response.success) {
+        setParams((prev) => ({
+          ...prev,
+          studentId: studentId,
+          page: 1,
+        }));
+        await fetchStudentExamSeriesById(studentId);
+        await fetchExamsResult({
+          studentId: studentId,
+          page: 1,
+        });
       }
     };
 
-    if (id) {
+    if (studentId) {
       fetchData();
     }
-  }, [id, getStudentById, fetchStudentExamSeriesById, fetchExamsResult]);
-
-  const loadExamResults = async (examseriesid = null) => {
-    const params = { studentId: id };
-    if (examseriesid && examseriesid !== "all") {
-      params.byExamSeriesId = examseriesid;
-    }
-
-    await onFilterChange(params);
-  };
-
-  const handleSeriesChange = async (value) => {
-    setSelectedSeries(value);
-
-    await loadExamResults(value);
-  };
-
-  const handleSearchChange = (e) => {
-    setSearchKeyword(e.target.value);
-    onSearch(e.target.value);
-  };
-
-  const openEditModal = (examsResult) => {
-    setIsEditModalOpen(true);
-    setSelectedExamsResult(examsResult);
-  };
+  }, [
+    studentId,
+    getStudentById,
+    fetchStudentExamSeriesById,
+    fetchExamsResult,
+    setParams,
+  ]);
 
   const openDeleteModal = (examsResult) => {
     setIsDeleteModalOpen(true);
@@ -84,77 +80,113 @@ export default function StudentsDetailPage() {
   };
 
   const handleExamResultDelete = async () => {
-    await deleteExamResult(selectedExamsResult.examResultsId);
+    await deleteExamResult(selectedExamsResult.resultId);
     setIsDeleteModalOpen(false);
-  };
-
-  const openAddModal = () => {
-    setIsAddModalOpen(true);
   };
 
   const columns = [
     {
       accessorKey: "subjCode",
-      header: <div className='text-left w-full'>Subject Code</div>,
-      cellClassName: "text-left",
+
+      header: "Subject Code",
+      align: "center",
+      cellClassName: "font-semibold",
     },
     {
       accessorKey: "subjDesc",
-      header: <div className='text-left w-full'>Subject</div>,
+      header: "Subject",
+
       cellClassName: "text-left",
     },
     {
       accessorKey: "marks",
-      header: <div className='text-left w-full'>Marks</div>,
-      cellClassName: "text-left",
+
+      header: "Mark",
     },
     {
       accessorKey: "subjGpa",
-      header: <div className='text-left w-full'>GPA</div>,
-      cellClassName: "text-left",
+      header: "GPA",
+      align: "center",
     },
     {
       accessorKey: "subjGrade",
-      header: <div className='text-left w-full'>Grade</div>,
+      header: "Grade",
+      align: "center",
+    },
+    {
+      accessorKey: "subjResult",
+      header: "Result",
       cellClassName: "text-left",
     },
     {
-      accessorKey: "subjResults",
-      header: <div className='text-left w-full'>Rank</div>,
-      cellClassName: "text-left",
-    },
-    {
-      accessorKey: "retake",
-      header: <div className='text-left w-full'>Retake</div>,
-      cellClassName: "text-left",
-      render: (row) => {
-        const isRetake = row.retake === "Yes";
+      accessorKey: "isRetake",
+      header: "Retake",
+      align: "center",
 
+      render: (row) => {
         return (
-          <span
-            className={`px-2 py-0.5 text-xs font-medium rounded-full border
-        ${
-          isRetake
-            ? "bg-red-100 text-red-700 border-red-200"
-            : "bg-green-100 text-green-700 border-green-200"
-        }`}>
-            {isRetake ? "Yes" : "No"}
-          </span>
+          <div className='flex justify-center'>
+            {row.isRetake ? (
+              <CheckCircle2Icon className='text-green-800' />
+            ) : (
+              <XCircleIcon className='text-red-800' />
+            )}
+          </div>
         );
       },
     },
   ];
 
-  console.log("student exam series", studentsExamSeries);
+  const handleFormSubmit = async (formData) => {
+    let result;
+    if (modalMode === "create") {
+      result = await postExamResult(formData);
+    } else {
+      result = await putExamResult(initialFormValues.resultId, formData);
+    }
+
+    if (result.success) {
+      setParams((prev) => ({ ...prev, page: 1 }));
+      await fetchExamsResult();
+
+      setIsModalOpen(false);
+    }
+    return result.success;
+  };
+
+  const options = Array.isArray(studentsExamSeries)
+    ? studentsExamSeries.map((item) => ({
+        value: item.seriesId,
+        label: item.seriesDesc,
+      }))
+    : [];
+
+  if (!loadStudent && !student) {
+    return (
+      <ResourceNotFound
+        title='Student Not Found'
+        message={`No student found with ID: ${studentId}. It may have been deleted or the ID is incorrect.`}
+        backTo='/students'
+      />
+    );
+  }
+
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='mx-auto'>
         <PageHeader
-          title={`Student Details - ${students.studentName || "Loading..."}`}
-          subtitle={`Student ID: ${students.studentIdNo || ""}`}
+          title={`Student Details - ${student?.studentName || "Loading..."}`}
+          subtitle={`Student ID: ${student?.studentIdNo || ""}`}
           primaryAction={{
             label: "Add Grades",
-            onClick: openAddModal,
+            onClick: () => {
+              setModalMode("create");
+              setInitialFormValues({
+                studentId: student?.studentId,
+                studentName: student?.studentName,
+              });
+              setIsModalOpen(true);
+            },
           }}
         />
 
@@ -163,11 +195,11 @@ export default function StudentsDetailPage() {
           fields={[
             {
               label: "Student ID",
-              value: students.studentIdNo,
+              value: student?.studentIdNo,
             },
             {
               label: "Student Name",
-              value: students.studentName,
+              value: student?.studentName,
             },
           ]}
           columnSize={2}
@@ -175,65 +207,67 @@ export default function StudentsDetailPage() {
           className='mb-6'
         />
 
-        <TableHeader
-          search={{
-            enabled: true,
-            placeholder: "Search exam results...",
-            value: searchKeyword,
-            onChange: handleSearchChange,
-          }}
-          filters={[
-            {
-              id: "examSeries",
-              label: "Exam Series",
-              type: "dropdown",
-              value: selectedSeries,
-              onChange: handleSeriesChange,
-              options: [
-                { value: "all", label: "All Exam Series" },
-                ...studentsExamSeries.map((item) => ({
-                  value: item.examSeriesId,
-                  label: item.examSeriesDescription,
-                })),
-              ],
-              hideAllOption: true,
-            },
-          ]}
-        />
+        <PageHeader
+          title=''
+          subtitle=''
+          showSearch={true}
+          searchPlaceholder='Search exam result...'
+          onSearch={onSearch}
+          searchMaxLength={50}>
+          <ExamSeriesFilter
+            data={studentsExamSeries}
+            valueKey='seriesId'
+            labelKey='seriesDesc'
+            filterKey='bySeries'
+            placeholder='Filter by Series'
+            initialFilters={params}
+            onFilterChange={onFilterChange}
+            isLoading={isLoading}
+          />
+        </PageHeader>
 
         <DataTable
           data={examsResult}
           columns={columns}
-          idAccessor='examResultsId'
-          onEdit={openEditModal}
+          idAccessor='resultId'
+          onEdit={(result) => {
+            setModalMode("edit");
+            setInitialFormValues({
+              resultId: result.resultId,
+              studentId: student?.studentId,
+              studentName: student?.studentName,
+              examSeriesId: result.seriesId,
+              seriesDesc: result.seriesDesc,
+              examSubjId: result.subjId,
+              subjDesc: result.subjDesc,
+              isRetake: result.isRetake,
+              marks: Number(result.marks).toFixed(2),
+              subjGpa: Number(result.subjGpa).toFixed(2),
+              subjResult: result.subjResult,
+              subjGrade: result.subjGrade,
+            });
+            setIsModalOpen(true);
+          }}
           onDelete={openDeleteModal}
           onPageChange={onPageChange}
           onSizeChange={onPageSizeChange}
           pagination={pagination}
           isLoading={isLoading}
         />
-
-        {isAddModalOpen && (
-          <AddExamsGrades
-            open={isAddModalOpen}
-            setOpen={setIsAddModalOpen}
-            student={students}
-            fetchExamsResult={fetchExamsResult}
-            selectedExamsResult={selectedExamsResult}
-          />
-        )}
-
-        {isEditModalOpen && (
-          <EditExamsGrades
-            open={isEditModalOpen}
-            setOpen={setIsEditModalOpen}
-            student={students}
-            fetchExamsResult={fetchExamsResult}
-            selectedExamsResult={selectedExamsResult}
-            selectedEdit={selectedExamsResult}
-          />
-        )}
-
+        <ExamResultModal
+          open={isModalOpen}
+          onOpenChange={setIsModalOpen}
+          initialValues={initialFormValues}
+          onSubmit={handleFormSubmit}
+          onSuccessDelete={() => {
+            fetchExamsResult();
+          }}
+          isSubmitting={isSubmitting}
+          mode={modalMode}
+          seriesOptions={options}
+          optionDisabled={modalMode === "edit"}
+          lockStudent={true}
+        />
         {isDeleteModalOpen && selectedExamsResult && (
           <Delete_modal
             open={isDeleteModalOpen}

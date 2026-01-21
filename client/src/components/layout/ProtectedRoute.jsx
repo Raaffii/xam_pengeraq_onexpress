@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/providers/AuthProvider";
-import { UnauthorizedPage } from "../ErrorPage";
+import { UnauthorizedPage } from "./ErrorPage";
 
 export const ProtectedRoute = ({ children, roles = [] }) => {
   const { user, loading } = useAuth();

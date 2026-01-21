@@ -5,10 +5,12 @@ import { SubjectModal } from "@/components/subjects";
 import { DataTable } from "@/components/table";
 import { useExamSeries } from "@/hooks/useExamsSeries";
 import { useExamSubject } from "@/hooks/useExamSubj";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const ExamSubjectPage = () => {
   const hasFetchedData = useRef(false);
+  usePageTitle("Subjects");
   const {
     fetchSubjects,
     onSearch,
@@ -106,8 +108,9 @@ const ExamSubjectPage = () => {
     };
   }, [modalMode, selectedSubj]);
 
-  const seriesOptions = Array.isArray(examSeries)
-    ? examSeries.map((item) => ({
+  const seriesOptions =
+    Array.isArray(examSeries) ?
+      examSeries.map((item) => ({
         value: item.seriesId,
         label: item.seriesDesc,
       }))

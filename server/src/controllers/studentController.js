@@ -35,11 +35,14 @@ const getStudentById = async (req, res) => {
   try {
     const studentId = req.params.id;
     const result = await studentService.getStudentById(studentId);
-    res.status(200).json({
-      data: result.data,
-    });
+    res.status(200).json(result);
   } catch (error) {
     console.error("get student error:", error);
+    if (error.message.includes("not found")) {
+      return res.status(404).json({
+        message: error.message,
+      });
+    }
 
     res.status(500).json({
       success: false,
@@ -75,7 +78,7 @@ const putStudent = async (req, res) => {
     const data = await studentService.putStudent(
       req.params.id,
       req.body,
-      userId
+      userId,
     );
     res.status(200).json(data);
   } catch (error) {

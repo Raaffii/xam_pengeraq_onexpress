@@ -9,11 +9,13 @@ import { useStudents } from "@/hooks/useStudents";
 import AddStudent from "@/components/student/AddStudent";
 import EditStudent from "@/components/student/EditStudent";
 import { useExamSeries } from "@/hooks/useExamsSeries";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const StudentsPage = () => {
   const hasFetchedData = useRef(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  usePageTitle("Students");
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);

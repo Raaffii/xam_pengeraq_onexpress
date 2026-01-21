@@ -2,13 +2,12 @@ import api from "@/utils/api";
 
 import { handleServiceError } from "@/utils/errorHandler";
 
-const BASE_URL = "/api/examresult";
+const BASE_URL = "/api/exam-results";
 
 export const examResultService = {
-  getExamResult: async (params, studentID) => {
-    // const margedData = { data1, data2 };
+  getExamResult: async (params) => {
     try {
-      const response = await api.get(`${BASE_URL}/${studentID}`, {
+      const response = await api.get(BASE_URL, {
         params,
       });
       return response.data;
@@ -26,7 +25,6 @@ export const examResultService = {
   },
 
   putExamResult: async (id, data) => {
-    console.log("dadada", id, data);
     try {
       const response = await api.put(`${BASE_URL}/${id}`, data);
       return response.data;
@@ -37,7 +35,6 @@ export const examResultService = {
 
   deleteExamResult: async (id) => {
     try {
-      console.log("id", id);
       const response = await api.delete(`${BASE_URL}/${id}`);
       return response.data;
     } catch (error) {

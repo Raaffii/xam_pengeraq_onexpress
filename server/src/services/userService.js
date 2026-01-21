@@ -82,6 +82,24 @@ const userService = {
 
     return user;
   },
+
+  async resetPassword(userId, newPassword) {
+    const user = await UserModel.findUserById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+
+    await UserModel.updateUser({
+      userId,
+      hashedPassword: hashedNewPassword,
+      editedBy: userId,
+    });
+
+    return true;
+  },
 };
 
 module.exports = userService;

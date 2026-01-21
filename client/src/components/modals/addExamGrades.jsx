@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useStudentsExamSeries } from "@/hooks/useStudentsExamSeries";
-import { useSubject } from "@/hooks/useSubject";
 import { useSubjectGrade } from "@/hooks/useSubjectGrade";
 import { useExamsResult } from "@/hooks/useExamResult";
 import { useExamSubject } from "@/hooks/useExamSubj";
@@ -22,7 +21,6 @@ export default function AddExamsGrades({
 }) {
   const { fetchStudentExamSeriesById, studentsExamSeries } =
     useStudentsExamSeries();
-  const { fetchSubjectByExamSeriesId, subject } = useSubject();
   const { postExamResult } = useExamsResult();
   const { fetchSubjectGradeByExamSubjectId, subjectGrade } = useSubjectGrade();
   const { fetchSubjects, examSubj } = useExamSubject();
@@ -135,30 +133,32 @@ export default function AddExamsGrades({
     <Modal
       open={open}
       onClose={() => setOpen(false)}
-      title='Add Exam Grades'
-      size='xl'>
+      title="Add Exam Grades"
+      size="xl"
+    >
       <Form
-        cancelText='Cancel'
+        cancelText="Cancel"
         onCancel={() => setOpen(false)}
-        onSubmit={handleSubmit}>
-        <div className='space-y-6'>
+        onSubmit={handleSubmit}
+      >
+        <div className="space-y-6">
           {/* Dropdown Section */}
-          <div className='grid grid-cols-2 gap-4'>
-            <FormField label='Exam Series' required>
+          <div className="grid grid-cols-2 gap-4">
+            <FormField label="Exam Series" required>
               <SearchableDropdown
-                id='examSeries'
-                name='examSeriesId'
+                id="examSeries"
+                name="examSeriesId"
                 options={optionsExamSeries}
                 value={formData.examSeriesId}
-                placeholder='Select exam series...'
+                placeholder="Select exam series..."
                 onChange={handlechange}
               />
             </FormField>
 
-            <FormField label='Subject' required>
+            <FormField label="Subject" required>
               <SearchableDropdown
-                id='subject'
-                name='examSubjId'
+                id="subject"
+                name="examSubjId"
                 options={optionsSubject}
                 value={formData.examSubjId}
                 placeholder={
@@ -173,22 +173,22 @@ export default function AddExamsGrades({
           </div>
 
           {/* Student Info */}
-          <FormField label='Student'>
+          <FormField label="Student">
             <Input
-              type='text'
+              type="text"
               value={student.studentName}
               disabled
-              className='bg-gray-100 text-gray-600'
+              className="bg-gray-100 text-gray-600"
             />
           </FormField>
 
           {/* Marks Input */}
-          <FormField label='Marks' required>
+          <FormField label="Marks" required>
             <Input
-              type='number'
-              name='marks'
-              placeholder='Enter marks (0 - 100)'
-              className='text-lg font-semibold'
+              type="number"
+              name="marks"
+              placeholder="Enter marks (0 - 100)"
+              className="text-lg font-semibold"
               onChange={handlechange}
               max={100}
               min={0}
@@ -196,35 +196,35 @@ export default function AddExamsGrades({
             />
           </FormField>
 
-          <FormField label='Retake'>
-            <label className='flex items-center gap-2'>
+          <FormField label="Retake">
+            <label className="flex items-center gap-2">
               <input
-                type='checkbox'
+                type="checkbox"
                 checked={formData.retake}
                 onChange={handleRetake}
-                className='w-4 h-4'
+                className="w-4 h-4"
                 disabled={!formData.marks}
               />
-              <span className='text-sm'>Retake</span>
+              <span className="text-sm">Retake</span>
             </label>
           </FormField>
 
           {/* Result Summary */}
-          <div className='grid grid-cols-3 gap-4'>
-            <div className='rounded-lg border-2 bg-primaryblue/10 p-4 text-center border-primaryblue'>
-              <p className='text-sm text-gray-500'>Grade</p>
-              <p className='text-3xl font-bold text-primaryblue'>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="rounded-lg border-2 bg-primaryblue/10 p-4 text-center border-primaryblue">
+              <p className="text-sm text-gray-500">Grade</p>
+              <p className="text-3xl font-bold text-primaryblue">
                 {formData?.subjGrade || "-"}
               </p>
             </div>
 
-            <div className='rounded-lg border-2 p-4 text-center'>
-              <p className='text-sm text-gray-500'>GPA</p>
+            <div className="rounded-lg border-2 p-4 text-center">
+              <p className="text-sm text-gray-500">GPA</p>
               {formData?.subjGpa || "-"}
             </div>
 
-            <div className='rounded-lg border-2 p-4 text-center'>
-              <p className='text-sm text-gray-500'>Rank</p>
+            <div className="rounded-lg border-2 p-4 text-center">
+              <p className="text-sm text-gray-500">Rank</p>
               {formData?.subjResults || "-"}
             </div>
           </div>

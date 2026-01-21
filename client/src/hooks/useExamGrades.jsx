@@ -65,7 +65,6 @@ export const useExamGrades = () => {
       setIsSubmitting(true);
       setError(null);
       toastId = toast.loading("Creating new grade...");
-      console.log(data);
       const response = await examGradesService.insertExamGrades(data);
       toast.success("Exam Grade added successfully!", { id: toastId });
 

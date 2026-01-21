@@ -1,25 +1,7 @@
 const ExamResult = require("../models/examResultModel");
 
-const getExamResult = async (
-  page,
-  limit,
-  search,
-  studentId,
-  byExamSeriesId
-) => {
-  try {
-    const result = await ExamResult.getExamResult(
-      page,
-      limit,
-      search,
-      studentId,
-      byExamSeriesId
-    );
-    return result;
-  } catch (error) {
-    console.error("Service error:", error);
-    throw new Error("Failed to get exam result");
-  }
+const getExamResult = async (options = {}) => {
+  return await ExamResult.getExamResult(options);
 };
 const postExamResult = async (data) => {
   try {

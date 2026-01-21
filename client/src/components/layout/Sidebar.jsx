@@ -73,7 +73,7 @@ export const Sidebar = ({ isOpen, setIsOpen }) => {
                   "group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95",
                   isCurrent
                     ? "bg-gray-900 text-white shadow-md border-l-4 border-blue-400"
-                    : "text-gray-300 hover:bg-gray-700 hover:text-white hover:shadow-sm"
+                    : "text-gray-300 hover:bg-gray-700 hover:text-white hover:shadow-sm",
                 )}
                 onClick={() => setIsOpen(false)}>
                 <Icon
@@ -81,7 +81,7 @@ export const Sidebar = ({ isOpen, setIsOpen }) => {
                     "mr-3 flex-shrink-0 h-5 w-5 transition-colors duration-200",
                     isCurrent
                       ? "text-blue-400"
-                      : "text-gray-400 group-hover:text-gray-300"
+                      : "text-gray-400 group-hover:text-gray-300",
                   )}
                   aria-hidden='true'
                 />

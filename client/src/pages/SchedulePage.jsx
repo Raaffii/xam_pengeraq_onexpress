@@ -6,9 +6,13 @@ import { useNavigate } from "react-router-dom";
 import AddSchedule from "@/components/schedule/AddSchedule";
 import EditSchedule from "@/components/schedule/EditSchedule";
 import Delete_modal from "@/components/modals/Delete_modal";
+
 import { Table, Calendar } from "lucide-react";
 
+import { usePageTitle } from "@/hooks/usePageTitle";
+
 export default function SchedulesPages() {
+  usePageTitle("Schedules");
   const {
     fetchClassSchedule,
     deleteClassSchedule,
@@ -169,7 +173,7 @@ export default function SchedulesPages() {
             setOpen={setIsDeleteModalOpen}
             onSubmit={handleScheduleDelete}
             entityData={selectedSchedule}
-            title='Delete Student'
+            title='Delete Schedule'
             confirmationText={`Are you sure you want to delete schedule "${selectedSchedule.classschhdid}"? This action cannot be undone.`}
           />
         )}

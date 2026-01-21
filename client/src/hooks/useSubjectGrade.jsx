@@ -14,10 +14,8 @@ export const useSubjectGrade = () => {
       setIsLoading(true);
       setError(null);
 
-      const response = await subjectGradeService.getSubjectGradeByExamSubj(
-        examSubjtId
-      );
-      console.log("subject grade", response);
+      const response =
+        await subjectGradeService.getSubjectGradeByExamSubj(examSubjtId);
       setSubjectGrade(response.data);
 
       return { success: true, data: response.data };

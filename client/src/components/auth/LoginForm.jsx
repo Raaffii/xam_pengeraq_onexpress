@@ -36,8 +36,8 @@ export const LoginForm = () => {
     if (!password.trim()) {
       return "Password is required";
     }
-    if (password.length < 8) {
-      return "Password must be at least 8 characters";
+    if (password.length < 6) {
+      return "Password must be at least 6 characters";
     }
     return null;
   };
@@ -85,13 +85,11 @@ export const LoginForm = () => {
 
       toast.success("Login Successful!", { id: toastId });
 
-      // if (result.data.user.role === "teacher") {
-      //   console.log("cek teacher");
-      //   navigate("/teacher");
-      // } else if (result.data.user.role === "admin") {
-      //   console.log("cek admin");
-      //   navigate("/");
-      // }
+      if (result.data.user.role === "teacher") {
+        navigate("/teacher/schedule", { replace: true });
+      } else if (result.data.user.role === "admin") {
+        navigate("/", { replace: true });
+      }
     } catch (error) {
       console.error("Login failed:", error);
       const errorMessage =

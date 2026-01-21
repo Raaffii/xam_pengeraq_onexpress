@@ -1,5 +1,4 @@
 const { z } = require("zod");
-const { passwordSchema } = require("./authSchema");
 const { paginationSchema } = require(".");
 
 const studentNameSchema = z
@@ -31,42 +30,27 @@ const updateStudentSchema = z.object({
   examSeriesId: examSeriesIdSchema.optional(),
 });
 
-const studentExamSeriesParamsSchema = z.object({
-  id: z
-    .string("User ID is required")
+const studentIdParamsSchema = z.object({
+  studentId: z
+    .string("Student ID is required")
     .pipe(
       z.coerce
-        .number("Invalid  student ID")
+        .number("Invalid Student ID")
         .int()
-        .positive("Student ID must be a positive number")
+        .positive("Student ID must be a positive number"),
     ),
 });
 
-const fetchStudentsQuerySchema = z
+const fetchStudentExamsQuerySchema = z
   .object({
     searchTerm: z.string().max(100, "Search term too long").trim().optional(),
-    isActive: z
-      .string()
-      .optional()
-      .transform((val) => {
-        if (val === undefined || val === "true" || val === "1") {
-          return true;
-        }
-        if (val === "false" || val === "0") {
-          return false;
-        }
-        if (val === "null" || val === "") {
-          return null;
-        }
-        return true;
-      })
-      .nullable(),
+    bySeries: z.string().max(45, "Series filter too long").trim().optional(),
   })
   .and(paginationSchema);
 
 module.exports = {
   createStudentSchema,
   updateStudentSchema,
-  studentExamSeriesParamsSchema,
-  fetchStudentsQuerySchema,
+  studentIdParamsSchema,
+  fetchStudentExamsQuerySchema,
 };

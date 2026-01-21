@@ -60,7 +60,7 @@ const ExamModel = {
     const { examName, examDesc, enteredBy } = data;
     try {
       const sql =
-        "INSERT INTO exam (examname, examdescription, createdBy) VALUES (?, ?, ?)";
+        "INSERT INTO exam (examname, examdescription, createdby) VALUES (?, ?, ?)";
       const [result] = await pool.execute(sql, [examName, examDesc, enteredBy]);
       return result;
     } catch (err) {

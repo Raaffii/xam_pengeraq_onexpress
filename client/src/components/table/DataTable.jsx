@@ -177,6 +177,16 @@ export const DataTable = ({
     }
   };
 
+  const renderHeaderContent = (column) => {
+    if (typeof column.header === "function") {
+      return column.header();
+    }
+    if (typeof column.header === "object" && column.header !== null) {
+      return column.header;
+    }
+    return column.header;
+  };
+
   return (
     <div className={`w-full ${className}`}>
       <div className='rounded-sm border shadow-sm overflow-hidden'>
@@ -191,7 +201,7 @@ export const DataTable = ({
                       column.align,
                     )} ${column.headerClassName || ""}`}
                     style={{ width: column.width }}>
-                    {column.header}
+                    {renderHeaderContent(column)}
                   </TableHead>
                 ))}
 
@@ -214,13 +224,18 @@ export const DataTable = ({
                         <LoadingSkeleton />
                       </TableCell>
                     ))}
+                    {showActions && (
+                      <TableCell className='p-4'>
+                        <LoadingSkeleton />
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))
               ) : data.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={processedColumns.length}
-                    className='h-24 text-center text-muted-foreground p-4'>
+                    colSpan={processedColumns.length + (showActions ? 1 : 0)}
+                    className='h-24 md:text-center text-muted-foreground p-4'>
                     No data available
                   </TableCell>
                 </TableRow>
@@ -385,26 +400,52 @@ export const DataTable = ({
 };
 
 DataTable.propTypes = {
-  columns: PropTypes.array,
+  columns: PropTypes.arrayOf(
+    PropTypes.shape({
+      header: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.node,
+        PropTypes.func,
+      ]),
+      accessorKey: PropTypes.string,
+      width: PropTypes.string,
+      align: PropTypes.oneOf(["left", "center", "right"]),
+      headerClassName: PropTypes.string,
+      cellClassName: PropTypes.string,
+      cell: PropTypes.func,
+      render: PropTypes.func,
+    }),
+  ),
   data: PropTypes.array,
-  showNumber: PropTypes.bool,
-  pagination: PropTypes.object,
+  pagination: PropTypes.shape({
+    currentPage: PropTypes.number,
+    totalPages: PropTypes.number,
+    totalItems: PropTypes.number,
+    pageSize: PropTypes.number,
+  }),
   onPageChange: PropTypes.func,
   onSizeChange: PropTypes.func,
+  pageSizeOptions: PropTypes.arrayOf(PropTypes.number),
   showPagination: PropTypes.bool,
-  pageSizeOptions: PropTypes.array,
+  showNumber: PropTypes.bool,
   isLoading: PropTypes.bool,
   className: PropTypes.string,
   selectable: PropTypes.bool,
   selectedRows: PropTypes.array,
-  additionalActions: PropTypes.array,
   onSelectRow: PropTypes.func,
   onSelectAll: PropTypes.func,
   rowIdKey: PropTypes.string,
+  showActions: PropTypes.bool,
   detailPage: PropTypes.string,
+  idAccessor: PropTypes.string,
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
-  showActions: PropTypes.bool,
-  idAccessor: PropTypes.oneOfType([PropTypes.string, PropTypes.func])
-    .isRequired,
+  additionalActions: PropTypes.arrayOf(
+    PropTypes.shape({
+      icon: PropTypes.node,
+      onClick: PropTypes.func,
+      title: PropTypes.string,
+      className: PropTypes.string,
+    }),
+  ),
 };

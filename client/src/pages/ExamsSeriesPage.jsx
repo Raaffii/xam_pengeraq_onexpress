@@ -5,6 +5,7 @@ import Delete_modal from "@/components/modals/Delete_modal";
 import { useExams } from "@/hooks/useExams";
 import { useExamSeries } from "@/hooks/useExamsSeries";
 import { ExamSeriesFilter, SeriesModal } from "@/components/examseries";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const ExamsSeriesPage = () => {
   const hasFetchedData = useRef(false);
@@ -13,6 +14,7 @@ const ExamsSeriesPage = () => {
   const [selectedSeries, setSelectedSeries] = useState(null);
   const [modalMode, setModalMode] = useState("create");
   const [initialFormValues, setInitialFormValues] = useState({});
+  usePageTitle("Series");
 
   const { fetchExams, exams, isLoading: examLoad } = useExams();
 
@@ -130,8 +132,9 @@ const ExamsSeriesPage = () => {
     },
   ];
 
-  const examOptions = Array.isArray(exams)
-    ? exams.map((item) => ({
+  const examOptions =
+    Array.isArray(exams) ?
+      exams.map((item) => ({
         value: item.examId,
         label: item.examName,
       }))

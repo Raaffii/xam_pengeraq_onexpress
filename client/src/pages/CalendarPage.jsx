@@ -9,8 +9,11 @@ import { Calendar as Cldr, Table } from "lucide-react";
 import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
 import { useEffect } from "react";
 import CalendarDetailPage from "@/components/calendar/CalendarDetailPage";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export default function CalendarPage() {
+  usePageTitle("Calendar");
+
   const locales = {
     "en-US": enUS,
   };

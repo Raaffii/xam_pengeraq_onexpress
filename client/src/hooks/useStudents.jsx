@@ -3,6 +3,7 @@ import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
 export const useStudents = () => {
   const [students, setStudents] = useState([]);
+  const [student, setStudent] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -66,14 +67,13 @@ export const useStudents = () => {
 
       const response = await studentService.getStudentsById(studentId);
 
-      setStudents(response.data);
+      setStudent(response.data);
 
       return { success: true, data: response.data };
     } catch (err) {
       console.error("Error fetching Student:", err);
 
       setError(err.message);
-      setStudents([]);
 
       return { success: false, error: err.message };
     } finally {
@@ -192,5 +192,7 @@ export const useStudents = () => {
     pagination,
     params,
     setParams,
+    student,
+    setStudent,
   };
 };

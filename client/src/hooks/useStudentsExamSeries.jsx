@@ -1,10 +1,9 @@
 import { studentsExamSeriesService } from "@/services/studentsExamSeriesService";
 import { useState, useCallback } from "react";
-// import toast from "react-hot-toast";
+
 export const useStudentsExamSeries = () => {
   const [studentsExamSeries, setStudentsExamSeries] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  //   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
   const [pagination, setPagination] = useState({
@@ -13,7 +12,7 @@ export const useStudentsExamSeries = () => {
     totalPage: 1,
     totalItem: 0,
   });
-  const [params, setParams] = useState({ page: 1, limit: 10 });
+  const [params, setParams] = useState({ pageSize: 10 });
 
   const formatStudentrData = useCallback((rawStudent) => {
     return rawStudent.map((item) => ({
@@ -32,7 +31,7 @@ export const useStudentsExamSeries = () => {
           ...finalParams,
         };
         const response = await studentsExamSeriesService.getStudentsExam(
-          apiParams
+          apiParams,
         );
         const data = formatStudentrData(response.data);
 
@@ -43,7 +42,7 @@ export const useStudentsExamSeries = () => {
             pageSize: 10,
             totalPages: 1,
             totalItems: 0,
-          }
+          },
         );
 
         return { success: true, data: data };
@@ -58,7 +57,7 @@ export const useStudentsExamSeries = () => {
         setIsLoading(false);
       }
     },
-    [params, formatStudentrData]
+    [params, formatStudentrData],
   );
 
   const fetchStudentExamSeriesById = useCallback(async (studentId) => {
@@ -91,7 +90,7 @@ export const useStudentsExamSeries = () => {
 
       return await fetchStudentsExamSeries({ searchTerm, page: 1 });
     },
-    [fetchStudentsExamSeries, setParams, params]
+    [fetchStudentsExamSeries, setParams, params],
   );
 
   const onPageChange = useCallback(
@@ -101,17 +100,34 @@ export const useStudentsExamSeries = () => {
       setParams(newParams);
       return await fetchStudentsExamSeries({ page });
     },
-    [params, fetchStudentsExamSeries]
+    [params, fetchStudentsExamSeries],
   );
 
   const onPageSizeChange = useCallback(
-    async (limit) => {
-      const newParams = { ...params, limit, page: 1 };
+    async (pageSize) => {
+      const newParams = { ...params, pageSize, page: 1 };
       setParams(newParams);
-      return await fetchStudentsExamSeries({ limit, page: 1 });
+      return await fetchStudentsExamSeries({ pageSize, page: 1 });
     },
-    [params, fetchStudentsExamSeries]
+    [params, fetchStudentsExamSeries],
   );
+
+  const onFilterChange = useCallback(
+    async (filters) => {
+      const newParams = {
+        ...params,
+        bySeries: filters.bySeries || null,
+        page: 1,
+      };
+      setParams(newParams);
+      return await fetchStudentsExamSeries({
+        bySeries: filters.bySeries || null,
+        page: 1,
+      });
+    },
+    [params, fetchStudentsExamSeries],
+  );
+
   return {
     fetchStudentsExamSeries,
     onPageChange,
@@ -124,5 +140,6 @@ export const useStudentsExamSeries = () => {
     pagination,
     params,
     setParams,
+    onFilterChange,
   };
 };

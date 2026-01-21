@@ -1,10 +1,5 @@
-import { ProtectedRoute } from "../components/layout/ProtectedRoute";
-import { NotFoundPage } from "../components/ErrorPage";
-import { PublicRoute } from "@/components/layout/PublicRoute";
-import LoginPage from "@/pages/LoginPage";
 import Layout from "@/components/layout/Layout";
 import DashboardPage from "@/pages/DashboardPage";
-import ProfilePage from "@/pages/ProfilePage";
 import StudentsPage from "@/pages/StudentsPage";
 import StudentsDetailPage from "@/components/student/StudentsDetailPage";
 import ExamsPage from "@/pages/ExamsPage";
@@ -18,9 +13,14 @@ import TeacherSchedulesPages from "@/pages/TeacherSchedulePage";
 import CalendarPage from "@/pages/CalendarPage";
 import ScheduleDetailPage from "@/components/schedule/ScheduleDetailPage";
 import { ExamSubjectGradePage } from "@/components/subjects";
+
 import TeacherCalendarPage from "@/pages/TeacherCalendarPage";
 import TeacherScheduleDetailPage from "@/components/teacher/teacherScheduleDetailPage";
 import ClassAttendancePage from "@/pages/ClassAtendancePage";
+
+import { publicRoutes } from "./publicRoutes";
+import TranscriptsPage from "@/pages/TranscriptsPage";
+import { NotFoundPage, ProtectedRoute } from "@/components/layout";
 
 const teacherPrivateRoutes = {
   path: "/teacher",
@@ -30,7 +30,6 @@ const teacherPrivateRoutes = {
     </ProtectedRoute>
   ),
   children: [
-    { index: true, element: <DashboardPage /> },
     { path: "schedule", element: <TeacherSchedulesPages /> },
     { path: "scheduledetail/:id", element: <TeacherScheduleDetailPage /> },
     { path: "schedule/calendar", element: <TeacherCalendarPage /> },
@@ -41,14 +40,12 @@ const teacherPrivateRoutes = {
 const adminPrivateRoutes = {
   path: "/",
   element: (
-    <ProtectedRoute roles={["admin", "teacher"]}>
+    <ProtectedRoute roles={["admin"]}>
       <Layout />
     </ProtectedRoute>
   ),
   children: [
-    { index: true, element: <DashboardPage /> },
     { path: "dashboard", element: <DashboardPage /> },
-    { path: "profile", element: <ProfilePage /> },
     { path: "exams", element: <ExamsPage /> },
     { path: "exams/:id", element: <ExamDetailPage /> },
     { path: "series", element: <ExamsSeriesPage /> },
@@ -56,31 +53,29 @@ const adminPrivateRoutes = {
     { path: "subjects", element: <ExamSubjectPage /> },
     { path: "subjects/:subjectId", element: <ExamSubjectGradePage /> },
     { path: "students", element: <StudentsPage /> },
-    { path: "students/:id", element: <StudentsDetailPage /> },
+    { path: "students/:studentId", element: <StudentsDetailPage /> },
     { path: "users", element: <UsersPage /> },
     { path: "schedule", element: <SchedulesPages /> },
     { path: "schedule/:id", element: <ScheduleDetailPage /> },
     { path: "schedule/calendar", element: <CalendarPage /> },
-    { path: "schedule", element: <SchedulesPages /> },
-    { path: "schedule/:id", element: <ScheduleDetailPage /> },
-    { path: "schedule/calendar", element: <CalendarPage /> },
+    { path: "transcripts", element: <TranscriptsPage /> },
   ],
 };
 
-const publicRoutes = [
-  {
-    path: "/login",
-    element: (
-      <PublicRoute>
-        <LoginPage />
-      </PublicRoute>
-    ),
-  },
-];
+const adminAndTeacherRoute = {
+  path: "/",
+  element: (
+    <ProtectedRoute roles={["admin", "teacher"]}>
+      <Layout />
+    </ProtectedRoute>
+  ),
+  children: [{ index: true, element: <DashboardPage /> }],
+};
 
 export const routes = [
   ...publicRoutes,
   teacherPrivateRoutes,
   adminPrivateRoutes,
+  adminAndTeacherRoute,
   { path: "*", element: <NotFoundPage /> },
 ];

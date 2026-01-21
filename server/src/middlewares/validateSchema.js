@@ -10,7 +10,6 @@ const validate = (schema, target = "body") => {
 
       next();
     } catch (error) {
-      console.error(error);
       if (error instanceof ZodError) {
         const formattedErrors = (error.issues || []).map((err) => ({
           field: err.path.join("."),
@@ -56,7 +55,7 @@ const validateMultiple = (schemas) => {
                 field: err.path.join("."),
                 message: err.message,
                 code: err.code,
-              }))
+              })),
             );
           }
         }
@@ -73,7 +72,7 @@ const validateMultiple = (schemas) => {
                 field: err.path.join("."),
                 message: err.message,
                 code: err.code,
-              }))
+              })),
             );
           }
         }
@@ -90,7 +89,7 @@ const validateMultiple = (schemas) => {
                 field: err.path.join("."),
                 message: err.message,
                 code: err.code,
-              }))
+              })),
             );
           }
         }

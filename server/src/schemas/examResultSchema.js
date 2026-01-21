@@ -1,5 +1,4 @@
 const { z } = require("zod");
-const { passwordSchema } = require("./authSchema");
 const { paginationSchema } = require(".");
 
 const ExamNameSchema = z
@@ -20,23 +19,33 @@ const examSubjIdScehma = z
   .nullable();
 
 const marksSchema = z
-  .number()
-  .min(0, "Marks must be at least 0")
-  .max(100, "Marks must be at most 100");
+  .string("Mark is required")
+  .regex(/^\d+\.\d{1,2}$/, "Mark must be in format XX.X or XX.XX")
+  .transform((val) => parseFloat(val).toFixed(2))
+  .refine(
+    (val) => parseFloat(val) >= 0 && parseFloat(val) <= 100,
+    "Mark must be between 0.00 and 100.00",
+  );
 
 const subjGpaSchema = z
-  .string("Subject GPA is required")
-  .max(50, "Subject GPA no must not exceed 4 characters")
-  .trim(); /// console.log just for testing changeitu to number ************
+  .string("GPA is required")
+  .regex(/^\d+\.\d{1,2}$/, "GPA must be in format X.X or X.XX")
+  .transform((val) => parseFloat(val).toFixed(2))
+  .refine(
+    (val) => parseFloat(val) >= 0 && parseFloat(val) <= 4,
+    "GPA must be between 0.00 and 4.00",
+  );
 
 const subjGradeSchema = z
-  .string("Subject Grade Id No is required")
-  .max(50, "Subject Grade no must not exceed 50 characters")
+  .string("Grade letter is required")
+  .min(1, "Grade letter is required")
+  .max(2, "Grade letter must not exceed 2 characters")
   .trim();
 
 const subjResultSchema = z
-  .string("Subject Result is required")
-  .max(50, "Subject Result must not exceed 50 characters")
+  .string("Result is required")
+  .min(1, "Result is required")
+  .max(20, "Result must not exceed 20 characters")
   .trim();
 
 const studentSchema = z
@@ -44,30 +53,35 @@ const studentSchema = z
   .positive("Exam Student ID must be positive")
   .nullable();
 
-const retakeSchema = z
-  .number()
-  .int("Retake must be an integer")
-  .min(0, "Retake must be 0 or 1")
-  .max(1, "Retake must be 0 or 1");
+const retakeSchema = z.coerce
+  .string()
+  .default("false")
+  .transform((val) => val === "true" || val === "1")
+  .pipe(z.boolean());
 
 const createExamResultSchema = z.object({
   examSeriesId: examSeriesIdSchema,
   examSubjId: examSubjIdScehma,
   marks: marksSchema,
-  retake: retakeSchema,
+  isRetake: retakeSchema,
   studentId: studentSchema,
   subjGpa: subjGpaSchema,
   subjGrade: subjGradeSchema,
-  subjResults: subjResultSchema,
+  subjResult: subjResultSchema,
 });
 
-const updateExamSchema = z.object({
-  marks: marksSchema.optional(),
-  subjGpa: subjGpaSchema.optional(),
-  subjGrade: subjGradeSchema.optional(),
-  retake: retakeSchema.optional(),
-  subjResults: subjResultSchema.optional(),
-});
+const updateExamSchema = z
+  .object({
+    marks: marksSchema.optional(),
+    subjGpa: subjGpaSchema.optional(),
+    subjGrade: subjGradeSchema.optional(),
+    isRetake: retakeSchema.optional(),
+    subjResult: subjResultSchema.optional(),
+  })
+  .refine(
+    (data) => Object.keys(data).length > 0,
+    "At least one field must be provided",
+  );
 
 const idParamsSchema = z.object({
   id: z
@@ -76,29 +90,19 @@ const idParamsSchema = z.object({
       z.coerce
         .number("Invalid  Exam ID")
         .int()
-        .positive("Exam Result ID must be a positive number")
+        .positive("Exam Result ID must be a positive number"),
     ),
 });
 
 const fetchExamsResultQuerySchema = z
   .object({
-    search: z.string().max(100, "Search term too long").trim().optional(),
-    isActive: z
+    searchTerm: z.string().max(100, "Search term too long").trim().optional(),
+    studentId: z.string().max(45, "Series filter too long").trim().optional(),
+    byExamSeriesId: z
       .string()
-      .optional()
-      .transform((val) => {
-        if (val === undefined || val === "true" || val === "1") {
-          return true;
-        }
-        if (val === "false" || val === "0") {
-          return false;
-        }
-        if (val === "null" || val === "") {
-          return null;
-        }
-        return true;
-      })
-      .nullable(),
+      .max(45, "Series filter too long")
+      .trim()
+      .optional(),
   })
   .and(paginationSchema);
 

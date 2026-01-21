@@ -17,10 +17,12 @@ export const UserFilter = ({ onFilterChange, initialFilters = {} }) => {
     }
   }, [initialFilters.byRole]);
 
-  const handleFilterChange = (key, value) => {
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+
     const newFilters = {
       ...filters,
-      [key]: value,
+      [name]: value,
     };
 
     setFilters(newFilters);
@@ -40,8 +42,10 @@ export const UserFilter = ({ onFilterChange, initialFilters = {} }) => {
     <div className="flex items-center gap-2">
       <div className="w-full md:min-w-[200px] md:w-auto">
         <SearchableDropdown
+          id={"byRole"}
+          name={"byRole"}
           value={filters.byRole}
-          onChange={(value) => handleFilterChange("byRole", value)}
+          onChange={handleFilterChange}
           options={[
             { value: "admin", label: "Admin" },
             { value: "teacher", label: "Teacher" },

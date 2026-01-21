@@ -144,7 +144,11 @@ const subjGradeService = {
       effectiveScore = 50;
     }
 
-    const grade = await SubjGradeModel.getGradeForScore(subjId, effectiveScore);
+    const grade = await SubjGradeModel.getGradeWithFallback(
+      subjId,
+      effectiveScore,
+    );
+
     if (!grade) {
       throw new Error("No grade found for this score");
     }
@@ -235,9 +239,8 @@ const subjGradeService = {
       const cleanupDetails = [];
 
       for (const dup of duplicates) {
-        const gradeIds = dup.gradeIds
-          ? dup.gradeIds.split(",").map(Number)
-          : [];
+        const gradeIds =
+          dup.gradeIds ? dup.gradeIds.split(",").map(Number) : [];
 
         if (gradeIds.length > 1) {
           const [keepId, ...deleteIds] = gradeIds;
@@ -331,9 +334,9 @@ const subjGradeService = {
     const groupedBySeries = Object.values(bySeries);
 
     const percentageWithoutGrades =
-      totalActiveSubjects > 0
-        ? ((subjects.length / totalActiveSubjects) * 100).toFixed(2)
-        : 0;
+      totalActiveSubjects > 0 ?
+        ((subjects.length / totalActiveSubjects) * 100).toFixed(2)
+      : 0;
 
     return {
       count: subjects.length,

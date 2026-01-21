@@ -176,7 +176,7 @@ export default function ScheduleDetailPage() {
 
   const handleChange = async (val) => {
     setValue(val);
-    if (val == "selected") {
+    if (val.target.value == "selected") {
       await fetchStudents({ enrolledClass: id, enrolledSelected: "SELECTED" });
     } else {
       await fetchStudents({
