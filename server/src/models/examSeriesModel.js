@@ -7,7 +7,7 @@ const SeriesModel = {
 
     if (searchTerm) {
       conditions.push(
-        "(LOWER(es.examseriesdescription) LIKE ? OR LOWER(e.examname) LIKE ?)"
+        "(LOWER(es.examseriesdescription) LIKE ? OR LOWER(e.examname) LIKE ?)",
       );
       const searchValue = `%${searchTerm}%`;
       params.push(searchValue, searchValue);
@@ -39,7 +39,10 @@ const SeriesModel = {
       LEFT JOIN exam e ON es.examid = e.examid   
       ${whereClause}
       ORDER BY es.createddate DESC
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/second
     `;
 
     const queryParams = [...params];

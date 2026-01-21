@@ -102,22 +102,30 @@ const ExamsSeriesPage = () => {
     },
     {
       accessorKey: "seriesDesc",
+
       header: <div className='text-left w-full'>Description</div>,
+
       cellClassName: "text-left",
     },
     {
       accessorKey: "seriesStartDate",
+
       header: <div className='text-left w-full'>Start Date</div>,
+
       cellClassName: "text-left",
     },
     {
       accessorKey: "seriesEndDate",
+
       header: <div className='text-left w-full'>End Date</div>,
+
       cellClassName: "text-left",
     },
     {
       accessorKey: "seriesCredit",
+
       header: <div className='text-left w-full'>Credits</div>,
+
       cellClassName: "text-left",
     },
   ];

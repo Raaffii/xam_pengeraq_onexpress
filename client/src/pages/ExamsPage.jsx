@@ -56,7 +56,9 @@ const ExamsPage = () => {
     },
     {
       accessorKey: "examDesc",
+
       header: <div className='text-left w-full'>Description</div>,
+
       cellClassName: "text-left",
     },
   ];

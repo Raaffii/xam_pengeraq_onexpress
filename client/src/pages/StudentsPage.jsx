@@ -96,9 +96,9 @@ const StudentsPage = () => {
       cellClassName: "text-left",
       render: (row) => (
         <div className='flex flex-wrap gap-1'>
-          {row.examSeries?.map((item, index) => (
+          {row.examSeries?.map((item) => (
             <span
-              key={index}
+              key={item.examSeriesId}
               className='px-2 py-0.5 text-xs rounded-full
                    bg-blue-50 text-blue-700 border border-blue-200'>
               {item.examSeriesDescription}
