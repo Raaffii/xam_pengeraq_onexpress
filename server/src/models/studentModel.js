@@ -28,17 +28,12 @@ const getStudent = async (page, limit, searchTerm = "", filter = {}) => {
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
   const studentIdQuery = `
-    SELECT s.studentid
-     FROM students s
-    LEFT JOIN studentexamseries se
-      ON s.studentid = se.studentid
-    LEFT JOIN examseries es
-      ON se.examseriesid = es.examseriesid
-    LEFT JOIN studentclass sc
-      ON s.studentid = sc.studentid
-   
-    ${whereClause}
-    LIMIT ? OFFSET ?
+  SELECT DISTINCT s.studentid
+  FROM students s
+  LEFT JOIN studentclass sc
+  ON s.studentid = sc.studentid
+  ${whereClause}
+  LIMIT ? OFFSET ?
   `;
 
   const [studentIds] = await pool.query(studentIdQuery, [
@@ -98,17 +93,32 @@ const getStudent = async (page, limit, searchTerm = "", filter = {}) => {
     }
 
     if (row.examSeriesId) {
-      map.get(row.studentId).examSeries.push({
-        examSeriesId: row.examSeriesId,
-        examSeriesDescription: row.examSeriesDescription,
-      });
-    }
+      const student = map.get(row.studentId);
 
+      const isExist = student.examSeries.some(
+        (item) => item.examSeriesId === row.examSeriesId,
+      );
+
+      if (!isExist) {
+        student.examSeries.push({
+          examSeriesId: row.examSeriesId,
+          examSeriesDescription: row.examSeriesDescription,
+        });
+      }
+    }
     if (row.studentClassId) {
-      map.get(row.studentId).studentClass.push({
-        classSchedule: row.classSchedule,
-        classStudent: row.classStudent,
-      });
+      const student = map.get(row.studentId);
+
+      const isExist = student.studentClass.some(
+        (item) => item.classSchedule === row.classSchedule,
+      );
+
+      if (!isExist) {
+        student.studentClass.push({
+          classSchedule: row.classSchedule,
+          classStudent: row.classStudent,
+        });
+      }
     }
   });
 

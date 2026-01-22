@@ -20,8 +20,15 @@ export default function ScheduleDetailPage() {
   const [curentEnroled, setCurentEnroled] = useState([]);
   const [value, setValue] = useState();
 
-  const { fetchStudentClass, assignStudentClass, studenctClass, pagination } =
-    useStudentClass();
+  const {
+    fetchStudentClass,
+    assignStudentClass,
+    studenctClass,
+    pagination,
+    onPageChange,
+    onPageSizeChange,
+    onFilterChange: fetchWithParamsChange,
+  } = useStudentClass();
 
   const { getClassScheduleById, classSchedule } = useClassSchedule();
 
@@ -29,19 +36,19 @@ export default function ScheduleDetailPage() {
     fetchStudents,
     students,
     pagination: paginationStudents,
-    onPageChange,
-    onPageSizeChange,
-    onSearch,
+    onPageChange: onPageChangeStudents,
+    onPageSizeChange: onPageSizeChangeStudents,
+    onSearch: onSearchStudents,
   } = useStudents();
 
   useEffect(() => {
     const fetchData = async () => {
-      await fetchStudentClass({ schedule: id });
+      await fetchWithParamsChange({ schedule: id });
       await getClassScheduleById(id);
     };
 
     fetchData();
-  }, [fetchStudentClass, id, getClassScheduleById]);
+  }, []);
 
   useEffect(() => {
     if (!students?.length) return;
@@ -71,6 +78,25 @@ export default function ScheduleDetailPage() {
       accessorKey: "enteredDate",
       header: <div className='text-left w-full'>Entered Datetime</div>,
       cellClassName: "text-left",
+    },
+    {
+      accessorKey: "attendancePercentage",
+      header: <div className='text-center w-full'>Attendance</div>,
+      cellClassName: "text-left",
+      render: (row) => (
+        <div className='flex w-full justify-center'>
+          <span
+            className={`px-3 py-1 text-sm font-semibold rounded-full border
+      ${
+        row.attendancePercentage == 0
+          ? "bg-red-100 text-red-700 border-red-300"
+          : "bg-blue-100 text-blue-700 border-blue-300"
+      }
+    `}>
+            {row.attendancePercentage}%
+          </span>
+        </div>
+      ),
     },
   ];
 
@@ -111,7 +137,7 @@ export default function ScheduleDetailPage() {
     } else {
       setEnrolledMode(bool);
       const result = await fetchStudents();
-      console.log("result", result);
+
       const array = result.data.flatMap((student) =>
         student.studentClass.flatMap((sc) =>
           id == sc.classSchedule ? [sc.classStudent] : [],
@@ -193,7 +219,7 @@ export default function ScheduleDetailPage() {
           title={`Class Details - ${classSchedule?.subjDesc || "Loading..."}`}
           subtitle={`teacher: ${classSchedule?.teacherName || ""}`}
           showSearch={true}
-          onSearch={onSearch}
+          onSearch={onSearchStudents}
           actions2={actions}
         />
 
@@ -204,6 +230,8 @@ export default function ScheduleDetailPage() {
             idAccessor='studentClassId'
             pagination={pagination}
             showActions={false}
+            onPageChange={onPageChange}
+            onSizeChange={onPageSizeChange}
           />
         ) : (
           <>
@@ -251,8 +279,8 @@ export default function ScheduleDetailPage() {
                 selectedRows={selectedRows}
                 onSelectRow={handleSelectRow}
                 showActions={false}
-                onPageChange={onPageChange}
-                onSizeChange={onPageSizeChange}
+                onPageChange={onPageChangeStudents}
+                onSizeChange={onPageSizeChangeStudents}
               />
             </div>
           </>

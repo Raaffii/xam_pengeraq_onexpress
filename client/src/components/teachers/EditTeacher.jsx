@@ -109,7 +109,7 @@ export default function EditTeacher({
         </label>
         {addAccount && (
           <>
-            <FormField label='Password'>
+            <FormField label='Username'>
               <Input
                 type='text'
                 className='bg-gray-100 text-gray-600'
@@ -128,6 +128,9 @@ export default function EditTeacher({
                   name='password'
                   onChange={handleInputChange}
                 />
+                <p className='text-xs text-gray-500 mt-1'>
+                  Leave empty if you don’t want to change password
+                </p>
               </FormField>
 
               <FormField label='Confirm Password'>

@@ -53,7 +53,8 @@ const getTeacherById = async (req, res) => {
 
 const postTeacher = async (req, res) => {
   try {
-    const dataId = await teacherService.postTeacher(req.body);
+    const data = { ...req.body, createdBy: req.user.userId };
+    const dataId = await teacherService.postTeacher(data);
 
     const accountAdd = req.body.addAccount;
     const teacherData = req.body;
@@ -87,7 +88,8 @@ const putTeacher = async (req, res) => {
   try {
     const id = req.params.id;
 
-    const data = await teacherService.putTeacher(req.body, id);
+    const inputData = { ...req.body, editedBy: req.user.userId };
+    const data = await teacherService.putTeacher(inputData, id);
 
     const accountAdd = req.body.addAccount;
     const teacherData = req.body;
@@ -126,9 +128,10 @@ const putTeacher = async (req, res) => {
 const deleteTeacher = async (req, res) => {
   try {
     const id = req.params.id;
-    await userService.teacherIdToNull(id);
     const data = await teacherService.deleteTeacher(id);
-
+    if (data) {
+      await userService.teacherIdToNull(id);
+    }
     res.status(200).json(data);
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {
@@ -136,6 +139,13 @@ const deleteTeacher = async (req, res) => {
         message: "Duplicate entry",
       });
     }
+    if (error.code === "ER_ROW_IS_REFERENCED_2") {
+      return res.status(400).json({
+        message:
+          "Cannot delete teacher because it is linked to an existing schedule.",
+      });
+    }
+
     res.status(500).json({
       message: "Failed to create setup",
       error: error.message,

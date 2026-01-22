@@ -10,6 +10,8 @@ const getClassAttendance = async (
   limit = Number(limit) || 10;
   const offset = (page - 1) * limit;
 
+  console.log(page, limit, searchTerm);
+
   // const searchValue = `%${searchTerm}%`;
   const { classSchDetailsId } = filter;
 
@@ -26,15 +28,6 @@ const getClassAttendance = async (
     conditions.push("csd.classschdetailsid=?");
     params.push(classSchDetailsId);
   }
-
-  // if (attend) { for filter
-  //   if (attend == "ATTEND") {
-  //     conditions.push("sa.attend IS NULL");
-  //   } else if (attend == "NOT_ATTEND") {
-  //     conditions.push("sa.attend IS NOT NULL");
-  //   } else {
-  //   }
-  // }
 
   const whereClause =
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
@@ -59,10 +52,9 @@ const getClassAttendance = async (
 
   const queryParams = [...params];
 
-  if (page) {
-    const offset = (page - 1) * page;
+  if (page && limit) {
     query += ` LIMIT ? OFFSET ?`;
-    queryParams.push(String(limit), String(offset));
+    queryParams.push(limit, offset);
   }
 
   const [rows] = await pool.execute(query, queryParams);

@@ -32,7 +32,7 @@ router.post("/", validateBody(createStudentSchema), postStudent);
 router.put(
   "/:id",
   validateMultiple({ params: idParamsSchema, body: updateStudentSchema }),
-  putStudent
+  putStudent,
 );
 router.delete("/:id", validateParams(idParamsSchema), deleteStudent);
 

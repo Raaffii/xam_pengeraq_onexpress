@@ -13,8 +13,14 @@ export default function ClassAttendancePage() {
   const hasFetchedData = useRef(false);
   const navigate = useNavigate();
 
-  const { fetchClassAttendance, classAttendance, pagination, onSearch } =
-    useClassAttendance();
+  const {
+    fetchClassAttendance,
+    classAttendance,
+    pagination,
+    onSearch,
+    onPageChange,
+    onPageSizeChange,
+  } = useClassAttendance();
 
   const { fetchClassScheduleDetailById, classScheduleDetail } =
     useClassScheduleDetail();
@@ -24,7 +30,6 @@ export default function ClassAttendancePage() {
     const fetchData = async () => {
       await fetchClassAttendance({ classSchDetailsId: id });
       await fetchClassScheduleDetailById(id);
-      //   await handleEvent(result.data);
     };
 
     fetchData();
@@ -43,7 +48,7 @@ export default function ClassAttendancePage() {
     },
 
     {
-      header: <div className='text-left w-full'>Teacher Name</div>,
+      header: <div className='text-left w-full'>Status</div>,
       cellClassName: "text-left",
       render: (row) => (
         <div className='flex flex-wrap gap-1'>
@@ -64,7 +69,9 @@ export default function ClassAttendancePage() {
       cellClassName: "text-center",
       render: (row) => (
         <div className='flex flex-wrap gap-1 w-full items-center justify-center'>
-          <span>{row.checkInDateTime ? row.checkInDateTime : "-"}</span>
+          <span>
+            {row.checkInDateTime ? row.checkInDateTime : "No-Checkin"}
+          </span>
         </div>
       ),
     },
@@ -74,7 +81,7 @@ export default function ClassAttendancePage() {
     {
       icon: Undo2,
       label: "back",
-      onClick: () => navigate("/teacher/schedule/calendar"),
+      onClick: () => navigate(-1),
     },
   ];
 
@@ -89,9 +96,9 @@ export default function ClassAttendancePage() {
   };
 
   const classDetail = classScheduleDetail?.classStartDateTime ? (
-    <h1>
+    <>
       {`Class Attendance — ${formatDate(classScheduleDetail?.classDateTime)}`}
-    </h1>
+    </>
   ) : (
     <div className='flex flex-col gap-2'>
       <h1 className='text-2xl font-semibold tracking-tight'>
@@ -123,8 +130,10 @@ export default function ClassAttendancePage() {
         <DataTable
           data={classAttendance}
           columns={columns}
-          pagination={pagination}
           showActions={false}
+          pagination={pagination}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
         />
       </div>
     </div>

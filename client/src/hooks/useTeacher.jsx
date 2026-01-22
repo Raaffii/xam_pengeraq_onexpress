@@ -33,7 +33,7 @@ export const useTeacher = () => {
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error fetching Student:", err);
+      console.error("Error fetching teacher:", err);
 
       setError(err.message);
       setTeacher([]);
@@ -52,12 +52,12 @@ export const useTeacher = () => {
       toastId = toast.loading("Creating new teacher...");
 
       const response = await teacherService.insertTeacher(data);
-      toast.success("Student added successfully!", { id: toastId });
+      toast.success("teacher added successfully!", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating student:", err);
-      toast.error(err.message || "Failed to create student", { id: toastId });
+      console.error("Error creating teacher:", err);
+      toast.error(err.message || "Failed to create teacher", { id: toastId });
       setError(err.message);
 
       return { success: false, error: err.message };
@@ -74,12 +74,12 @@ export const useTeacher = () => {
       toastId = toast.loading("Creating new teacher...");
 
       const response = await teacherService.updateTeacher(data, id);
-      toast.success("Student added successfully!", { id: toastId });
+      toast.success("teacher added successfully!", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating student:", err);
-      toast.error(err.message || "Failed to create student", { id: toastId });
+      console.error("Error creating teacher:", err);
+      toast.error(err.message || "Failed to create teacher", { id: toastId });
       setError(err.message);
 
       return { success: false, error: err.message };
@@ -96,12 +96,12 @@ export const useTeacher = () => {
       toastId = toast.loading("Creating new teacher...");
 
       const response = await teacherService.deleteTeacher(id);
-      toast.success("Student added successfully!", { id: toastId });
+      toast.success("teacher delete successfully!", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating student:", err);
-      toast.error(err.message || "Failed to create student", { id: toastId });
+      console.error("Error creating teacher:", err);
+      toast.error(err.message || "Failed to create teacher", { id: toastId });
       setError(err.message);
 
       return { success: false, error: err.message };
@@ -147,6 +147,7 @@ export const useTeacher = () => {
     isLoading,
     error,
     params,
+    isSubmitting,
     deleteTeacher,
     setParams,
     onPageChange,

@@ -3,7 +3,6 @@ const Students = require("../models/studentModel");
 const StudentExam = require("../models/studentExamModel");
 
 const getStudent = async (page, limit, searchTerm, filter) => {
-  console.log("filter", filter);
   return await Students.getStudent(page, limit, searchTerm, filter);
 };
 

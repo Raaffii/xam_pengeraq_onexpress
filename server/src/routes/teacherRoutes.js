@@ -15,18 +15,22 @@ const {
   deleteTeacher,
 } = require("../controllers/teacherController");
 const {
-  fetchSubjectsQuerySchema,
-  createSubjectSchema,
-  updateSubjectSchema,
-  subjIdParamsSchema,
-} = require("../schemas/subjectSchema");
+  fetchTeacher,
+  createTeacherSchema,
+  idParamsSchema,
+  updateTeacherSchema,
+} = require("../schemas/teacherSchema");
 
 router.use(authenticateToken);
 
-router.get("/", getTeacher);
+router.get("/", validateQuery(fetchTeacher), getTeacher);
 router.get("/:id", getTeacherById);
-router.post("/", postTeacher);
-router.put("/:id", putTeacher);
-router.delete("/:id", deleteTeacher);
+router.post("/", validateBody(createTeacherSchema), postTeacher);
+router.put(
+  "/:id",
+  validateMultiple({ params: idParamsSchema, body: updateTeacherSchema }),
+  putTeacher,
+);
+router.delete("/:id", validateParams(idParamsSchema), deleteTeacher);
 
 module.exports = router;

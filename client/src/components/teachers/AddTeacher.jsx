@@ -24,7 +24,7 @@ export default function AddTeacher({ open, setOpen, fetchTeacher }) {
       toast.error("Password do not match");
       return;
     } else if (formData.password.length < 8) {
-      toast.error("Minimum 8 characters");
+      toast.error("Password Minimum 8 characters");
       return;
     }
 
@@ -98,7 +98,7 @@ export default function AddTeacher({ open, setOpen, fetchTeacher }) {
         </label>
         {addAccount && (
           <>
-            <FormField label='Password'>
+            <FormField label='Username'>
               <Input
                 type='text'
                 className='bg-gray-100 text-gray-600'

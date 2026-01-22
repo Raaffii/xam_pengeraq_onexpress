@@ -43,7 +43,7 @@ export const useStudentClass = () => {
             pageSize: 10,
             totalPages: 1,
             totalItems: 0,
-          }
+          },
         );
         setStudentClass(data);
         return { success: true, data: data };
@@ -58,7 +58,7 @@ export const useStudentClass = () => {
         setIsLoading(false);
       }
     },
-    [params, formatStudentClass]
+    [params, formatStudentClass],
   );
 
   const assignStudentClass = useCallback(async (data) => {
@@ -87,16 +87,18 @@ export const useStudentClass = () => {
     async (filters) => {
       const newParams = {
         ...params,
+        schedule: filters.schedule || null,
         byExamSeriesId: filters.byExamSeriesId || null,
         page: 1,
       };
       setParams(newParams);
       return await fetchStudentClass({
+        schedule: filters.schedule || null,
         byExamSeriesId: filters.byExamSeriesId || null,
         page: 1,
       });
     },
-    [params, fetchStudentClass]
+    [params, fetchStudentClass],
   );
 
   const onSearch = useCallback(
@@ -106,7 +108,7 @@ export const useStudentClass = () => {
 
       return await fetchStudentClass({ search, page: 1 });
     },
-    [fetchStudentClass, setParams, params]
+    [fetchStudentClass, setParams, params],
   );
 
   const onPageChange = useCallback(
@@ -115,7 +117,7 @@ export const useStudentClass = () => {
       setParams(newParams);
       return await fetchStudentClass({ page });
     },
-    [params, fetchStudentClass]
+    [params, fetchStudentClass],
   );
 
   const onPageSizeChange = useCallback(
@@ -124,7 +126,7 @@ export const useStudentClass = () => {
       setParams(newParams);
       return await fetchStudentClass({ limit, page: 1 });
     },
-    [params, fetchStudentClass]
+    [params, fetchStudentClass],
   );
 
   return {

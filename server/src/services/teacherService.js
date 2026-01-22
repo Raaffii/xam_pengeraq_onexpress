@@ -46,7 +46,7 @@ const deleteTeacher = async (id) => {
     return result;
   } catch (error) {
     console.error("Service error:", error);
-    throw new Error("Failed to get student exam series");
+    throw error;
   }
 };
 

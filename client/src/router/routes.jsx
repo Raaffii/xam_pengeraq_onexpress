@@ -60,6 +60,7 @@ const adminPrivateRoutes = {
     { path: "schedule/:id", element: <ScheduleDetailPage /> },
     { path: "schedule/calendar", element: <CalendarPage /> },
     { path: "transcripts", element: <TranscriptsPage /> },
+    { path: "class-attendance/:id", element: <ClassAttendancePage /> },
   ],
 };
 

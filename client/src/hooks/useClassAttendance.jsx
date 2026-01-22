@@ -38,6 +38,7 @@ export const useClassAttendance = () => {
         const response =
           await ClassAttendanceService.getClassAttendance(apiParams);
         const data = formatClassSchedule(response.data);
+
         setPagination(
           response.pagination || {
             currentPage: 1,

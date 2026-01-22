@@ -68,36 +68,51 @@ const getTeacherById = async (id) => {
 };
 
 const postTeacher = async (data) => {
-  const { teacherName, teacherEmail } = data;
-  const query = `INSERT INTO teacher (teachername, emailaddress) VALUES (?, ?)`;
-  const [rows] = await pool.query(query, [teacherName, teacherEmail]);
+  const { teacherName, teacherEmail, createdBy } = data;
+  const query = `INSERT INTO teacher (teachername, emailaddress, createdby, createddate) VALUES (?, ?,?,?)`;
+  const [rows] = await pool.query(query, [
+    teacherName,
+    teacherEmail,
+    createdBy,
+    new Date(),
+  ]);
 
   return rows.insertId;
 };
 
 const putTeacher = async (data, id) => {
-  const { teacherName, teacherEmail } = data;
+  const { teacherName, teacherEmail, editedBy } = data;
 
   const query = `
     UPDATE teacher 
-    SET teachername = ?, emailaddress = ?
+    SET teachername = ?, emailaddress = ?, editedby = ?, editeddate=?
     WHERE teacherid = ?
   `;
 
-  const [rows] = await pool.query(query, [teacherName, teacherEmail, id]);
+  const [rows] = await pool.query(query, [
+    teacherName,
+    teacherEmail,
+    editedBy,
+    new Date(),
+    id,
+  ]);
 
   return { data: rows };
 };
 
 const deleteTeacher = async (id) => {
-  const query = `
+  try {
+    const query = `
     DELETE FROM teacher
     WHERE teacherid = ?
   `;
 
-  const [rows] = await pool.query(query, [id]);
+    const [rows] = await pool.query(query, [id]);
 
-  return { data: rows };
+    return { data: rows };
+  } catch (err) {
+    throw err;
+  }
 };
 
 module.exports = {
