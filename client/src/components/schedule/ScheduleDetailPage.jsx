@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import PageHeader from "../common/PageHeader";
 import { useStudentClass } from "@/hooks/useStudentClass";
 import { DataTable } from "../table";
@@ -10,13 +10,13 @@ import { useStudents } from "@/hooks/useStudents";
 import { Button } from "../custom";
 import toast from "react-hot-toast";
 import { SearchableDropdown } from "../common";
+import { useRowSelection } from "@/hooks";
 
 export default function ScheduleDetailPage() {
   const { id } = useParams();
-
+  const hasFetchedData = useRef(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [enrolledMode, setEnrolledMode] = useState(true);
-  const [selectedRows, setSelectedRows] = useState([]);
   const [curentEnroled, setCurentEnroled] = useState([]);
   const [value, setValue] = useState();
 
@@ -41,14 +41,22 @@ export default function ScheduleDetailPage() {
     onSearch: onSearchStudents,
   } = useStudents();
 
+  const { selectedRows, handleSelectRow, handleSelectAll, setSelectedRows } =
+    useRowSelection({
+      rowIdKey: "studentId",
+    });
+
   useEffect(() => {
+    if (hasFetchedData.current) return;
+    hasFetchedData.current = true;
+
     const fetchData = async () => {
       await fetchWithParamsChange({ schedule: id });
       await getClassScheduleById(id);
     };
 
     fetchData();
-  }, []);
+  }, [fetchWithParamsChange, getClassScheduleById, id]);
 
   useEffect(() => {
     if (!students?.length) return;
@@ -61,38 +69,39 @@ export default function ScheduleDetailPage() {
 
     setSelectedRows(array);
     setCurentEnroled(array);
-  }, [students, id]);
+  }, [students, id, setSelectedRows]);
 
   const columns = [
     {
       accessorKey: "studentIdNo",
-      header: <div className='text-left w-full'>ID</div>,
+      header: <div className="text-left w-full">ID</div>,
       cellClassName: "text-left",
     },
     {
       accessorKey: "studentName",
-      header: <div className='text-left w-full'>Student Name</div>,
+      header: <div className="text-left w-full">Student Name</div>,
       cellClassName: "text-left",
     },
     {
       accessorKey: "enteredDate",
-      header: <div className='text-left w-full'>Entered Datetime</div>,
+      header: <div className="text-left w-full">Entered Datetime</div>,
       cellClassName: "text-left",
     },
     {
       accessorKey: "attendancePercentage",
-      header: <div className='text-center w-full'>Attendance</div>,
+      header: <div className="text-center w-full">Attendance</div>,
       cellClassName: "text-left",
       render: (row) => (
-        <div className='flex w-full justify-center'>
+        <div className="flex w-full justify-center">
           <span
             className={`px-3 py-1 text-sm font-semibold rounded-full border
       ${
-        row.attendancePercentage == 0
-          ? "bg-red-100 text-red-700 border-red-300"
-          : "bg-blue-100 text-blue-700 border-blue-300"
+        row.attendancePercentage == 0 ?
+          "bg-red-100 text-red-700 border-red-300"
+        : "bg-blue-100 text-blue-700 border-blue-300"
       }
-    `}>
+    `}
+          >
             {row.attendancePercentage}%
           </span>
         </div>
@@ -103,25 +112,26 @@ export default function ScheduleDetailPage() {
   const columnStudent = [
     {
       accessorKey: "studentIdNo",
-      header: <div className='text-left w-full'>ID</div>,
+      header: <div className="text-left w-full">ID</div>,
       cellClassName: "text-left",
     },
     {
       accessorKey: "studentName",
-      header: <div className='text-left w-full'>Student Name</div>,
+      header: <div className="text-left w-full">Student Name</div>,
       cellClassName: "text-left",
     },
     {
       accessorKey: "examSeriesDescription",
-      header: <div className='text-left w-full'>Curent Series</div>,
+      header: <div className="text-left w-full">Curent Series</div>,
       cellClassName: "text-left",
       render: (row) => (
-        <div className='flex flex-wrap gap-1'>
+        <div className="flex flex-wrap gap-1">
           {row.examSeries?.map((item, index) => (
             <span
               key={index}
-              className='px-2 py-0.5 text-xs rounded-full
-                   bg-blue-50 text-blue-700 border border-blue-200'>
+              className="px-2 py-0.5 text-xs rounded-full
+                   bg-blue-50 text-blue-700 border border-blue-200"
+            >
               {item.examSeriesDescription}
             </span>
           ))}
@@ -186,15 +196,6 @@ export default function ScheduleDetailPage() {
     await assignStudentClass(submitData);
   };
 
-  const handleSelectRow = (row) => {
-    setSelectedRows((prev) => {
-      if (prev.includes(row)) {
-        return prev.filter((r) => r !== row);
-      }
-      return [...prev, row];
-    });
-  };
-
   const options = [
     { value: "selected", label: "Selected" },
     { value: "unselected", label: "All" },
@@ -213,8 +214,8 @@ export default function ScheduleDetailPage() {
   };
 
   return (
-    <div className='min-h-screen bg-gray-50'>
-      <div className='mx-auto'>
+    <div className="min-h-screen bg-gray-50">
+      <div className="mx-auto">
         <PageHeader
           title={`Class Details - ${classSchedule?.subjDesc || "Loading..."}`}
           subtitle={`teacher: ${classSchedule?.teacherName || ""}`}
@@ -223,57 +224,56 @@ export default function ScheduleDetailPage() {
           actions2={actions}
         />
 
-        {enrolledMode ? (
+        {enrolledMode ?
           <DataTable
             data={studenctClass}
             columns={columns}
-            idAccessor='studentClassId'
+            idAccessor="studentClassId"
             pagination={pagination}
             showActions={false}
             onPageChange={onPageChange}
             onSizeChange={onPageSizeChange}
           />
-        ) : (
-          <>
+        : <>
             {/* Action Bar */}
-            <div className='flex items-center justify-between mb-4 p-4 bg-white rounded-lg shadow-sm border'>
+            <div className="flex items-center justify-between mb-4 p-4 bg-white rounded-lg shadow-sm border">
               <div>
                 <div>
-                  <h2 className='text-lg font-semibold text-gray-800'>
+                  <h2 className="text-lg font-semibold text-gray-800">
                     Assign Students to Class
                   </h2>
                 </div>
-                <p className='text-sm text-gray-500'>
+                <p className="text-sm text-gray-500">
                   Select students from the table below
                 </p>
               </div>
 
-              <div className='flex items-center gap-2'>
+              <div className="flex items-center gap-2">
                 <SearchableDropdown
                   value={value}
                   options={options}
                   onChange={handleChange}
-                  searchPlaceholder='Search...'
-                  emptyMessage='No items found'
+                  searchPlaceholder="Search..."
+                  emptyMessage="No items found"
                   minSearchLength={0}
-                  className='h-10'
+                  className="h-10"
                 />
-                <span className='text-sm text-gray-60 w-full'>
+                <span className="text-sm text-gray-60 w-full">
                   {selectedRows.length} selected
                 </span>
 
-                <Button className='px-4 py-2' onClick={assignToClass}>
+                <Button className="px-4 py-2" onClick={assignToClass}>
                   Assign
                 </Button>
               </div>
             </div>
 
             {/* Table */}
-            <div className='bg-white rounded-lg shadow-sm border'>
+            <div className="bg-white rounded-lg shadow-sm border">
               <DataTable
                 data={students}
                 columns={columnStudent}
-                idAccessor='studentId'
+                idAccessor="studentId"
                 pagination={paginationStudents}
                 selectable={true}
                 selectedRows={selectedRows}
@@ -281,10 +281,11 @@ export default function ScheduleDetailPage() {
                 showActions={false}
                 onPageChange={onPageChangeStudents}
                 onSizeChange={onPageSizeChangeStudents}
+                onSelectAll={handleSelectAll}
               />
             </div>
           </>
-        )}
+        }
 
         {isAddModalOpen && (
           <AddStudentClass
