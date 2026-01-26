@@ -15,6 +15,7 @@ const {
   cleanDuplicateGrades,
   checkSubjectsWithoutGrades,
   newGrade,
+  insertDefaultGradesForSubjects,
 } = require("../controllers/subjGradeController");
 const {
   subjIdParamsSchema,
@@ -29,6 +30,7 @@ router.use(authenticateToken);
 
 router.get("/grades/check-duplicates", checkDuplicateGrades);
 router.get("/grades/check-without-grades", checkSubjectsWithoutGrades);
+router.post("/grades/insert-default-grades", insertDefaultGradesForSubjects);
 router.delete("/grades/clean-duplicates", cleanDuplicateGrades);
 
 router.get(
