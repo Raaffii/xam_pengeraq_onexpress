@@ -37,6 +37,7 @@ export const useClassScheduleDetail = () => {
         const response =
           await classScheduleDetailService.getClassScheduleDetail(apiParams);
         const data = formatClassSchedule(response.data);
+
         setPagination(
           response.pagination || {
             currentPage: 1,

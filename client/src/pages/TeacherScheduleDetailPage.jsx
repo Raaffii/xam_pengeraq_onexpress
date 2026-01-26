@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import AddSchedule from "@/components/schedule/AddSchedule";
 
 import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
+
 import { UserCheck } from "lucide-react";
 
 import {
@@ -20,11 +21,14 @@ import {
 
 export default function TeacherScheduleDetailPage() {
   const { id } = useParams();
-  const { fetchClassSchedule, onSearch, onPageChange, onPageSizeChange } =
-    useClassSchedule();
+  const { fetchClassSchedule, onSearch, onPageSizeChange } = useClassSchedule();
 
-  const { fetchClassScheduleDetail, classScheduleDetail, pagination } =
-    useClassScheduleDetail();
+  const {
+    fetchClassScheduleDetail,
+    classScheduleDetail,
+    pagination,
+    onPageChange,
+  } = useClassScheduleDetail();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -122,7 +126,7 @@ export default function TeacherScheduleDetailPage() {
       onClick: () => navigate(`/teacher/schedule`),
     },
   ];
-
+  console.log("pagi2", pagination);
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='mx-auto'>
@@ -140,11 +144,11 @@ export default function TeacherScheduleDetailPage() {
         <DataTable
           data={classScheduleDetail}
           columns={columns}
+          idAccessor='classschhdid'
+          additionalActions={startClassAction}
           onPageChange={onPageChange}
           onSizeChange={onPageSizeChange}
           pagination={pagination}
-          idAccessor='classschhdid'
-          additionalActions={startClassAction}
         />
 
         {isModalOpen && (

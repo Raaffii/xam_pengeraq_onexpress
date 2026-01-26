@@ -8,6 +8,7 @@ const getClassScheduleDetail = async (
   teacherId,
   scheduleId,
   nowDate,
+  usePagination,
 ) => {
   try {
     const result = await ClassScheduleDetail.getClassScheduleDetail(
@@ -18,6 +19,7 @@ const getClassScheduleDetail = async (
       teacherId,
       scheduleId,
       nowDate,
+      usePagination,
     );
     return result;
   } catch (error) {

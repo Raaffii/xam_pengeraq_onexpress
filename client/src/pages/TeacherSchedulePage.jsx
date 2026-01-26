@@ -219,6 +219,8 @@ export default function TeacherSchedulesPages() {
     </Select>
   );
 
+  console.log("pagi", pagination);
+
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='mx-auto'>

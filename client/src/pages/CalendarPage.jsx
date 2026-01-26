@@ -50,6 +50,7 @@ export default function CalendarPage() {
     const fetchData = async () => {
       const result = await fetchClassScheduleDetail({
         date: new Date().setMonth(new Date().getMonth() + calendarShow),
+        usePagination: false,
       });
       await handleEvent(result.data);
     };
@@ -166,6 +167,7 @@ export default function CalendarPage() {
     if (con == "next") {
       const resultOri = await fetchClassScheduleDetail({
         date: new Date().setMonth(new Date().getMonth() + calendarShow + 1),
+        usePagination: false,
       });
 
       await handleEvent(resultOri.data);
@@ -173,6 +175,7 @@ export default function CalendarPage() {
     } else if (con == "prev") {
       const resultOri = await fetchClassScheduleDetail({
         date: new Date().setMonth(new Date().getMonth() + calendarShow - 1),
+        usePagination: false,
       });
 
       await handleEvent(resultOri.data);

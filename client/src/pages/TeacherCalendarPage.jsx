@@ -136,6 +136,7 @@ export default function TeacherCalendarPage() {
     if (con == "next") {
       const resultOri = await fetchClassScheduleDetail({
         date: new Date().setMonth(new Date().getMonth() + calendarShow + 1),
+        usePagination: false,
       });
 
       await handleEvent(resultOri.data);
@@ -143,6 +144,7 @@ export default function TeacherCalendarPage() {
     } else if (con == "prev") {
       const resultOri = await fetchClassScheduleDetail({
         date: new Date().setMonth(new Date().getMonth() + calendarShow - 1),
+        usePagination: false,
       });
 
       await handleEvent(resultOri.data);
@@ -150,6 +152,7 @@ export default function TeacherCalendarPage() {
     } else {
       const resultOri = await fetchClassScheduleDetail({
         date: new Date().setMonth(new Date().getMonth()),
+        usePagination: false,
       });
 
       await handleEvent(resultOri.data);
