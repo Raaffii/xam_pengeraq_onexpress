@@ -1,6 +1,7 @@
 const SubjGradeModel = require("../models/subjGradeModel");
 const SubjModel = require("../models/subjModel");
 const pool = require("../config/db");
+const { defaultSubjGrades } = require("../utils/data");
 
 const subjGradeService = {
   /**
@@ -357,6 +358,76 @@ const subjGradeService = {
         percentageWithoutGrades: parseFloat(percentageWithoutGrades),
       },
     };
+  },
+  async insertDefaultGradesForSubjects() {
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+
+      // Get subjects without grades
+      const subjects = await SubjGradeModel.findSubjectsWithoutGrades();
+
+      if (subjects.length === 0) {
+        await conn.commit();
+        return {
+          insertedCount: 0,
+          affectedSubjects: [],
+          details: [],
+          summary: {
+            totalSubjectsProcessed: 0,
+            totalGradesInserted: 0,
+            gradesPerSubject: defaultSubjGrades.length,
+          },
+        };
+      }
+
+      let totalInserted = 0;
+      const insertDetails = [];
+
+      for (const subject of subjects) {
+        const insertedCount = await SubjGradeModel.insertDefaultGrades(
+          conn,
+          subject.subjId,
+          subject.seriesId,
+          defaultSubjGrades,
+        );
+
+        totalInserted += insertedCount;
+
+        insertDetails.push({
+          subjId: subject.subjId,
+          subjCode: subject.subjCode,
+          subjDesc: subject.subjDesc,
+          seriesId: subject.seriesId,
+          seriesDesc: subject.seriesDesc,
+          gradesInserted: insertedCount,
+        });
+      }
+
+      await conn.commit();
+
+      return {
+        insertedCount: totalInserted,
+        affectedSubjects: subjects.map((s) => ({
+          subjId: s.subjId,
+          subjCode: s.subjCode,
+          subjDesc: s.subjDesc,
+          seriesId: s.seriesId,
+        })),
+        details: insertDetails,
+        summary: {
+          totalSubjectsProcessed: subjects.length,
+          totalGradesInserted: totalInserted,
+          gradesPerSubject: defaultSubjGrades.length,
+          averageGradesPerSubject: (totalInserted / subjects.length).toFixed(2),
+        },
+      };
+    } catch (error) {
+      await conn.rollback();
+      throw error;
+    } finally {
+      conn.release();
+    }
   },
 };
 

@@ -489,6 +489,47 @@ const SubjGradeModel = {
       values.flat(),
     );
   },
+
+  async insertDefaultGrades(conn, examSubjId, examSeriesId, defaultGrades) {
+    if (!defaultGrades || defaultGrades.length === 0) {
+      return 0;
+    }
+
+    const values = defaultGrades.map((grade) => [
+      examSeriesId,
+      examSubjId,
+      grade.subjgradeseq,
+      grade.subjmin,
+      grade.subjmax,
+      grade.subjgrade,
+      grade.subjgpa,
+      grade.subjresult,
+      grade.active ? 1 : 0,
+    ]);
+
+    const placeholders = defaultGrades
+      .map(() => "(?, ?, ?, ?, ?, ?, ?, ?, ?)")
+      .join(", ");
+
+    const query = `
+    INSERT INTO subjgrade (
+      examseriesid,
+      examsubjid,
+      subjgradeseq,
+      subjmin,
+      subjmax,
+      subjgrade,
+      subjgpa,
+      subjresult,
+      active
+    )
+    VALUES ${placeholders}
+  `;
+
+    const flatValues = values.flat();
+    const [result] = await conn.execute(query, flatValues);
+    return result.affectedRows;
+  },
 };
 
 module.exports = SubjGradeModel;

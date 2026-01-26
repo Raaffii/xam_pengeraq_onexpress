@@ -224,6 +224,31 @@ const checkSubjectsWithoutGrades = async (req, res) => {
   }
 };
 
+const insertDefaultGradesForSubjects = async (req, res) => {
+  try {
+    const result = await subjGradeService.insertDefaultGradesForSubjects();
+
+    if (result.insertedCount === 0) {
+      return res.status(200).json({
+        data: result,
+        message: "No subjects found that need default grades",
+      });
+    }
+
+    res.status(200).json({
+      data: result,
+      message: `Successfully inserted default grades for ${result.affectedSubjects.length} subject(s). Total ${result.insertedCount} grade records created.`,
+    });
+  } catch (error) {
+    console.error("Insert default grades error:", error.message);
+
+    res.status(500).json({
+      message: "Failed to insert default grades",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getSubjectGrades,
   newGrade,
@@ -233,4 +258,5 @@ module.exports = {
   checkDuplicateGrades,
   cleanDuplicateGrades,
   checkSubjectsWithoutGrades,
+  insertDefaultGradesForSubjects,
 };

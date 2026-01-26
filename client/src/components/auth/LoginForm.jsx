@@ -102,24 +102,24 @@ export const LoginForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className='space-y-5'>
+    <form onSubmit={handleSubmit} className="space-y-5">
       {/* Error Alert */}
       {submitError && (
-        <Alert variant='destructive'>
+        <Alert variant="destructive">
           <AlertDescription>{submitError}</AlertDescription>
         </Alert>
       )}
 
       {/* Email Field */}
-      <div className='relative'>
+      <div className="relative">
         <InputField
-          id='emailAddress'
-          name='emailAddress'
-          label='E-mail'
-          type='email'
+          id="emailAddress"
+          name="emailAddress"
+          label="E-mail"
+          type="email"
           value={formData.emailAddress}
           onChange={handleChange}
-          placeholder='name@example.com'
+          placeholder="name@example.com"
           isRequired={true}
           error={errors.emailAddress}
           onError={(error) =>
@@ -127,35 +127,36 @@ export const LoginForm = () => {
           }
           disabled={isLoading}
           validate={validateEmail}
-          inputClassName='pl-10 border-gray-400'
+          inputClassName="pl-10 border-gray-400"
         />
-        <div className='absolute left-3 top-[46px] text-gray-400 pointer-events-none'>
-          <Mail className='w-5 h-5' />
+        <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
+          <Mail className="w-5 h-5" />
         </div>
       </div>
 
       {/* Password Field */}
-      <div className='space-y-2'>
-        <div className='flex items-center justify-between'>
-          <Label htmlFor='password'>
-            Password <span className='text-red-500'>*</span>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="password">
+            Password <span className="text-red-500">*</span>
           </Label>
           <button
-            type='button'
+            type="button"
             onClick={() => navigate("/forgot-password")}
-            className='text-sm font-medium hover:underline transition-colors'>
+            className="text-sm font-medium hover:underline transition-colors"
+          >
             Forgot password?
           </button>
         </div>
-        <div className='relative'>
+        <div className="relative">
           <InputField
-            id='password'
-            name='password'
-            label='Password'
+            id="password"
+            name="password"
+            label="Password"
             type={showPassword ? "text" : "password"}
             value={formData.password}
             onChange={handleChange}
-            placeholder='Input your password here'
+            placeholder="Input your password here"
             isRequired={true}
             error={errors.password}
             onError={(error) =>
@@ -163,42 +164,41 @@ export const LoginForm = () => {
             }
             disabled={isLoading}
             validate={validatePassword}
-            inputClassName='pl-10 pr-10 border-gray-400'
-            labelClassName='hidden'
+            inputClassName="pl-10 pr-10 border-gray-400"
+            labelClassName="hidden"
           />
-          <div className='absolute left-3 top-[14px] text-gray-400 pointer-events-none'>
-            <Lock className='w-5 h-5' />
+          <div className="absolute left-3 top-[14px] text-gray-400 pointer-events-none">
+            <Lock className="w-5 h-5" />
           </div>
           <button
-            type='button'
+            type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className='absolute right-3 top-[14px] text-gray-400 hover:text-gray-600'
-            disabled={isLoading}>
-            {showPassword ? (
-              <EyeOff className='w-5 h-5' />
-            ) : (
-              <Eye className='w-5 h-5' />
-            )}
+            className="absolute right-3 top-[14px] text-gray-400 hover:text-gray-600"
+            disabled={isLoading}
+          >
+            {showPassword ?
+              <EyeOff className="w-5 h-5" />
+            : <Eye className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
       {/* Submit Button */}
       <Button
-        type='submit'
+        type="submit"
         disabled={isLoading}
-        className='w-full h-12 text-white font-medium text-base disabled:opacity-50 disabled:cursor-not-allowed bg-blue-700'>
-        {isLoading ? (
+        className="w-full h-12 text-white font-medium text-base disabled:opacity-50 disabled:cursor-not-allowed bg-blue-700"
+      >
+        {isLoading ?
           <>
-            <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 ' />
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 " />
             Loading...
           </>
-        ) : (
-          <>
-            <LogIn className='w-5 h-5 mr-2' />
+        : <>
+            <LogIn className="w-5 h-5 mr-2" />
             Login
           </>
-        )}
+        }
       </Button>
     </form>
   );
