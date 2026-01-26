@@ -2,14 +2,20 @@ import { DataTable } from "@/components/table";
 import { useClassSchedule } from "@/hooks/useClassSchedule";
 import { useEffect, useState } from "react";
 import PageHeader from "@/components/common/PageHeader";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import AddSchedule from "@/components/schedule/AddSchedule";
 import EditSchedule from "@/components/schedule/EditSchedule";
 import Delete_modal from "@/components/modals/Delete_modal";
-
-import { Table, Calendar } from "lucide-react";
-
 import { usePageTitle } from "@/hooks/usePageTitle";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function SchedulesPages() {
   usePageTitle("Schedules");
@@ -29,6 +35,11 @@ export default function SchedulesPages() {
   const [selectedSchedule, setSelectedSchedule] = useState();
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const currentView =
+    location.pathname === "/schedule/calendar" ? "calendar" : "list";
+
   useEffect(() => {
     const fetchData = async () => {
       await fetchClassSchedule();
@@ -79,7 +90,7 @@ export default function SchedulesPages() {
     },
     {
       accessorKey: "repeatValue",
-      header: <div className='text-left w-full'>Repeat Value</div>,
+      header: <div className='text-left w-full'>Frequency</div>,
       cellClassName: "text-left",
       render: (row) => (
         <div className='flex flex-wrap gap-1'>
@@ -106,18 +117,32 @@ export default function SchedulesPages() {
     },
   ];
 
-  const actions = [
-    {
-      icon: Table,
-      label: "table",
-      onClick: () => navigate("/schedule"),
-    },
-    {
-      icon: Calendar,
-      label: "calendar",
-      onClick: () => navigate("/schedule/calendar"),
-    },
-  ];
+  const actionsChildren = (
+    <Select
+      onValueChange={(value) => {
+        if (value === "list") {
+          navigate("/schedule");
+        }
+
+        if (value === "calendar") {
+          navigate("/schedule/calendar");
+        }
+      }}
+      value={currentView}>
+      <SelectTrigger className='w-full max-w-48'>
+        <SelectValue placeholder='View By' />
+      </SelectTrigger>
+
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>View By</SelectLabel>
+
+          <SelectItem value='list'>View By List</SelectItem>
+          <SelectItem value='calendar'>View By Calendar</SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
 
   return (
     <div className='min-h-screen bg-gray-50'>
@@ -129,11 +154,11 @@ export default function SchedulesPages() {
           onSearch={onSearch}
           searchPlaceholder='Search by teacher name or subject'
           searchMaxLength={50}
-          actions2={actions}
           primaryAction={{
-            label: "Add Schedule",
+            label: "New Schedule",
             onClick: () => setIsModalOpen(true),
           }}
+          childrenCustom={actionsChildren}
         />
 
         <DataTable

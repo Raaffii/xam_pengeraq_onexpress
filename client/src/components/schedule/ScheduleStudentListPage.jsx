@@ -4,28 +4,34 @@ import PageHeader from "../common/PageHeader";
 import { useStudentClass } from "@/hooks/useStudentClass";
 import { DataTable } from "../table";
 import { useEffect } from "react";
-import AddStudentClass from "../schedule/AddStudenctClass";
+
 import { useClassSchedule } from "@/hooks/useClassSchedule";
-import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
 import { useStudents } from "@/hooks/useStudents";
 import { Button } from "../custom";
 import toast from "react-hot-toast";
 import { SearchableDropdown } from "../common";
+import { Trash } from "lucide-react";
+import Delete_modal from "../modals/Delete_modal";
 
-export default function TeacherScheduleDetailPage() {
+export default function ScheduleStudentListPage() {
   const { id } = useParams();
 
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [enrolledMode, setEnrolledMode] = useState(true);
   const [selectedRows, setSelectedRows] = useState([]);
   const [curentEnroled, setCurentEnroled] = useState([]);
+  const [selectedDropStudent, setSelectedDropStudent] = useState();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState();
   const [value, setValue] = useState();
 
-  const { fetchStudentClass, assignStudentClass, studenctClass, pagination } =
-    useStudentClass();
-
-  const { fetchClassScheduleDetail, classScheduleDetail } =
-    useClassScheduleDetail();
+  const {
+    fetchStudentClass,
+    assignStudentClass,
+    studenctClass,
+    pagination,
+    onPageChange,
+    onPageSizeChange,
+    onFilterChange: fetchWithParamsChange,
+  } = useStudentClass();
 
   const { getClassScheduleById, classSchedule } = useClassSchedule();
 
@@ -33,19 +39,33 @@ export default function TeacherScheduleDetailPage() {
     fetchStudents,
     students,
     pagination: paginationStudents,
-    onPageChange,
-    onPageSizeChange,
+    onPageChange: onPageChangeStudents,
+    onPageSizeChange: onPageSizeChangeStudents,
+    onSearch: onSearchStudents,
+    onFilterChange: fetchStudentWithParamChange,
   } = useStudents();
 
   useEffect(() => {
     const fetchData = async () => {
-      await fetchStudentClass({ schedule: id });
-      await fetchClassScheduleDetail({ schedule: id });
+      await fetchWithParamsChange({ schedule: id });
       await getClassScheduleById(id);
     };
 
     fetchData();
-  }, [fetchStudentClass, id, getClassScheduleById]);
+  }, []);
+
+  useEffect(() => {
+    if (!students?.length) return;
+
+    const array = students.flatMap((student) =>
+      student.studentClass.flatMap((sc) =>
+        id == sc.classSchedule ? [sc.classStudent] : [],
+      ),
+    );
+
+    setSelectedRows(array);
+    setCurentEnroled(array);
+  }, [students, id]);
 
   const columns = [
     {
@@ -63,7 +83,64 @@ export default function TeacherScheduleDetailPage() {
       header: <div className='text-left w-full'>Entered Datetime</div>,
       cellClassName: "text-left",
     },
+    {
+      accessorKey: "attendancePercentage",
+      header: <div className='text-center w-full'>Attendance</div>,
+      cellClassName: "text-left",
+      render: (row) => (
+        <div className='flex w-full justify-center'>
+          <span
+            className={`px-3 py-1 text-sm font-semibold rounded-full border
+      ${
+        row.attendancePercentage == 0
+          ? "bg-red-100 text-red-700 border-red-300"
+          : "bg-blue-100 text-blue-700 border-blue-300"
+      }
+    `}>
+            {row.attendancePercentage}%
+          </span>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "enteredDate",
+      header: <div className='text-center w-full'>Drop Student</div>,
+      cellClassName: "text-left",
+      render: (row) => (
+        <div className='flex w-full justify-center'>
+          <button
+            onClick={() => handleDropStudent(row.studentId, row.studentName)}
+            className='group p-0 w-9 h-9 rounded-lg
+             bg-red-50 text-red-600
+             hover:bg-red-100
+             flex items-center justify-center
+             transition-all duration-200
+             hover:shadow-sm'>
+            <Trash className='w-5 h-5 transition-transform duration-200 group-hover:scale-110' />
+          </button>
+        </div>
+      ),
+    },
   ];
+
+  const handleDropStudent = (studentId, studentName) => {
+    setSelectedDropStudent({ studentId, studentName });
+    setIsDeleteModalOpen(true);
+  };
+  const handleConfirmDropStudent = async () => {
+    const submitData = {
+      scheduleId: id,
+      removeStudents: [selectedDropStudent.studentId],
+    };
+
+    const result = await assignStudentClass(submitData);
+    if (result.success) {
+      await fetchStudentClass({
+        schedule: id,
+      });
+      setIsDeleteModalOpen(false);
+    }
+  };
 
   const columnStudent = [
     {
@@ -78,7 +155,7 @@ export default function TeacherScheduleDetailPage() {
     },
     {
       accessorKey: "examSeriesDescription",
-      header: <div className='text-left w-full'>Curent Series</div>,
+      header: <div className='text-left w-full'>Exam Series</div>,
       cellClassName: "text-left",
       render: (row) => (
         <div className='flex flex-wrap gap-1'>
@@ -98,15 +175,19 @@ export default function TeacherScheduleDetailPage() {
   const changeMode = async (bool) => {
     if (bool) {
       setEnrolledMode(bool);
-      await fetchStudentClass({ schedule: id });
+      await fetchStudentClass({
+        schedule: id,
+      });
     } else {
       setEnrolledMode(bool);
-      const result = await fetchStudents();
+      const result = await fetchStudentWithParamChange({
+        subject: classSchedule?.examSubjId,
+      });
 
       const array = result.data.flatMap((student) =>
         student.studentClass.flatMap((sc) =>
-          id == sc.classSchedule ? [sc.classStudent] : []
-        )
+          id == sc.classSchedule ? [sc.classStudent] : [],
+        ),
       );
       setSelectedRows(array);
       setCurentEnroled(array);
@@ -119,7 +200,7 @@ export default function TeacherScheduleDetailPage() {
       onClick: () => changeMode(true),
     },
     {
-      label: "All Students",
+      label: "Assign Students",
       onClick: () => changeMode(false),
     },
   ];
@@ -156,33 +237,45 @@ export default function TeacherScheduleDetailPage() {
       if (prev.includes(row)) {
         return prev.filter((r) => r !== row);
       }
-
       return [...prev, row];
     });
   };
 
   const options = [
     { value: "selected", label: "Selected" },
-    { value: "unselected", label: "Unselected" },
+    { value: "unselected", label: "All" },
   ];
 
   const handleChange = async (val) => {
     setValue(val);
-    if (val == "selected") {
-      await fetchStudents({ enrolledClass: id });
+    if (val.target.value == "selected") {
+      await fetchStudents({ enrolledClass: id, enrolledSelected: "SELECTED" });
     } else {
-      await fetchStudents({ enrolledClass: null });
+      await fetchStudents({
+        enrolledClass: id,
+        enrolledSelected: "NOT_SELECTED",
+      });
     }
   };
 
-  console.log("clas", classScheduleDetail);
+  const pageTitle = (
+    <div className='text-xl font-semibold flex items-baseline gap-2'>
+      <span>Class Subject - {classSchedule?.subjDesc || "Loading..."}</span>
+
+      <span className='text-lg text-gray-500 font-normal'>
+        Conducted By - {classSchedule?.teacherName || "Loading..."}
+      </span>
+    </div>
+  );
+
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='mx-auto'>
         <PageHeader
-          title={`Class Schedule - ${classSchedule?.subjDesc || "Loading..."}`}
-          subtitle={`teacher: ${classSchedule?.teacherName || ""}`}
+          title={pageTitle}
+          subtitle={``}
           showSearch={true}
+          onSearch={onSearchStudents}
           actions2={actions}
         />
 
@@ -193,6 +286,8 @@ export default function TeacherScheduleDetailPage() {
             idAccessor='studentClassId'
             pagination={pagination}
             showActions={false}
+            onPageChange={onPageChange}
+            onSizeChange={onPageSizeChange}
           />
         ) : (
           <>
@@ -240,21 +335,20 @@ export default function TeacherScheduleDetailPage() {
                 selectedRows={selectedRows}
                 onSelectRow={handleSelectRow}
                 showActions={false}
-                onPageChange={onPageChange}
-                onSizeChange={onPageSizeChange}
+                onPageChange={onPageChangeStudents}
+                onSizeChange={onPageSizeChangeStudents}
               />
             </div>
           </>
         )}
 
-        {isAddModalOpen && (
-          <AddStudentClass
-            open={isAddModalOpen}
-            setOpen={setIsAddModalOpen}
-
-            // student={students}
-            // fetchExamsResult={fetchExamsResult}
-            // selectedExamsResult={selectedExamsResult}
+        {isDeleteModalOpen && (
+          <Delete_modal
+            open={isDeleteModalOpen}
+            setOpen={setIsDeleteModalOpen}
+            onSubmit={handleConfirmDropStudent}
+            title='Delete Student'
+            confirmationText={`Are you sure you want to delete student "${selectedDropStudent?.studentName}"? This action cannot be undone.`}
           />
         )}
       </div>

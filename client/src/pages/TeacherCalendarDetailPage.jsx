@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/select";
 
 export default function TeacherCalendarPage() {
-  const { id } = useParams();
   const locales = {
     "en-US": enUS,
   };
@@ -28,8 +27,7 @@ export default function TeacherCalendarPage() {
   const [view, setView] = useState(Views.MONTH);
   const [events, setEvents] = useState();
   const hasFetchedData = useRef(false);
-  const { fetchClassScheduleDetail, onSearch, classScheduleDetail } =
-    useClassScheduleDetail();
+  const { fetchClassScheduleDetail, onSearch } = useClassScheduleDetail();
 
   const localizer = dateFnsLocalizer({
     format,
@@ -45,7 +43,6 @@ export default function TeacherCalendarPage() {
     const fetchData = async () => {
       const result = await fetchClassScheduleDetail({
         date: new Date().setMonth(new Date().getMonth() + calendarShow),
-        scheduleId: id || null,
       });
       await handleEvent(result.data);
     };
@@ -163,34 +160,18 @@ export default function TeacherCalendarPage() {
 
   const monthYear = monthsAndYear(calendarShow);
 
-  let currentView;
+  const currentView =
+    location.pathname === "/teacher/schedule/calendar" ? "calendar" : "list";
 
-  if (id) {
-    currentView =
-      location.pathname === `/teacher/schedule/calendar/${id}`
-        ? "calendar"
-        : "list";
-  } else {
-    currentView =
-      location.pathname === "/teacher/schedule/calendar" ? "calendar" : "list";
-  }
   const actionsChildren = (
     <Select
       onValueChange={(value) => {
         if (value === "list") {
-          if (id) {
-            navigate(`/teacher/schedule/detail/${id}`);
-          } else {
-            navigate(`/teacher/schedule`);
-          }
+          navigate("/teacher/schedule");
         }
 
         if (value === "calendar") {
-          if (id) {
-            navigate(`/teacher/schedule/calendar/${id}`);
-          } else {
-            navigate(`/teacher/schedule/calendar`);
-          }
+          navigate("/teacher/schedule/calendar");
         }
       }}
       value={currentView}>
@@ -209,26 +190,17 @@ export default function TeacherCalendarPage() {
     </Select>
   );
 
-  const actions = [
-    {
-      label: "<- Back",
-      onClick: () => navigate(`/teacher/schedule`),
-    },
-  ];
-
   return (
     <div>
       <PageHeader
-        title={`Teacher Schedules ${id ? `Detail - ${classScheduleDetail[0]?.subjDesc || "loading"} ` : ""} `}
+        title='Teacher Schedules'
         subtitle='Your Schedule'
         showSearch={false}
         onSearch={onSearch}
         searchPlaceholder='Search by name'
         searchMaxLength={50}
-        actions2={id ? actions : undefined}
-        childrenCustom={actionsChildren}
+        children={actionsChildren}
       />
-
       <div className='flex justify-between m-2'>
         <div className='flex gap-3 items-center'>
           <h1 className='text-black font-semibold'>

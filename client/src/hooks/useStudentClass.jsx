@@ -69,12 +69,12 @@ export const useStudentClass = () => {
       toastId = toast.loading("Creating new students...");
 
       const response = await studentClassService.assignStudentClass(data);
-      toast.success("Student added successfully!", { id: toastId });
+      toast.success("Changes saved successfully!", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
       console.error("Error creating student:", err);
-      toast.error(err.message || "Failed to create student", { id: toastId });
+      toast.error(err.message || "Changes Failed", { id: toastId });
       setError(err.message);
 
       return { success: false, error: err.message };

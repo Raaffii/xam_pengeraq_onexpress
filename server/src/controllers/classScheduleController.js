@@ -11,14 +11,14 @@ const getClassSchedule = async (req, res) => {
       limit,
       searchTerm,
       date,
-      teacherId
+      teacherId,
     );
 
     res.status(200).json({
       data: result.data,
       pagination: {
-        currentPage: page,
-        pageSize: limit,
+        currentPage: Number(page),
+        pageSize: Number(limit),
         totalPages: Math.ceil(result.total / limit),
         totalItems: result.total,
       },
@@ -82,7 +82,7 @@ const putClassSchedule = async (req, res) => {
     const data = await classScheduleService.putClassSchedule(
       req.params.id,
       req.body,
-      userId
+      userId,
     );
     res.status(200).json(data);
   } catch (error) {

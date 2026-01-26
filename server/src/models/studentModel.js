@@ -5,7 +5,7 @@ const getStudent = async (page, limit, searchTerm = "", filter = {}) => {
   limit = Number(limit) || 10;
   const offset = (page - 1) * limit;
 
-  const { enrolledClass, enrolledSelected } = filter;
+  const { enrolledClass, enrolledSelected, subject } = filter;
 
   const conditions = [];
   const params = [];
@@ -24,6 +24,11 @@ const getStudent = async (page, limit, searchTerm = "", filter = {}) => {
     params.push(searchValue);
   }
 
+  if (subject) {
+    conditions.push(`esj.examsubjid = ? `);
+    params.push(subject);
+  }
+
   const whereClause =
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
@@ -31,7 +36,11 @@ const getStudent = async (page, limit, searchTerm = "", filter = {}) => {
   SELECT DISTINCT s.studentid
   FROM students s
   LEFT JOIN studentclass sc
-  ON s.studentid = sc.studentid
+    ON s.studentid = sc.studentid
+  LEFT JOIN studentexamseries se
+    ON s.studentid=se.studentid
+  LEFT JOIN examsubj esj
+    ON se.examseriesid=esj.examseriesid
   ${whereClause}
   LIMIT ? OFFSET ?
   `;
@@ -69,6 +78,7 @@ const getStudent = async (page, limit, searchTerm = "", filter = {}) => {
       ON s.studentid = se.studentid
     LEFT JOIN examseries es
       ON se.examseriesid = es.examseriesid
+      
     LEFT JOIN studentclass sc
       ON s.studentid = sc.studentid
 
@@ -125,16 +135,15 @@ const getStudent = async (page, limit, searchTerm = "", filter = {}) => {
   const formattedRows = Array.from(map.values());
 
   const countQuery = `
-    SELECT COUNT(*) AS total
+    SELECT  COUNT(DISTINCT s.studentid) AS total
     FROM students s
-    LEFT JOIN studentexamseries se
-      ON s.studentid = se.studentid
-    LEFT JOIN examseries es
-      ON se.examseriesid = es.examseriesid
-    LEFT JOIN studentclass sc
-      ON s.studentid = sc.studentid
-   
-    ${whereClause}
+  LEFT JOIN studentclass sc
+    ON s.studentid = sc.studentid
+  LEFT JOIN studentexamseries se
+    ON s.studentid=se.studentid
+  LEFT JOIN examsubj esj
+    ON se.examseriesid=esj.examseriesid
+  ${whereClause}
   `;
 
   const [countResult] = await pool.query(countQuery, [...params]);

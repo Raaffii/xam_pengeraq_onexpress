@@ -2,14 +2,22 @@ import { Calendar, Views, dateFnsLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { enUS } from "date-fns/locale";
 import PageHeader from "@/components/common/PageHeader";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { monthsAndYear } from "@/utils/monthsYear";
 import { useState } from "react";
-import { Calendar as Cldr, Table } from "lucide-react";
 import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
 import { useEffect } from "react";
 import CalendarDetailPage from "@/components/calendar/CalendarDetailPage";
 import { usePageTitle } from "@/hooks/usePageTitle";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function CalendarPage() {
   usePageTitle("Calendar");
@@ -18,6 +26,11 @@ export default function CalendarPage() {
     "en-US": enUS,
   };
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const currentView =
+    location.pathname === "/schedule/calendar" ? "calendar" : "list";
+
   const [calendarShow, setCalendarShow] = useState(0);
   const [view, setView] = useState(Views.MONTH);
   const [events, setEvents] = useState();
@@ -43,19 +56,6 @@ export default function CalendarPage() {
 
     fetchData();
   }, [fetchClassScheduleDetail]);
-
-  const actions = [
-    {
-      icon: Table,
-      label: "table",
-      onClick: () => navigate("/schedule"),
-    },
-    {
-      icon: Cldr,
-      label: "calendar",
-      onClick: () => navigate("/schedule/calendar"),
-    },
-  ];
 
   const components = {
     event: ({ event }) => {
@@ -135,6 +135,33 @@ export default function CalendarPage() {
     setEvents(mappedEvents);
   };
 
+  const actionsChildren = (
+    <Select
+      onValueChange={(value) => {
+        if (value === "list") {
+          navigate("/schedule");
+        }
+
+        if (value === "calendar") {
+          navigate("/schedule/calendar");
+        }
+      }}
+      value={currentView}>
+      <SelectTrigger className='w-full max-w-48'>
+        <SelectValue placeholder='View By' />
+      </SelectTrigger>
+
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>View By</SelectLabel>
+
+          <SelectItem value='list'>View By List</SelectItem>
+          <SelectItem value='calendar'>View By Calendar</SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+
   const handleChangeCalendar = async (con) => {
     if (con == "next") {
       const resultOri = await fetchClassScheduleDetail({
@@ -174,7 +201,7 @@ export default function CalendarPage() {
         showSearch={false}
         searchPlaceholder='Search by name'
         searchMaxLength={50}
-        actions2={actions}
+        children={actionsChildren}
       />
       <div className='flex justify-between m-2'>
         <div className='flex gap-3 items-center'>

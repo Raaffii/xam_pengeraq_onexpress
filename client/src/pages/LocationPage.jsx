@@ -1,51 +1,42 @@
-import { useTeacher } from "@/hooks/useTeacher";
+import { useLocation } from "@/hooks/useLocation";
 import PageHeader from "@/components/common/PageHeader";
 import { useEffect, useRef, useState } from "react";
 import { DataTable } from "@/components/table";
 import AddTeacher from "@/components/teachers/AddTeacher";
-import EditTeacher from "@/components/teachers/EditTeacher";
+import AddLocation from "@/components/location/AddLocation";
 import Delete_modal from "@/components/modals/Delete_modal";
+import EditLocation from "@/components/location/EditLocation";
 
-export default function TeacherPage() {
+export default function LocationPage() {
   const hasFetchedData = useRef(false);
   const {
-    fetchTeacher,
-    teacher,
-    deleteTeacher,
+    fetchLocation,
+    location,
+    deletelocation,
     pagination,
     onPageChange,
     onPageSizeChange,
     onSearch,
-  } = useTeacher();
+  } = useLocation();
   const [isModalOpen, setIsModalOpen] = useState();
   const [isModalEditOpen, setIsModalEditOpen] = useState();
   const [isModalDeleteOpen, setIsModalDeleteOpen] = useState();
-  const [selectedTeacher, setSelectedTeacher] = useState();
+  const [selectedLocation, setselectedLocation] = useState();
 
   useEffect(() => {
     if (hasFetchedData.current) return;
     hasFetchedData.current = true;
     const fetchData = async () => {
-      await fetchTeacher();
+      await fetchLocation();
     };
 
     fetchData();
-  }, [fetchTeacher]);
+  }, [fetchLocation]);
 
   const columns = [
     {
-      accessorKey: "teacherName",
-      header: <div className='text-left w-full'>Teacher Name</div>,
-      cellClassName: "text-left",
-    },
-    {
-      accessorKey: "emailAddress",
-      header: <div className='text-left w-full'>Email Address</div>,
-      cellClassName: "text-left",
-    },
-    {
-      accessorKey: "userName",
-      header: <div className='text-left w-full'>Account</div>,
+      accessorKey: "locationName",
+      header: <div className='text-left w-full'>Location Name</div>,
       cellClassName: "text-left",
     },
   ];
@@ -53,7 +44,7 @@ export default function TeacherPage() {
   const fields = [
     {
       label: "",
-      name: "studentId",
+      name: "locationId",
       type: "hidden",
     },
     {
@@ -81,20 +72,20 @@ export default function TeacherPage() {
     alert("cek");
   };
   const openEditModal = (teacher) => {
-    setSelectedTeacher(teacher);
+    setselectedLocation(teacher);
     setIsModalEditOpen(true);
   };
 
   const openDeleteModal = (teacher) => {
-    setSelectedTeacher(teacher);
+    setselectedLocation(teacher);
     setIsModalDeleteOpen(true);
   };
 
-  const handleTeacherDelete = async (teacher) => {
-    const result = await deleteTeacher(teacher.teacherId);
+  const handleLocationDelete = async (location) => {
+    const result = await deletelocation(location.classLocationId);
     if (result.success) {
       // setParams((prev) => ({ ...prev, page: 1 }));
-      fetchTeacher();
+      fetchLocation();
     }
     return result.success;
   };
@@ -102,22 +93,22 @@ export default function TeacherPage() {
   return (
     <div className='min-h-screen '>
       <PageHeader
-        title='Teacher'
-        subtitle='Manage teacher records and exam series assignments'
+        title='Location'
+        subtitle='Manage location records'
         primaryAction={{
-          label: "Add Teacher",
+          label: "Add Class",
           onClick: () => setIsModalOpen(true),
         }}
         showSearch={true}
-        searchPlaceholder='Search by name..'
+        searchPlaceholder='Search by class..'
         onSearch={onSearch}
         searchMaxLength={50}>
         {" "}
       </PageHeader>{" "}
       <DataTable
-        data={teacher}
+        data={location}
         columns={columns}
-        idAccessor='teacherId'
+        idAccessor='classLocationId'
         onEdit={openEditModal}
         onDelete={openDeleteModal}
         onPageChange={onPageChange}
@@ -125,34 +116,34 @@ export default function TeacherPage() {
         pagination={pagination}
       />
       {isModalOpen && (
-        <AddTeacher
+        <AddLocation
           open={isModalOpen}
           setOpen={setIsModalOpen}
           onSubmit={handleTeacherSubmit}
           fields={fields}
-          title='Add New Student'
-          fetchTeacher={fetchTeacher}
+          title='Add New Location'
+          fetchLocation={fetchLocation}
         />
       )}
       {isModalEditOpen && (
-        <EditTeacher
+        <EditLocation
           open={isModalEditOpen}
           setOpen={setIsModalEditOpen}
           onSubmit={handleTeacherSubmit}
           fields={fields}
-          title='Add Edit Student'
-          fetchTeacher={fetchTeacher}
-          selectedTeacher={selectedTeacher}
+          title='Add Edit Location'
+          fetchLocation={fetchLocation}
+          selectedLocation={selectedLocation}
         />
       )}
-      {isModalDeleteOpen && selectedTeacher && (
+      {isModalDeleteOpen && selectedLocation && (
         <Delete_modal
           open={isModalDeleteOpen}
           setOpen={setIsModalDeleteOpen}
-          onSubmit={handleTeacherDelete}
-          entityData={selectedTeacher}
+          onSubmit={handleLocationDelete}
+          entityData={selectedLocation}
           title='Delete Schedule'
-          confirmationText={`Are you sure you want to delete teacher "${selectedTeacher?.teacherName}"? This action cannot be undone.`}
+          confirmationText={`Are you sure you want to delete teacher "${selectedLocation?.locationName}"? This action cannot be undone.`}
         />
       )}
     </div>

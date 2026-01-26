@@ -59,7 +59,7 @@ export default function EditTeacher({
       onClose={() => {
         setOpen(false);
       }}
-      title={<div className='flex items-center'>Edit Teacher</div>}
+      title={<div className='flex items-center'>Edit Class</div>}
       size='lg'>
       <Form
         onSubmit={handleSubmit}

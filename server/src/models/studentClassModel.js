@@ -10,6 +10,20 @@ const getStudentClass = async (page, limit, searchTerm = "", schedule) => {
   const conditions = [];
   const params = [];
 
+  if (searchTerm) {
+    const searchValue = searchTerm ? `%${searchTerm}%` : "%";
+    conditions.push("s.studentname LIKE ?");
+    params.push(searchValue);
+  }
+
+  if (schedule) {
+    conditions.push("sc.classschhdid = ?");
+    params.push(schedule);
+  }
+
+  const whereClause =
+    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
   const finishClassQuery = `
   SELECT COUNT(*) AS totalFinishClass 
   FROM classschdetails cd 
@@ -26,6 +40,7 @@ const getStudentClass = async (page, limit, searchTerm = "", schedule) => {
   sc.studentclassid AS studentClassId,
   s.studentidno AS studentIdNo,
   sc.createddate as enteredDate,
+  s.studentid as studentId,
 
   COUNT(sat.checkindatetime) AS totalAttend,
 
@@ -47,7 +62,7 @@ LEFT JOIN studattendstat sat
   ON s.studentid = sat.studentid 
   AND cd.classschdetailsid = sat.classschdetailsid
 
-WHERE sc.classschhdid = ?
+${whereClause}
 
 GROUP BY s.studentid
 
@@ -56,7 +71,7 @@ LIMIT ? OFFSET ?
   const [rows] = await pool.query(query, [
     totalMeeting,
     totalMeeting,
-    schedule,
+    ...params,
     limit,
     offset,
   ]);

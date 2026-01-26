@@ -8,8 +8,9 @@ export default function PageHeader({
   subtitle,
   actions = [],
   actions2 = [],
+  actionDropDown = [],
   primaryAction,
-  children,
+  childrenCustom,
   showSearch = false,
   searchPlaceholder = "Search...",
   onSearch,
@@ -95,35 +96,36 @@ export default function PageHeader({
       </div>
 
       {/* Filters and Search Section */}
-      {(children || showSearch || actions2) && (
+      {(childrenCustom || showSearch || actions2) && (
         <div className='flex flex-wrap items-center gap-2 flex-shrink-0 justify-end'>
           <div className='flex-1 min-w-0'>
-            {children}
-
-            {actions2.length > 0 && (
-              <div className='flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:gap-2'>
-                {actions2.map((action, index) => (
-                  <button
-                    key={index}
-                    type='button'
-                    className={`inline-flex items-center justify-center px-3 py-2 border rounded-lg text-sm font-medium transition-colors duration-200 ${
-                      action.variant === "primary"
-                        ? "border-blue-600 text-white bg-blue-600 hover:bg-blue-700"
-                        : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
-                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                    onClick={action.onClick}
-                    disabled={action.disabled}>
-                    {action.icon && (
-                      <action.icon
-                        className='h-4 w-4 mr-2'
-                        aria-hidden='true'
-                      />
-                    )}
-                    {action.label}
-                  </button>
-                ))}
-              </div>
-            )}
+            <div className='flex gap-1'>
+              {actions2.length > 0 && (
+                <div className='flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:gap-2'>
+                  {actions2.map((action, index) => (
+                    <button
+                      key={index}
+                      type='button'
+                      className={`inline-flex items-center justify-center px-3 py-2 border rounded-lg text-sm font-medium transition-colors duration-200 ${
+                        action.variant === "primary"
+                          ? "border-blue-600 text-white bg-blue-600 hover:bg-blue-700"
+                          : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
+                      } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                      onClick={action.onClick}
+                      disabled={action.disabled}>
+                      {action.icon && (
+                        <action.icon
+                          className='h-4 w-4 mr-2'
+                          aria-hidden='true'
+                        />
+                      )}
+                      {action.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {childrenCustom}
+            </div>
           </div>
 
           {/* Search Bar */}

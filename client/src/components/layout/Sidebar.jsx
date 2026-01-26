@@ -9,6 +9,7 @@ import {
   UserCircle,
   ClipboardList,
   Calendar,
+  MapPin,
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -22,14 +23,15 @@ export const Sidebar = ({ isOpen, setIsOpen }) => {
     if (user.role === "admin") {
       navigation = [
         { name: "Dashboard", href: "/", icon: Home },
-        { name: "Schedule", href: "/schedule", icon: Calendar },
-        { name: "Students", href: "/students", icon: Users },
         { name: "Teacher", href: "/teachers", icon: GraduationCap },
+        { name: "Students", href: "/students", icon: Users },
+        { name: "Schedule", href: "/schedule", icon: Calendar },
+        { name: "Location", href: "/location", icon: MapPin },
         { name: "Exams", href: "/exams", icon: ClipboardList },
-        { name: "Series", href: "/series", icon: Folder },
         { name: "Subjects", href: "/subjects", icon: FileText },
+        { name: "Exam Series", href: "/series", icon: Folder },
         { name: "Users", href: "/users", icon: UserCircle },
-        { name: "Transcripts", href: "/transcripts", icon: Inbox },
+        { name: "Print Certificate", href: "/transcripts", icon: Inbox },
       ];
     } else if (user.role === "teacher") {
       navigation = [
@@ -40,8 +42,16 @@ export const Sidebar = ({ isOpen, setIsOpen }) => {
   }
 
   const location = useLocation();
-  const pathname =
-    location.pathname === "/" ? "" : location.pathname.split("/")[1];
+
+  let pathname;
+  let pathArray;
+  if (user.role === "admin") {
+    pathname = location.pathname === "/" ? "" : location.pathname.split("/")[1];
+    pathArray = 1;
+  } else if (user.role === "teacher") {
+    pathname = location.pathname === "/" ? "" : location.pathname.split("/")[2];
+    pathArray = 2;
+  }
 
   const SidebarContent = () => (
     <div className='flex min-h-0 flex-1 flex-col bg-gradient-to-b from-gray-800 to-gray-900'>
@@ -64,7 +74,7 @@ export const Sidebar = ({ isOpen, setIsOpen }) => {
             const isCurrent =
               item.href === "/"
                 ? pathname === ""
-                : pathname === item.href.split("/")[1];
+                : pathname === item.href.split("/")[pathArray];
             const Icon = item.icon;
             return (
               <Link

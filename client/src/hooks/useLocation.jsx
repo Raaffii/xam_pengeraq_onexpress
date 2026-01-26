@@ -1,9 +1,9 @@
-import { teacherService } from "@/services/teacherService";
+import { locationService } from "@/services/locationService";
 import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
 // import toast from "react-hot-toast";
-export const useTeacher = () => {
-  const [teacher, setTeacher] = useState([]);
+export const useLocation = () => {
+  const [location, setLocation] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   //   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -16,7 +16,7 @@ export const useTeacher = () => {
     totalItem: 0,
   });
 
-  const fetchTeacher = useCallback(async (overrideParams = {}) => {
+  const fetchLocation = useCallback(async (overrideParams = {}) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -26,17 +26,17 @@ export const useTeacher = () => {
         ...finalParams,
       };
 
-      const response = await teacherService.getTeacher(apiParams);
+      const response = await locationService.getLocation(apiParams);
 
-      setTeacher(response.data);
+      setLocation(response.data);
       setPagination(response.pagination);
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error fetching teacher:", err);
+      console.error("Error fetching location:", err);
 
       setError(err.message);
-      setTeacher([]);
+      setLocation([]);
 
       return { success: false, error: err.message };
     } finally {
@@ -44,20 +44,20 @@ export const useTeacher = () => {
     }
   }, []);
 
-  const createTeacher = useCallback(async (data) => {
+  const createLocation = useCallback(async (data) => {
     let toastId;
     try {
       setIsSubmitting(true);
       setError(null);
-      toastId = toast.loading("Creating new teacher...");
+      toastId = toast.loading("Creating new location...");
 
-      const response = await teacherService.insertTeacher(data);
-      toast.success("teacher added successfully!", { id: toastId });
+      const response = await locationService.insertlocation(data);
+      toast.success("location added successfully!", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating teacher:", err);
-      toast.error(err.message || "Failed to create teacher", { id: toastId });
+      console.error("Error creating location:", err);
+      toast.error(err.message || "Failed to create location", { id: toastId });
       setError(err.message);
 
       return { success: false, error: err.message };
@@ -66,20 +66,20 @@ export const useTeacher = () => {
     }
   }, []);
 
-  const updateTeacher = useCallback(async (data, id) => {
+  const updateLocation = useCallback(async (data, id) => {
     let toastId;
     try {
       setIsSubmitting(true);
       setError(null);
-      toastId = toast.loading("Updating new teacher...");
-
-      const response = await teacherService.updateTeacher(data, id);
-      toast.success("teacher edit successfully!", { id: toastId });
+      toastId = toast.loading("Updating new location...");
+      console.log("data", data);
+      const response = await locationService.updateLocation(data, id);
+      toast.success("location edit successfully!", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating teacher:", err);
-      toast.error(err.message || "Failed to create teacher", { id: toastId });
+      console.error("Error creating location:", err);
+      toast.error(err.message || "Failed to create location", { id: toastId });
       setError(err.message);
 
       return { success: false, error: err.message };
@@ -88,20 +88,20 @@ export const useTeacher = () => {
     }
   }, []);
 
-  const deleteTeacher = useCallback(async (id) => {
+  const deletelocation = useCallback(async (id) => {
     let toastId;
     try {
       setIsSubmitting(true);
       setError(null);
-      toastId = toast.loading("Creating new teacher...");
+      toastId = toast.loading("Creating new location...");
 
-      const response = await teacherService.deleteTeacher(id);
-      toast.success("teacher delete successfully!", { id: toastId });
+      const response = await locationService.deleteLocation(id);
+      toast.success("location delete successfully!", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating teacher:", err);
-      toast.error(err.message || "Failed to create teacher", { id: toastId });
+      console.error("Error creating location:", err);
+      toast.error(err.message || "Failed to create location", { id: toastId });
       setError(err.message);
 
       return { success: false, error: err.message };
@@ -114,18 +114,18 @@ export const useTeacher = () => {
     async (page) => {
       const newParams = { ...params, page };
       setParams(newParams);
-      return await fetchTeacher({ page });
+      return await fetchLocation({ page });
     },
-    [params, fetchTeacher],
+    [params, fetchLocation],
   );
 
   const onPageSizeChange = useCallback(
     async (limit) => {
       const newParams = { ...params, limit, page: 1 };
       setParams(newParams);
-      return await fetchTeacher({ limit, page: 1 });
+      return await fetchLocation({ limit, page: 1 });
     },
-    [params, fetchTeacher],
+    [params, fetchLocation],
   );
 
   const onSearch = useCallback(
@@ -133,22 +133,22 @@ export const useTeacher = () => {
       const newParams = { ...params, searchTerm };
       setParams(newParams);
 
-      return await fetchTeacher({ searchTerm, page: 1 });
+      return await fetchLocation({ searchTerm, page: 1 });
     },
-    [fetchTeacher, setParams, params],
+    [fetchLocation, setParams, params],
   );
 
   return {
-    fetchTeacher,
-    createTeacher,
-    updateTeacher,
+    fetchLocation,
+    createLocation,
+    updateLocation,
     pagination,
-    teacher,
+    location,
     isLoading,
     error,
     params,
     isSubmitting,
-    deleteTeacher,
+    deletelocation,
     setParams,
     onPageChange,
     onPageSizeChange,

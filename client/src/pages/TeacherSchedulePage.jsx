@@ -4,16 +4,23 @@ import { useEffect, useState, useRef } from "react";
 import PageHeader from "@/components/common/PageHeader";
 import { useNavigate } from "react-router-dom";
 import AddSchedule from "@/components/schedule/AddSchedule";
-import EditSchedule from "@/components/schedule/EditSchedule";
-import Delete_modal from "@/components/modals/Delete_modal";
-
-import { QrCode, Flag, Table, Calendar } from "lucide-react";
+import { QrCode, Flag, UserCheck } from "lucide-react";
 import QrCodeModal from "@/components/teacher/QrCodeModal";
+
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function TeacherSchedulesPages() {
   const {
     fetchClassSchedule,
-    deleteClassSchedule,
+
     classSchedule,
     pagination,
     onSearch,
@@ -22,9 +29,7 @@ export default function TeacherSchedulesPages() {
   } = useClassSchedule();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedSchedule, setSelectedSchedule] = useState();
+
   const [isOpenQrCode, setIsOpenQrCode] = useState(false);
   const [selectedClass, setSelectedClass] = useState({});
   const hasFetchedData = useRef(false);
@@ -39,25 +44,6 @@ export default function TeacherSchedulesPages() {
 
     fetchData();
   }, [fetchClassSchedule]);
-
-  const openEditModal = (schedule) => {
-    setSelectedSchedule(schedule);
-    setIsEditModalOpen(true);
-  };
-
-  const openDeleteModal = (student) => {
-    setSelectedSchedule(student);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleScheduleDelete = async (schedule) => {
-    const result = await deleteClassSchedule(schedule.classschhdid);
-    if (result.success) {
-      // setParams((prev) => ({ ...prev, page: 1 }));
-      fetchClassSchedule({ page: 1 });
-    }
-    return result.success;
-  };
 
   const isClassToday = (row) => {
     const today = new Date();
@@ -146,19 +132,6 @@ export default function TeacherSchedulesPages() {
     },
   ];
 
-  const actions = [
-    {
-      icon: Table,
-      label: "table",
-      onClick: () => navigate("/teacher/schedule"),
-    },
-    {
-      icon: Calendar,
-      label: "calendar",
-      onClick: () => navigate("/teacher/schedule/calendar"),
-    },
-  ];
-
   const handleStartClass = (row) => {
     const canStart = isClassToday(row);
 
@@ -200,7 +173,51 @@ export default function TeacherSchedulesPages() {
         );
       },
     },
+    {
+      title: "Attendance",
+      onClick: (row) =>
+        navigate(`/teacher/schedule/attendance/${row.classschhdid}`),
+      render: () => {
+        return (
+          <div>
+            <div className='relative bg-blue-200 rounded-lg p-1'>
+              <UserCheck size={18} />
+            </div>
+          </div>
+        );
+      },
+    },
   ];
+
+  const currentView =
+    location.pathname === "/schedule/calendar" ? "calendar" : "list";
+
+  const actionsChildren = (
+    <Select
+      onValueChange={(value) => {
+        if (value === "list") {
+          navigate("/teacher/schedule");
+        }
+
+        if (value === "calendar") {
+          navigate("/teacher/schedule/calendar");
+        }
+      }}
+      value={currentView}>
+      <SelectTrigger className='w-full max-w-48'>
+        <SelectValue placeholder='View By' />
+      </SelectTrigger>
+
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>View By</SelectLabel>
+
+          <SelectItem value='list'>View By List</SelectItem>
+          <SelectItem value='calendar'>View By Calendar</SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
 
   return (
     <div className='min-h-screen bg-gray-50'>
@@ -211,8 +228,8 @@ export default function TeacherSchedulesPages() {
           showSearch={true}
           searchPlaceholder='Search by subject...'
           searchMaxLength={50}
-          actions2={actions}
           onSearch={onSearch}
+          childrenCustom={actionsChildren}
         />
 
         <DataTable
@@ -223,6 +240,7 @@ export default function TeacherSchedulesPages() {
           pagination={pagination}
           idAccessor='classschhdid'
           additionalActions={startClassAction}
+          detailPage='teacher/schedule/detail'
         />
 
         {isModalOpen && (
@@ -243,27 +261,6 @@ export default function TeacherSchedulesPages() {
           classschhdid={selectedClass?.classschhdid}
           classStartDateTime={selectedClass?.classStartDateTime}
         />
-
-        {isEditModalOpen && (
-          <EditSchedule
-            open={isEditModalOpen}
-            setOpen={setIsEditModalOpen}
-            title='Add New Student'
-            fetchClassSchedule={fetchClassSchedule}
-            selectedSchedule={selectedSchedule}
-          />
-        )}
-
-        {isDeleteModalOpen && selectedSchedule && (
-          <Delete_modal
-            open={isDeleteModalOpen}
-            setOpen={setIsDeleteModalOpen}
-            onSubmit={handleScheduleDelete}
-            entityData={selectedSchedule}
-            title='Delete Student'
-            confirmationText={`Are you sure you want to delete student "${selectedSchedule.classschhdid}"? This action cannot be undone.`}
-          />
-        )}
       </div>
     </div>
   );

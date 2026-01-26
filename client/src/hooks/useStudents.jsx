@@ -176,6 +176,24 @@ export const useStudents = () => {
     },
     [params, fetchStudents],
   );
+
+  const onFilterChange = useCallback(
+    async (filters) => {
+      const newParams = {
+        ...params,
+        subject: filters.subject || null,
+
+        page: 1,
+      };
+      setParams(newParams);
+      return await fetchStudents({
+        subject: filters.subject || null,
+        page: 1,
+      });
+    },
+    [params, fetchStudents],
+  );
+
   return {
     fetchStudents,
     updateStudents,
@@ -185,6 +203,7 @@ export const useStudents = () => {
     deleteStudent,
     getStudentById,
     onSearch,
+    onFilterChange,
     isSubmitting,
     students,
     isLoading,

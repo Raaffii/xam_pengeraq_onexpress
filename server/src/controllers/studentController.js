@@ -9,13 +9,13 @@ const getStudent = async (req, res) => {
       page,
       limit,
       searchTerm,
-      filter
+      filter,
     );
     res.status(200).json({
       data: result.data,
       pagination: {
-        currentPage: page,
-        pageSize: limit,
+        currentPage: Number(page),
+        pageSize: Number(limit),
         totalPages: Math.ceil(result.total / limit),
         totalItems: result.total,
       },
