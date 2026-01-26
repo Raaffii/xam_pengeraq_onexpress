@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import PageHeader from "../common/PageHeader";
 import { useStudentClass } from "@/hooks/useStudentClass";
 import { DataTable } from "../table";
@@ -10,14 +10,18 @@ import { useStudents } from "@/hooks/useStudents";
 import { Button } from "../custom";
 import toast from "react-hot-toast";
 import { SearchableDropdown } from "../common";
+
 import { Trash } from "lucide-react";
 import Delete_modal from "../modals/Delete_modal";
+
+import { useRowSelection } from "@/hooks";
 
 export default function ScheduleStudentListPage() {
   const { id } = useParams();
 
+  const hasFetchedData = useRef(false);
+
   const [enrolledMode, setEnrolledMode] = useState(true);
-  const [selectedRows, setSelectedRows] = useState([]);
   const [curentEnroled, setCurentEnroled] = useState([]);
   const [selectedDropStudent, setSelectedDropStudent] = useState();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState();
@@ -45,14 +49,22 @@ export default function ScheduleStudentListPage() {
     onFilterChange: fetchStudentWithParamChange,
   } = useStudents();
 
+  const { selectedRows, handleSelectRow, handleSelectAll, setSelectedRows } =
+    useRowSelection({
+      rowIdKey: "studentId",
+    });
+
   useEffect(() => {
+    if (hasFetchedData.current) return;
+    hasFetchedData.current = true;
+
     const fetchData = async () => {
       await fetchWithParamsChange({ schedule: id });
       await getClassScheduleById(id);
     };
 
     fetchData();
-  }, []);
+  }, [fetchWithParamsChange, getClassScheduleById, id]);
 
   useEffect(() => {
     if (!students?.length) return;
@@ -65,7 +77,7 @@ export default function ScheduleStudentListPage() {
 
     setSelectedRows(array);
     setCurentEnroled(array);
-  }, [students, id]);
+  }, [students, id, setSelectedRows]);
 
   const columns = [
     {
@@ -155,7 +167,9 @@ export default function ScheduleStudentListPage() {
     },
     {
       accessorKey: "examSeriesDescription",
+
       header: <div className='text-left w-full'>Exam Series</div>,
+
       cellClassName: "text-left",
       render: (row) => (
         <div className='flex flex-wrap gap-1'>
@@ -230,15 +244,6 @@ export default function ScheduleStudentListPage() {
     };
 
     await assignStudentClass(submitData);
-  };
-
-  const handleSelectRow = (row) => {
-    setSelectedRows((prev) => {
-      if (prev.includes(row)) {
-        return prev.filter((r) => r !== row);
-      }
-      return [...prev, row];
-    });
   };
 
   const options = [
@@ -337,6 +342,7 @@ export default function ScheduleStudentListPage() {
                 showActions={false}
                 onPageChange={onPageChangeStudents}
                 onSizeChange={onPageSizeChangeStudents}
+                onSelectAll={handleSelectAll}
               />
             </div>
           </>
