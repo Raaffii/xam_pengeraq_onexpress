@@ -1,8 +1,7 @@
 const pool = require("../config/db");
 
-const getStudentClass = async (page, limit, searchTerm = "", schedule) => {
-  page = Number(page) || 1;
-  limit = Number(limit) || 10;
+const getStudentClass = async (options = {}) => {
+  const { page, limit, searchTerm, schedule } = options;
   const offset = (page - 1) * limit;
 
   // const searchValue = `%${searchTerm}%`;

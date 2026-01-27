@@ -7,7 +7,7 @@ export const useClassLocation = () => {
   //   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  const [params, setParams] = useState({ page: 1, limit: 10 });
+  const [params, setParams] = useState({ page: 1, pageSize: 10 });
 
   const fetchClassLocation = useCallback(async () => {
     try {

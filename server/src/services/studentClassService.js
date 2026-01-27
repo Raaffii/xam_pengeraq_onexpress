@@ -1,18 +1,7 @@
 const StudentClass = require("../models/studentClassModel");
 
-const getStudentClass = async (page, limit, searchTerm, schedule) => {
-  try {
-    const result = await StudentClass.getStudentClass(
-      page,
-      limit,
-      searchTerm,
-      schedule
-    );
-    return result;
-  } catch (error) {
-    console.error("Service error:", error);
-    throw new Error("Get student class failed");
-  }
+const getStudentClass = async (options = {}) => {
+  return await StudentClass.getStudentClass(options);
 };
 
 const putStudentClass = async (data) => {
@@ -23,14 +12,14 @@ const putStudentClass = async (data) => {
     if (Array.isArray(data.addStudents) && data.addStudents.length > 0) {
       addResult = await StudentClass.postStudentClass(
         data.scheduleId,
-        data.addStudents
+        data.addStudents,
       );
     }
 
     if (Array.isArray(data.removeStudents) && data.removeStudents.length > 0) {
       removeResult = await StudentClass.removeStudentFromClass(
         data.scheduleId,
-        data.removeStudents
+        data.removeStudents,
       );
     }
 

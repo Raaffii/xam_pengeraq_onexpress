@@ -1,14 +1,13 @@
 import { locationService } from "@/services/locationService";
 import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
-// import toast from "react-hot-toast";
+
 export const useLocation = () => {
   const [location, setLocation] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  //   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [params, setParams] = useState({ page: 1, limit: 10 });
+  const [params, setParams] = useState({ page: 1, pageSize: 10 });
   const [pagination, setPagination] = useState({
     page: 1,
     pageSize: 10,
@@ -16,33 +15,36 @@ export const useLocation = () => {
     totalItem: 0,
   });
 
-  const fetchLocation = useCallback(async (overrideParams = {}) => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  const fetchLocation = useCallback(
+    async (overrideParams = {}) => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      const finalParams = { ...params, ...overrideParams };
-      const apiParams = {
-        ...finalParams,
-      };
+        const finalParams = { ...params, ...overrideParams };
+        const apiParams = {
+          ...finalParams,
+        };
 
-      const response = await locationService.getLocation(apiParams);
+        const response = await locationService.getLocation(apiParams);
 
-      setLocation(response.data);
-      setPagination(response.pagination);
+        setLocation(response.data);
+        setPagination(response.pagination);
 
-      return { success: true, data: response.data };
-    } catch (err) {
-      console.error("Error fetching location:", err);
+        return { success: true, data: response.data };
+      } catch (err) {
+        console.error("Error fetching location:", err);
 
-      setError(err.message);
-      setLocation([]);
+        setError(err.message);
+        setLocation([]);
 
-      return { success: false, error: err.message };
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+        return { success: false, error: err.message };
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [params],
+  );
 
   const createLocation = useCallback(async (data) => {
     let toastId;
@@ -120,10 +122,10 @@ export const useLocation = () => {
   );
 
   const onPageSizeChange = useCallback(
-    async (limit) => {
-      const newParams = { ...params, limit, page: 1 };
+    async (pageSize) => {
+      const newParams = { ...params, pageSize, page: 1 };
       setParams(newParams);
-      return await fetchLocation({ limit, page: 1 });
+      return await fetchLocation({ pageSize, page: 1 });
     },
     [params, fetchLocation],
   );

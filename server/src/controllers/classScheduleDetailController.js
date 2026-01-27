@@ -3,26 +3,33 @@ const crypto = require("crypto");
 
 const getClassScheduleDetail = async (req, res) => {
   try {
-    let { page, limit, searchTerm, date, scheduleId, nowDate, usePagination } =
-      req.query;
+    let {
+      page,
+      pageSize,
+      searchTerm,
+      date,
+      scheduleId,
+      nowDate,
+      usePagination,
+    } = req.query;
     const { teacherId } = req.user;
 
-    const result = await classScheduleDetailService.getClassScheduleDetail(
+    const result = await classScheduleDetailService.getClassScheduleDetail({
       page,
-      limit,
+      limit: pageSize,
       searchTerm,
       date,
       teacherId,
       scheduleId,
       nowDate,
       usePagination,
-    );
+    });
 
     res.status(200).json({
       data: result.data,
       pagination: {
         currentPage: Number(page),
-        pageSize: Number(limit),
+        pageSize: Number(pageSize),
         totalPages: result?.pagination?.totalPages,
         totalItems: result?.pagination?.totalItems,
       },

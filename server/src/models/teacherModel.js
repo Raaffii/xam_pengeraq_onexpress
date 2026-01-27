@@ -1,9 +1,7 @@
 const pool = require("../config/db");
 
-const getTeacher = async (page, limit, searchTerm = "") => {
-  page = Number(page) || 1;
-  limit = Number(limit) || 10;
-  const offset = (page - 1) * limit;
+const getTeacher = async (options = {}) => {
+  let { page = 1, limit = 10, searchTerm = "" } = options;
 
   const params = [];
   const conditions = [];
@@ -17,7 +15,7 @@ const getTeacher = async (page, limit, searchTerm = "") => {
   const whereClause =
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  const query = `
+  let query = `
     SELECT 
     t.teachername as teacherName,
     t.emailaddress as emailAddress,
@@ -29,12 +27,17 @@ const getTeacher = async (page, limit, searchTerm = "") => {
     LEFT JOIN users s ON t.teacherid = s.teacherid
     
      ${whereClause}
-    LIMIT ? OFFSET ?
     `;
+  const queryParams = [...params];
+  if (page && limit) {
+    const offset = (page - 1) * limit;
+    query += ` LIMIT ? OFFSET ?`;
+    queryParams.push(String(limit), String(offset));
+  }
 
-  const [rows] = await pool.query(query, [...params, limit, offset]);
+  const [rows] = await pool.execute(query, queryParams);
   const countQuery = `SELECT COUNT(*) AS total  FROM teacher t ${whereClause} `;
-  const [countResult] = await pool.query(countQuery, [...params]);
+  const [countResult] = await pool.execute(countQuery, [...params]);
   const total = countResult[0].total;
 
   return { data: rows, total: total };

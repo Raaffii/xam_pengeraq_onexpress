@@ -1,19 +1,7 @@
 const pool = require("../config/db");
 
-const getClassAttendance = async (
-  page,
-  limit,
-  searchTerm = "",
-  filter = {},
-) => {
-  page = Number(page) || 1;
-  limit = Number(limit) || 10;
-  const offset = (page - 1) * limit;
-
-  console.log(page, limit, searchTerm);
-
-  // const searchValue = `%${searchTerm}%`;
-  const { classSchDetailsId } = filter;
+const getClassAttendance = async (options = {}) => {
+  const { page = 1, limit = 10, searchTerm, classSchDetailsId } = options;
 
   const conditions = [];
   const params = [];
@@ -53,6 +41,7 @@ const getClassAttendance = async (
   const queryParams = [...params];
 
   if (page && limit) {
+    const offset = (page - 1) * limit;
     query += ` LIMIT ? OFFSET ?`;
     queryParams.push(limit, offset);
   }

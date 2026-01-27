@@ -4,15 +4,19 @@ const userService = require("../services/userService");
 
 const getTeacher = async (req, res) => {
   try {
-    let { page, limit, searchTerm } = req.query;
+    let { page, pageSize, searchTerm } = req.query;
 
-    const result = await teacherService.getTeacher(page, limit, searchTerm);
+    const result = await teacherService.getTeacher({
+      page,
+      limit: pageSize,
+      searchTerm,
+    });
     res.status(200).json({
       data: result.data,
       pagination: {
-        currentPage: page,
-        pageSize: limit,
-        totalPages: Math.ceil(result.total / limit),
+        currentPage: Number(page),
+        pageSize: Number(pageSize),
+        totalPages: Math.ceil(result.total / pageSize),
         totalItems: result.total,
       },
     });

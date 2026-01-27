@@ -1,8 +1,7 @@
 const pool = require("../config/db");
 
-const getLocation = async (page, limit, searchTerm = "") => {
-  page = Number(page) || 1;
-  limit = Number(limit) || 10;
+const getLocation = async (options = {}) => {
+  let { page = 1, limit = 10, searchTerm } = options;
   const offset = (page - 1) * limit;
 
   const params = [];
@@ -26,9 +25,9 @@ const getLocation = async (page, limit, searchTerm = "") => {
     LIMIT ? OFFSET ?
     `;
 
-  const [rows] = await pool.query(query, [...params, limit, offset]);
+  const [rows] = await pool.execute(query, [...params, limit, offset]);
   const countQuery = `SELECT COUNT(*) AS total  FROM classlocation cl ${whereClause} `;
-  const [countResult] = await pool.query(countQuery, [...params]);
+  const [countResult] = await pool.execute(countQuery, [...params]);
   const total = countResult[0].total;
 
   return { data: rows, total: total };
@@ -71,7 +70,6 @@ const postLocation = async (data) => {
 
 const putLocation = async (data, id) => {
   const { locationName, editedBy } = data;
-  console.log("id", id);
   const query = `
     UPDATE classlocation 
     SET locationname = ?, editedby = ?, editeddate=?

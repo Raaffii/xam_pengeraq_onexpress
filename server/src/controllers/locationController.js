@@ -1,18 +1,21 @@
-const studentExamService = require("../services/studentExamService");
 const locationService = require("../services/locationService");
 const userService = require("../services/userService");
 
 const getLocation = async (req, res) => {
   try {
-    let { page, limit, searchTerm } = req.query;
+    let { page, pageSize, searchTerm } = req.query;
 
-    const result = await locationService.getLocation(page, limit, searchTerm);
+    const result = await locationService.getLocation({
+      page,
+      limit: pageSize,
+      searchTerm,
+    });
     res.status(200).json({
       data: result.data,
       pagination: {
-        currentPage: page,
-        pageSize: limit,
-        totalPages: Math.ceil(result.total / limit),
+        currentPage: Number(page),
+        pageSize: Number(pageSize),
+        totalPages: Math.ceil(result.total / pageSize),
         totalItems: result.total,
       },
     });

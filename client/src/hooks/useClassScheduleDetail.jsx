@@ -14,7 +14,7 @@ export const useClassScheduleDetail = () => {
     totalPages: 1,
     totalItems: 0,
   });
-  const [params, setParams] = useState({ page: 1, limit: 10 });
+  const [params, setParams] = useState({ page: 1, pageSize: 10 });
 
   const formatClassSchedule = useCallback((rawExams) => {
     return rawExams.map((item) => ({
@@ -86,7 +86,7 @@ export const useClassScheduleDetail = () => {
         setIsLoading(false);
       }
     },
-    [params, formatClassSchedule],
+    [],
   );
 
   const startClassSession = useCallback(async (classschhdid) => {
@@ -189,10 +189,10 @@ export const useClassScheduleDetail = () => {
   );
 
   const onPageSizeChange = useCallback(
-    async (limit) => {
-      const newParams = { ...params, limit, page: 1 };
+    async (pageSize) => {
+      const newParams = { ...params, pageSize, page: 1 };
       setParams(newParams);
-      return await fetchClassScheduleDetail({ limit, page: 1 });
+      return await fetchClassScheduleDetail({ pageSize, page: 1 });
     },
     [params, fetchClassScheduleDetail],
   );

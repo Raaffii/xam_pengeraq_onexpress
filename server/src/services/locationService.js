@@ -1,13 +1,7 @@
 const Location = require("../models/locationModel");
 
-const getLocation = async (page, limit, searchTerm) => {
-  try {
-    const result = await Location.getLocation(page, limit, searchTerm);
-    return result;
-  } catch (error) {
-    console.error("Service error:", error);
-    throw new Error("Failed to get student exam series");
-  }
+const getLocation = async (options = {}) => {
+  return await Location.getLocation(options);
 };
 
 const postLocation = async (data) => {

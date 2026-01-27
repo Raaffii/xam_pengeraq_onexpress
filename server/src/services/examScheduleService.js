@@ -5,20 +5,8 @@ const ClassScheduleDetail = require("../models/classScheduleDetailsModel");
 
 const addDateByRepeat = require("../utils/addDateByRepeat");
 
-const getClassSchedule = async (page, limit, searchTerm, date, teacherId) => {
-  try {
-    const result = await ClassSchedule.getClassSchedule(
-      page,
-      limit,
-      searchTerm,
-      date,
-      teacherId,
-    );
-    return result;
-  } catch (error) {
-    console.error("Service error:", error);
-    throw new Error("Failed to get student by id");
-  }
+const getClassSchedule = async (options = {}) => {
+  return await ClassSchedule.getClassSchedule(options);
 };
 
 const postClassSchedule = async (data, userId) => {

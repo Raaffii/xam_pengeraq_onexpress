@@ -1,31 +1,7 @@
 const ClassScheduleDetail = require("../models/classScheduleDetailsModel");
 
-const getClassScheduleDetail = async (
-  page,
-  limit,
-  searchTerm,
-  date,
-  teacherId,
-  scheduleId,
-  nowDate,
-  usePagination,
-) => {
-  try {
-    const result = await ClassScheduleDetail.getClassScheduleDetail(
-      page,
-      limit,
-      searchTerm,
-      date,
-      teacherId,
-      scheduleId,
-      nowDate,
-      usePagination,
-    );
-    return result;
-  } catch (error) {
-    console.error("Service error:", error);
-    throw new Error("Failed to get student by id");
-  }
+const getClassScheduleDetail = async (options = {}) => {
+  return await ClassScheduleDetail.getClassScheduleDetail(options);
 };
 
 const getClassScheduleDetailById = async (classSchDetailsId) => {

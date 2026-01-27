@@ -104,7 +104,7 @@ const StudentsPage = () => {
     },
     {
       accessorKey: "examSeriesDescription",
-      header: "Current Series",
+      header: "Exam Series",
       cellClassName: "text-left",
       render: (row) => {
         const maxVisible = 3;

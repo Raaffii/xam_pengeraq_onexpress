@@ -8,8 +8,8 @@ const getExam = async (req, res) => {
     res.status(200).json({
       data: result.data,
       pagination: {
-        currentPage: page,
-        pageSize: pageSize,
+        currentPage: Number(page),
+        pageSize: Number(pageSize),
         totalPages: Math.ceil(result.total / pageSize),
         totalItems: result.total,
       },

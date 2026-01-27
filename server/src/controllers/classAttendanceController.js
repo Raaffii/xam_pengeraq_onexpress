@@ -2,21 +2,20 @@ const ClassAttendanceService = require("../services/classAttendanceService");
 
 const getClassAttendance = async (req, res) => {
   try {
-    let { page, limit, searchTerm } = req.query;
-    const filter = req.query;
+    const filters = {
+      page: Number(req.query.page),
+      limit: Number(req.query.pageSize),
+      searchTerm: req.query.searchTerm,
+      classSchDetailsId: req.query.classSchDetailsId,
+    };
 
-    const result = await ClassAttendanceService.getClassAttendance(
-      page,
-      limit,
-      searchTerm,
-      filter,
-    );
+    const result = await ClassAttendanceService.getClassAttendance(filters);
     res.status(200).json({
       data: result.data,
       pagination: {
-        currentPage: Number(page),
-        pageSize: Number(limit),
-        totalPages: Math.ceil(result.total / limit),
+        currentPage: filters.page,
+        pageSize: filters.limit,
+        totalPages: Math.ceil(result.total / filters.limit),
         totalItems: result.total,
       },
     });

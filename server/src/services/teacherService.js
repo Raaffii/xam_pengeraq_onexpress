@@ -1,13 +1,7 @@
 const Teacher = require("../models/teacherModel");
 
-const getTeacher = async (page, limit, searchTerm) => {
-  try {
-    const result = await Teacher.getTeacher(page, limit, searchTerm);
-    return result;
-  } catch (error) {
-    console.error("Service error:", error);
-    throw new Error("Failed to get student exam series");
-  }
+const getTeacher = async (options = {}) => {
+  return await Teacher.getTeacher(options);
 };
 
 const postTeacher = async (data) => {

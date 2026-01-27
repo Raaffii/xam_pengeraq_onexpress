@@ -2,24 +2,23 @@ const classScheduleService = require("../services/examScheduleService");
 
 const getClassSchedule = async (req, res) => {
   try {
-    let { page, limit, searchTerm, date } = req.query;
-
+    let { page, pageSize, searchTerm, date } = req.query;
     const { teacherId } = req.user;
 
-    const result = await classScheduleService.getClassSchedule(
+    const result = await classScheduleService.getClassSchedule({
       page,
-      limit,
+      limit: pageSize,
       searchTerm,
       date,
       teacherId,
-    );
+    });
 
     res.status(200).json({
       data: result.data,
       pagination: {
         currentPage: Number(page),
-        pageSize: Number(limit),
-        totalPages: Math.ceil(result.total / limit),
+        pageSize: Number(pageSize),
+        totalPages: Math.ceil(result.total / pageSize),
         totalItems: result.total,
       },
     });

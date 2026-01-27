@@ -21,16 +21,17 @@ const bulkInsertScheduleDetail = async (conn, data) => {
   return result.affectedRows;
 };
 
-const getClassScheduleDetail = async (
-  page,
-  limit,
-  searchTerm = "",
-  date,
-  teacherId,
-  scheduleId,
-  nowDate = false,
-  usePagination = true,
-) => {
+const getClassScheduleDetail = async (options = {}) => {
+  let {
+    page,
+    limit,
+    searchTerm = "",
+    date,
+    teacherId,
+    scheduleId,
+    nowDate = false,
+    usePagination = true,
+  } = options;
   usePagination = String(usePagination) !== "false";
 
   page = Number(page) || 1;

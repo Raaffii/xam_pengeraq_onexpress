@@ -1,14 +1,12 @@
 import { teacherService } from "@/services/teacherService";
 import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
-// import toast from "react-hot-toast";
 export const useTeacher = () => {
   const [teacher, setTeacher] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  //   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [params, setParams] = useState({ page: 1, limit: 10 });
+  const [params, setParams] = useState({ page: 1, pageSize: 10 });
   const [pagination, setPagination] = useState({
     page: 1,
     pageSize: 10,
@@ -16,33 +14,36 @@ export const useTeacher = () => {
     totalItem: 0,
   });
 
-  const fetchTeacher = useCallback(async (overrideParams = {}) => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  const fetchTeacher = useCallback(
+    async (overrideParams = {}) => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      const finalParams = { ...params, ...overrideParams };
-      const apiParams = {
-        ...finalParams,
-      };
+        const finalParams = { ...params, ...overrideParams };
+        const apiParams = {
+          ...finalParams,
+        };
 
-      const response = await teacherService.getTeacher(apiParams);
+        const response = await teacherService.getTeacher(apiParams);
 
-      setTeacher(response.data);
-      setPagination(response.pagination);
+        setTeacher(response.data);
+        setPagination(response.pagination);
 
-      return { success: true, data: response.data };
-    } catch (err) {
-      console.error("Error fetching teacher:", err);
+        return { success: true, data: response.data };
+      } catch (err) {
+        console.error("Error fetching teacher:", err);
 
-      setError(err.message);
-      setTeacher([]);
+        setError(err.message);
+        setTeacher([]);
 
-      return { success: false, error: err.message };
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+        return { success: false, error: err.message };
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [params],
+  );
 
   const createTeacher = useCallback(async (data) => {
     let toastId;
@@ -120,10 +121,10 @@ export const useTeacher = () => {
   );
 
   const onPageSizeChange = useCallback(
-    async (limit) => {
-      const newParams = { ...params, limit, page: 1 };
+    async (pageSize) => {
+      const newParams = { ...params, pageSize, page: 1 };
       setParams(newParams);
-      return await fetchTeacher({ limit, page: 1 });
+      return await fetchTeacher({ pageSize, page: 1 });
     },
     [params, fetchTeacher],
   );

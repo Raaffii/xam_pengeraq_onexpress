@@ -1,15 +1,7 @@
 const pool = require("../config/db");
 
-const getClassSchedule = async (
-  page,
-  limit,
-  searchTerm = "",
-  date,
-  teacherId,
-) => {
-  page = Number(page) || 1;
-  limit = Number(limit) || 10;
-  const offset = (page - 1) * limit;
+const getClassSchedule = async (options = {}) => {
+  const { page = 1, limit = 10, searchTerm, date, teacherId } = options;
 
   const conditions = [];
   const params = [];
@@ -54,7 +46,7 @@ const getClassSchedule = async (
   const queryParams = [...params];
 
   if (page) {
-    const offset = (page - 1) * page;
+    const offset = (page - 1) * limit;
     query += ` LIMIT ? OFFSET ?`;
     queryParams.push(String(limit), String(offset));
   }
