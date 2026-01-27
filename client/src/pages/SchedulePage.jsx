@@ -27,6 +27,7 @@ export default function SchedulesPages() {
     pagination,
     onPageChange,
     onPageSizeChange,
+    isLoading,
   } = useClassSchedule();
   const hasFetchedData = useRef(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -173,6 +174,7 @@ export default function SchedulesPages() {
           pagination={pagination}
           detailPage='schedule'
           idAccessor='classschhdid'
+          isLoading={isLoading}
         />
 
         {isModalOpen && (

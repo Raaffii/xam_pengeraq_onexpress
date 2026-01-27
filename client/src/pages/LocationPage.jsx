@@ -16,6 +16,7 @@ export default function LocationPage() {
     onPageChange,
     onPageSizeChange,
     onSearch,
+    isLoading,
   } = useLocation();
   const [isModalOpen, setIsModalOpen] = useState();
   const [isModalEditOpen, setIsModalEditOpen] = useState();
@@ -113,6 +114,7 @@ export default function LocationPage() {
         onPageChange={onPageChange}
         onSizeChange={onPageSizeChange}
         pagination={pagination}
+        isLoading={isLoading}
       />
       {isModalOpen && (
         <AddLocation
