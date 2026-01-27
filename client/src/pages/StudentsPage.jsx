@@ -1,13 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import PageHeader from "@/components/common/PageHeader";
-
 import { DataTable } from "@/components/table";
-
 import Delete_modal from "@/components/modals/Delete_modal";
 import { useStudents } from "@/hooks/useStudents";
-
-import AddStudent from "@/components/student/AddStudent";
-import EditStudent from "@/components/student/EditStudent";
+import { StudentModal } from "@/components/student/StudentModal";
 import { useExamSeries } from "@/hooks/useExamsSeries";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
@@ -16,9 +12,9 @@ const StudentsPage = () => {
   usePageTitle("Students");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [modalMode, setModalMode] = useState("create");
 
   const {
     createStudents,
@@ -32,7 +28,11 @@ const StudentsPage = () => {
     onPageChange,
     onPageSizeChange,
   } = useStudents();
-  const { fetchExamSeries, examSeries } = useExamSeries();
+  const {
+    fetchExamSeries,
+    examSeries,
+    isLoading: isLoadingSeries,
+  } = useExamSeries();
 
   useEffect(() => {
     if (hasFetchedData.current) return;
@@ -45,9 +45,16 @@ const StudentsPage = () => {
     fetchExamSeries();
   }, [fetchStudents, fetchExamSeries]);
 
+  const openCreateModal = () => {
+    setSelectedStudent(null);
+    setModalMode("create");
+    setIsModalOpen(true);
+  };
+
   const openEditModal = (student) => {
     setSelectedStudent(student);
-    setIsEditModalOpen(true);
+    setModalMode("edit");
+    setIsModalOpen(true);
   };
 
   const openDeleteModal = (student) => {
@@ -55,21 +62,24 @@ const StudentsPage = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleStudentEdit = async (formData) => {
-    const result = await updateStudents(selectedStudent.studentId, formData);
-    if (result.success) {
-      fetchStudents();
+  const handleFormSubmit = async (formData) => {
+    let response;
+    if (modalMode === "create") {
+      response = await createStudents(formData);
+    } else {
+      response = await updateStudents(selectedStudent.studentId, formData);
     }
-    return result.success;
-  };
 
-  const handleStudentSubmit = async (formData) => {
-    const result = await createStudents(formData);
-    if (result.success) {
-      setParams((prev) => ({ ...prev, page: 1 }));
-      fetchStudents({ page: 1 });
+    if (response?.success) {
+      if (modalMode === "create") {
+        setParams((prev) => ({ ...prev, page: 1 }));
+        fetchStudents({ page: 1 });
+      } else {
+        fetchStudents();
+      }
+      setIsModalOpen(false);
+      setSelectedStudent(null);
     }
-    return result.success;
   };
 
   const handleStudentDelete = async (entityData) => {
@@ -84,57 +94,47 @@ const StudentsPage = () => {
   const columns = [
     {
       accessorKey: "studentIdNo",
-      header: <div className='text-left w-full'>ID</div>,
+      header: "ID",
       cellClassName: "text-left",
     },
     {
       accessorKey: "studentName",
-      header: <div className='text-left w-full'>Student Name</div>,
+      header: "Name",
       cellClassName: "text-left",
     },
     {
       accessorKey: "examSeriesDescription",
-      header: <div className='text-left w-full'>Curent Series</div>,
+      header: "Current Series",
       cellClassName: "text-left",
-      render: (row) => (
-        <div className='flex flex-wrap gap-1'>
-          {row.examSeries?.map((item) => (
-            <span
-              key={item.examSeriesId}
-              className='px-2 py-0.5 text-xs rounded-full
-                   bg-blue-50 text-blue-700 border border-blue-200'>
-              {item.examSeriesDescription}
-            </span>
-          ))}
-        </div>
-      ),
-    },
-  ];
+      render: (row) => {
+        const maxVisible = 3;
+        const examSeries = row.examSeries || [];
+        const visibleSeries = examSeries.slice(0, maxVisible);
+        const remaining = examSeries.length - maxVisible;
 
-  const fields = [
-    {
-      label: "",
-      name: "studentId",
-      type: "hidden",
-    },
-    {
-      label: "ID",
-      name: "studentIdNo",
-      type: "text",
-      required: true,
-      maxLength: 4,
-    },
-    {
-      label: "Name",
-      name: "studentName",
-      type: "text",
-      required: true,
-    },
-    {
-      label: "Exam Series",
-      name: "examSeriesId",
-      type: "dropdown",
-      required: true,
+        return (
+          <div className="flex flex-wrap gap-1 max-w-md items-center">
+            {visibleSeries.map((item) => (
+              <span
+                key={item.examSeriesId}
+                className="px-2 py-0.5 text-xs rounded-full
+             bg-blue-50 text-blue-700 border border-blue-200
+             inline-block max-w-[180px]"
+                title={item.examSeriesDescription}
+              >
+                <span className="truncate block">
+                  {item.examSeriesDescription}
+                </span>
+              </span>
+            ))}
+            {remaining > 0 && (
+              <span className="px-2 py-0.5 text-xs text-gray-600">
+                +{remaining} more
+              </span>
+            )}
+          </div>
+        );
+      },
     },
   ];
 
@@ -144,26 +144,27 @@ const StudentsPage = () => {
   }));
 
   return (
-    <div className='min-h-screen '>
+    <div className="min-h-screen ">
       <PageHeader
-        title='Students'
-        subtitle='Manage student records and exam series assignments'
+        title="Students"
+        subtitle="Manage student records and exam series assignments"
         primaryAction={{
           label: "Add Student",
-          onClick: () => setIsModalOpen(true),
+          onClick: openCreateModal,
         }}
         showSearch={true}
-        searchPlaceholder='Search by name'
+        searchPlaceholder="Search by name"
         onSearch={onSearch}
-        searchMaxLength={50}>
+        searchMaxLength={50}
+      >
         {" "}
       </PageHeader>
 
       <DataTable
         data={students}
         columns={columns}
-        detailPage='students'
-        idAccessor='studentId'
+        detailPage="students"
+        idAccessor="studentId"
         onEdit={openEditModal}
         onDelete={openDeleteModal}
         onPageChange={onPageChange}
@@ -171,30 +172,15 @@ const StudentsPage = () => {
         pagination={pagination}
       />
 
-      {isModalOpen && (
-        <AddStudent
-          open={isModalOpen}
-          setOpen={setIsModalOpen}
-          onSubmit={handleStudentSubmit}
-          fields={fields}
-          title='Add New Student'
-          fetchStudents={fetchStudents}
-          seriesOptions={optionSeries}
-        />
-      )}
-
-      {isEditModalOpen && selectedStudent && (
-        <EditStudent
-          open={isEditModalOpen}
-          setOpen={setIsEditModalOpen}
-          onSubmit={handleStudentEdit}
-          fields={fields}
-          entityData={selectedStudent}
-          title='Edit Student'
-          fetchStudents={fetchStudents}
-          seriesOptions={optionSeries}
-        />
-      )}
+      <StudentModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        initialValues={selectedStudent || {}}
+        onSubmit={handleFormSubmit}
+        mode={modalMode}
+        examSeriesOptions={optionSeries}
+        isLoadingSeries={isLoadingSeries}
+      />
 
       {isDeleteModalOpen && selectedStudent && (
         <Delete_modal
@@ -202,7 +188,7 @@ const StudentsPage = () => {
           setOpen={setIsDeleteModalOpen}
           onSubmit={handleStudentDelete}
           entityData={selectedStudent}
-          title='Delete Student'
+          title="Delete Student"
           confirmationText={`Are you sure you want to delete student "${selectedStudent.studentName}"? This action cannot be undone.`}
         />
       )}
