@@ -11,6 +11,7 @@ export default function PageHeader({
   actionDropDown = [],
   primaryAction,
   childrenCustom,
+  children,
   showSearch = false,
   searchPlaceholder = "Search...",
   onSearch,
@@ -96,10 +97,11 @@ export default function PageHeader({
       </div>
 
       {/* Filters and Search Section */}
-      {(childrenCustom || showSearch || actions2) && (
+      {(childrenCustom || children || showSearch || actions2) && (
         <div className='flex flex-wrap items-center gap-2 flex-shrink-0 justify-end'>
           <div className='flex-1 min-w-0'>
             <div className='flex gap-1'>
+              {children}
               {actions2.length > 0 && (
                 <div className='flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:gap-2'>
                   {actions2.map((action, index) => (

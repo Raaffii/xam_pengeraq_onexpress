@@ -16,6 +16,7 @@ export default function TeacherPage() {
     onPageChange,
     onPageSizeChange,
     onSearch,
+    isLoading,
   } = useTeacher();
   const [isModalOpen, setIsModalOpen] = useState();
   const [isModalEditOpen, setIsModalEditOpen] = useState();
@@ -123,6 +124,7 @@ export default function TeacherPage() {
         onPageChange={onPageChange}
         onSizeChange={onPageSizeChange}
         pagination={pagination}
+        isLoading={isLoading}
       />
       {isModalOpen && (
         <AddTeacher

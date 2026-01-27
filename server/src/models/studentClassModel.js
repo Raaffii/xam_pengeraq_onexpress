@@ -67,7 +67,7 @@ GROUP BY s.studentid
 
 LIMIT ? OFFSET ?
 `;
-  const [rows] = await pool.query(query, [
+  const [rows] = await pool.execute(query, [
     totalMeeting,
     totalMeeting,
     ...params,

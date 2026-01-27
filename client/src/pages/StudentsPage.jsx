@@ -27,6 +27,7 @@ const StudentsPage = () => {
     setParams,
     onPageChange,
     onPageSizeChange,
+    isLoading,
   } = useStudents();
   const {
     fetchExamSeries,
@@ -113,22 +114,21 @@ const StudentsPage = () => {
         const remaining = examSeries.length - maxVisible;
 
         return (
-          <div className="flex flex-wrap gap-1 max-w-md items-center">
+          <div className='flex flex-wrap gap-1 max-w-md items-center'>
             {visibleSeries.map((item) => (
               <span
                 key={item.examSeriesId}
-                className="px-2 py-0.5 text-xs rounded-full
+                className='px-2 py-0.5 text-xs rounded-full
              bg-blue-50 text-blue-700 border border-blue-200
-             inline-block max-w-[180px]"
-                title={item.examSeriesDescription}
-              >
-                <span className="truncate block">
+             inline-block max-w-[180px]'
+                title={item.examSeriesDescription}>
+                <span className='truncate block'>
                   {item.examSeriesDescription}
                 </span>
               </span>
             ))}
             {remaining > 0 && (
-              <span className="px-2 py-0.5 text-xs text-gray-600">
+              <span className='px-2 py-0.5 text-xs text-gray-600'>
                 +{remaining} more
               </span>
             )}
@@ -144,32 +144,32 @@ const StudentsPage = () => {
   }));
 
   return (
-    <div className="min-h-screen ">
+    <div className='min-h-screen '>
       <PageHeader
-        title="Students"
-        subtitle="Manage student records and exam series assignments"
+        title='Students'
+        subtitle='Manage student records and exam series assignments'
         primaryAction={{
           label: "Add Student",
           onClick: openCreateModal,
         }}
         showSearch={true}
-        searchPlaceholder="Search by name"
+        searchPlaceholder='Search by name'
         onSearch={onSearch}
-        searchMaxLength={50}
-      >
+        searchMaxLength={50}>
         {" "}
       </PageHeader>
 
       <DataTable
         data={students}
         columns={columns}
-        detailPage="students"
-        idAccessor="studentId"
+        detailPage='students'
+        idAccessor='studentId'
         onEdit={openEditModal}
         onDelete={openDeleteModal}
         onPageChange={onPageChange}
         onSizeChange={onPageSizeChange}
         pagination={pagination}
+        isLoading={isLoading}
       />
 
       <StudentModal
@@ -188,7 +188,7 @@ const StudentsPage = () => {
           setOpen={setIsDeleteModalOpen}
           onSubmit={handleStudentDelete}
           entityData={selectedStudent}
-          title="Delete Student"
+          title='Delete Student'
           confirmationText={`Are you sure you want to delete student "${selectedStudent.studentName}"? This action cannot be undone.`}
         />
       )}

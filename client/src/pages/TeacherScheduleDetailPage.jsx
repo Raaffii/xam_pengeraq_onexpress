@@ -21,10 +21,18 @@ import {
 
 export default function TeacherScheduleDetailPage() {
   const { id } = useParams();
-  const { fetchClassSchedule, onSearch, onPageSizeChange } = useClassSchedule();
 
-  const { classScheduleDetail, pagination, onPageChange, onFilterChange } =
-    useClassScheduleDetail();
+  const {
+    classScheduleDetail,
+    pagination,
+    fetchClassScheduleDetail,
+    onSearch,
+    onPageChange,
+    onFilterChange,
+    onPageSizeChange,
+    setParams,
+    params,
+  } = useClassScheduleDetail();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -35,11 +43,12 @@ export default function TeacherScheduleDetailPage() {
     if (hasFetchedData.current) return;
     hasFetchedData.current = true;
     const fetchData = async () => {
-      await onFilterChange({ scheduleId: id });
+      await fetchClassScheduleDetail({ scheduleId: id });
+      setParams({ ...params, scheduleId: id });
     };
 
     fetchData();
-  }, [fetchClassSchedule]);
+  }, [fetchClassScheduleDetail]);
 
   const isToday = (date) => {
     const today = new Date();
@@ -180,15 +189,6 @@ export default function TeacherScheduleDetailPage() {
           onSizeChange={onPageSizeChange}
           pagination={pagination}
         />
-
-        {isModalOpen && (
-          <AddSchedule
-            open={isModalOpen}
-            setOpen={setIsModalOpen}
-            title='Add New Student'
-            fetchClassSchedule={fetchClassSchedule}
-          />
-        )}
       </div>
     </div>
   );

@@ -170,7 +170,6 @@ export const useClassScheduleDetail = () => {
 
   const onSearch = useCallback(
     async (searchTerm) => {
-      console.log("cee", searchTerm);
       const newParams = { ...params, searchTerm };
       setParams(newParams);
 
