@@ -118,7 +118,7 @@ export const useClassScheduleDetail = () => {
   const openClassSession = useCallback(async (classschhdid) => {
     let toastId;
     try {
-      setIsSubmitting(true);
+      setIsLoading(true);
       setError(null);
 
       toastId = toast.loading("Checking QR code availability...");
@@ -145,7 +145,7 @@ export const useClassScheduleDetail = () => {
 
       return { success: false, error: err.message };
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   }, []);
 

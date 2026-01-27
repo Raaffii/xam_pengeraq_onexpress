@@ -10,21 +10,56 @@ const getStudentClass = async (page, limit, searchTerm = "", schedule) => {
   const conditions = [];
   const params = [];
 
+  const finishClassQuery = `
+  SELECT COUNT(*) AS totalFinishClass 
+  FROM classschdetails cd 
+  WHERE cd.classschhdid = ? 
+  AND cd.classtoken IS NOT NULL
+`;
+
+  const [finishClassResult] = await pool.query(finishClassQuery, [schedule]);
+  const totalMeeting = finishClassResult[0].totalFinishClass;
+
   const query = `
-    SELECT 
-    s.studentname as studentName,
-    sc.studentclassid as studentClassId,
-    s.studentidno as studentIdNo,
-    sc.createddate as enteredDate
+ SELECT 
+  s.studentname AS studentName,
+  sc.studentclassid AS studentClassId,
+  s.studentidno AS studentIdNo,
+  sc.createddate as enteredDate,
 
-    FROM studentclass sc 
-    LEFT JOIN students s ON sc.studentid = s.studentid
-    LEFT JOIN classschhd ch ON sc.classschhdid= ch.classschhdid
+  COUNT(sat.checkindatetime) AS totalAttend,
 
-    WHERE sc.classschhdid = ?
+  CASE 
+    WHEN ? > 0 
+    THEN ROUND((COUNT(sat.checkindatetime) / ?) * 100, 0)
+    ELSE 0
+  END AS attendancePercentage
 
-    LIMIT ? OFFSET ?`;
-  const [rows] = await pool.query(query, [schedule, limit, offset]);
+FROM studentclass sc 
+LEFT JOIN students s 
+  ON sc.studentid = s.studentid
+
+LEFT JOIN classschdetails cd 
+  ON sc.classschhdid = cd.classschhdid
+  AND cd.classtoken IS NOT NULL
+
+LEFT JOIN studattendstat sat 
+  ON s.studentid = sat.studentid 
+  AND cd.classschdetailsid = sat.classschdetailsid
+
+WHERE sc.classschhdid = ?
+
+GROUP BY s.studentid
+
+LIMIT ? OFFSET ?
+`;
+  const [rows] = await pool.query(query, [
+    totalMeeting,
+    totalMeeting,
+    schedule,
+    limit,
+    offset,
+  ]);
 
   const countQuery = `SELECT COUNT(*) AS total FROM studentclass s WHERE s.classschhdid=?`;
   const [countResult] = await pool.query(countQuery, [schedule]);

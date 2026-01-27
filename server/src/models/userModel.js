@@ -83,11 +83,12 @@ const UserModel = {
       role,
       enteredBy,
       studentId,
+      teacherId,
     } = userData;
 
     const query = `
-      INSERT INTO users (name, emailaddress, password, role, createdby, studentid, createddate)
-      VALUES (?, ?, ?, ?, ?, ?,NOW())
+      INSERT INTO users (name, emailaddress, password, role, createdby, studentid,teacherid, createddate)
+      VALUES (?, ?, ?, ?, ?, ?, ?,NOW())
     `;
 
     const [result] = await pool.execute(query, [
@@ -97,6 +98,7 @@ const UserModel = {
       role,
       enteredBy || null,
       studentId || null,
+      teacherId || null,
     ]);
 
     return result.insertId;
@@ -106,7 +108,7 @@ const UserModel = {
     const [rows] = await pool.query(
       `SELECT userid, name, emailaddress as email, password,role, teacherid, active 
      FROM users WHERE emailaddress = ? AND active = true`,
-      [email]
+      [email],
     );
     return rows[0];
   },
@@ -121,6 +123,7 @@ const UserModel = {
       active,
       hashedPassword,
       studentId,
+      teacherId,
     } = updateData;
 
     const fields = [];
@@ -156,6 +159,11 @@ const UserModel = {
       params.push(studentId);
     }
 
+    if (teacherId !== undefined) {
+      fields.push("teacherid = ?");
+      params.push(teacherId);
+    }
+
     fields.push("editedby = ?");
     params.push(editedBy);
 
@@ -170,6 +178,7 @@ const UserModel = {
     params.push(userId);
 
     const [result] = await pool.execute(sql, params);
+
     return result.affectedRows > 0;
   },
 
@@ -205,7 +214,7 @@ const UserModel = {
      FROM users u
      LEFT JOIN students s ON s.studentid = u.studentid
      WHERE u.userid = ? AND u.active = true`,
-      [userId]
+      [userId],
     );
 
     return rows[0];
@@ -305,6 +314,16 @@ const UserModel = {
       [userId],
     );
     return rows[0];
+  },
+
+  async teacherIdToNull(teacherId) {
+    const [rows] = await pool.execute(
+      `UPDATE users
+      SET teacherid = NULL
+      WHERE teacherid = ?;`,
+      [teacherId],
+    );
+    return rows;
   },
 };
 

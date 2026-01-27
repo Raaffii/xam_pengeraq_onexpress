@@ -129,6 +129,7 @@ export default function CalendarPage() {
       examseries: item.examSeriesDescription,
       examsubject: item.subjDesc,
       repeatvalue: item.repeatValue,
+      scheduleId: item.classSchDetailsId,
     }));
 
     setEvents(mappedEvents);

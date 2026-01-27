@@ -8,8 +8,15 @@ const userService = {
   },
 
   async createUser(data) {
-    const { userName, emailAddress, password, role, enteredBy, studentId } =
-      data;
+    const {
+      userName,
+      emailAddress,
+      password,
+      role,
+      enteredBy,
+      studentId,
+      teacherId,
+    } = data;
     const existingUser = await UserModel.findUserByEmail(emailAddress);
     if (existingUser && existingUser.active === 1) {
       throw new Error("Email already exists");
@@ -23,6 +30,7 @@ const userService = {
       role,
       enteredBy,
       studentId,
+      teacherId,
     });
 
     return this.fetchUserDetails(userId);
@@ -33,6 +41,7 @@ const userService = {
 
     if (data.emailAddress) {
       const existingUser = await UserModel.findUserByEmail(data.emailAddress);
+
       if (
         existingUser &&
         existingUser.active === 1 &&
@@ -44,10 +53,12 @@ const userService = {
 
     if (data.password) {
       const hashedPassword = await bcrypt.hash(data.password, 10);
+
       userData = { ...userData, hashedPassword };
     }
 
     const result = await UserModel.updateUser(userData);
+
     if (!result) {
       throw new Error("User not found");
     }
@@ -99,6 +110,15 @@ const userService = {
     });
 
     return true;
+  },
+
+  async teacherIdToNull(teacherId) {
+    try {
+      const user = await UserModel.teacherIdToNull(teacherId);
+      return user;
+    } catch (err) {
+      throw err;
+    }
   },
 };
 

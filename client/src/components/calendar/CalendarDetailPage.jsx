@@ -1,6 +1,6 @@
 import { Modal } from "../custom";
 import PropTypes from "prop-types";
-
+import { useNavigate } from "react-router-dom";
 export default function CalendarDetailPage({
   open,
   setOpen,
@@ -8,7 +8,7 @@ export default function CalendarDetailPage({
   selectedDate,
 }) {
   const selectedDay = new Date(selectedDate).toDateString();
-
+  const navigate = useNavigate();
   const filteredData = data.filter((item) => {
     return new Date(item?.start).toDateString() === selectedDay;
   });
@@ -38,12 +38,18 @@ export default function CalendarDetailPage({
       {filteredData?.map((item, index) => (
         <div
           key={index}
-          className='bg-white border rounded-lg p-2 shadow-sm hover:shadow-md transition my-3 
-          '>
+          className='bg-white border rounded-lg p-2 shadow-sm hover:shadow-md transition my-3 hover:bg-blue-100 
+          cursor-pointer'
+          onClick={() => navigate(`/class-attendance/${item.scheduleId}`)}>
           <div className='flex justify-between items-center'>
-            <div>
-              <p className='font-semibold text-gray-800'>{item.teacher}</p>
-              <p className='font-semibold text-blue-600'>{item.examsubject}</p>
+            <div className='flex items-center gap-3'>
+              <h1 className='font-semibold'>{index + 1}.</h1>
+              <div>
+                <p className='font-semibold text-gray-800'>{item.teacher}</p>
+                <p className='font-semibold text-blue-600'>
+                  {item.examsubject}
+                </p>
+              </div>
             </div>
 
             <div className='flex-col flex items-center '>

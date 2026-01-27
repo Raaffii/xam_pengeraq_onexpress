@@ -110,7 +110,7 @@ export default function SchedulesPages() {
     {
       icon: Table,
       label: "table",
-      onClick: () => alert("cek1"),
+      onClick: () => navigate("/schedule"),
     },
     {
       icon: Calendar,

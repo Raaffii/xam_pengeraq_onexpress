@@ -16,7 +16,8 @@ const AttendanceQRCodeModal = ({
   const [classStarted, setClassStarted] = useState();
   const [urlToken, setUrlToken] = useState();
 
-  const { startClassSession, openClassSession } = useClassScheduleDetail();
+  const { startClassSession, openClassSession, isLoading } =
+    useClassScheduleDetail();
   const [startDateTime, setStartDateTime] = useState();
 
   useEffect(() => {
@@ -27,7 +28,7 @@ const AttendanceQRCodeModal = ({
 
         setStartDateTime(result.startDateTime);
         setClassStarted(result.token ? true : false);
-        setUrlToken(`${CHECKIN_URL}/checkin/?token=${result.token}`);
+        setUrlToken(`${CHECKIN_URL}/checkin?token=${result.token}`);
       }
     };
 
@@ -40,7 +41,7 @@ const AttendanceQRCodeModal = ({
     const result = await startClassSession(classschhdid);
     setStartDateTime(result.startDateTime);
 
-    setUrlToken(`${CHECKIN_URL}/checkin/?token=${result.token}`);
+    setUrlToken(`${CHECKIN_URL}/checkin?token=${result.token}`);
     setClassStarted(true);
   };
 
@@ -74,6 +75,7 @@ const AttendanceQRCodeModal = ({
               <button
                 type='button'
                 className='px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700'
+                disabled={isLoading}
                 onClick={handleStartClass}>
                 Start Class
               </button>
