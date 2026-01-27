@@ -39,6 +39,7 @@ export default function EditSchedule({
   const { fetchExamSeries, examSeries } = useExamSeries();
 
   const { fetchTeacher, teacher } = useTeacher();
+  const [error, setError] = useState();
   const { fetchClassLocation, classLocation } = useClassLocation();
   const { fetchSubjects, examSubj } = useExamSubject();
   const { putClassSchedule, isSubmitting } = useClassSchedule();
@@ -122,6 +123,17 @@ export default function EditSchedule({
 
   const handlechange = async (e) => {
     const { name, value } = e.target;
+
+    if (name === "endDateTime" && formData.startDateTime) {
+      const startDate = formData.startDateTime.split("T")[0];
+
+      if (value < startDate) {
+        setError({ [name]: true });
+        return;
+      } else {
+        setError({ [name]: false });
+      }
+    }
 
     setFormData((prev) => ({
       ...prev,
@@ -250,7 +262,13 @@ export default function EditSchedule({
                 name='endDateTime'
                 onChange={handlechange}
                 value={formData.endDateTime?.split("T")[0] || ""}
+                className={`${error?.endDateTime ? "border-2 border-red-600 rounded-lg" : ""}`}
               />
+              {error?.endDateTime && (
+                <p className='text-xs text-red-500 mt-1'>
+                  End date cannot be earlier than start date
+                </p>
+              )}
             </FormField>
           </div>
         )}

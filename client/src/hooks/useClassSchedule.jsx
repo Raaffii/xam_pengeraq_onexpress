@@ -98,7 +98,7 @@ export const useClassSchedule = () => {
       return { success: true, data: response.data };
     } catch (err) {
       console.error("Error creating schedul:", err);
-      toast.error(err.message || "Failed to create schedule", {
+      toast.error("Failed to create schedule", {
         id: toastId,
       });
       setError(err.message);

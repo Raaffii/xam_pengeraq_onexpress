@@ -52,7 +52,7 @@ export const setupService = {
   getSetupData: () => JSON.parse(localStorage.getItem("setup")),
 
   setSetupData: (setup) => {
-    console.log(setup);
+    // console.log(setup);
     localStorage.setItem("setup", JSON.stringify(setup));
   },
 

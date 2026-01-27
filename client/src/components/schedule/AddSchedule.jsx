@@ -30,7 +30,7 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
   });
 
   const { fetchExamSeries, examSeries } = useExamSeries();
-
+  const [error, setError] = useState();
   const { fetchSubjects, examSubj } = useExamSubject();
   const { fetchTeacher, teacher } = useTeacher();
   const { fetchClassLocation, classLocation } = useClassLocation();
@@ -109,6 +109,17 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
 
   const handlechange = async (e) => {
     const { name, value } = e.target;
+
+    if (name === "endDateTime" && formData.startDateTime) {
+      const startDate = formData.startDateTime.split("T")[0];
+
+      if (value < startDate) {
+        setError({ [name]: true });
+        return;
+      } else {
+        setError({ [name]: false });
+      }
+    }
 
     setFormData((prev) => ({
       ...prev,
@@ -217,7 +228,7 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
           </div>
         </FormField>
         {repeatCheck && (
-          <div className='flex w-full gap-2 items-end'>
+          <div className='flex w-full gap-2 items-center'>
             <FormField label='Repeat' required className='w-full'>
               <SearchableDropdown
                 id='examSeries'
@@ -231,7 +242,20 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
             </FormField>
 
             <FormField label='End Date' required className='w-full'>
-              <Input type='date' name='endDateTime' onChange={handlechange} />
+              <div>
+                <Input
+                  type='date'
+                  name='endDateTime'
+                  onChange={handlechange}
+                  className={`${error?.endDateTime ? "border-2 border-red-600 rounded-lg" : ""}`}
+                />
+
+                {error?.endDateTime && (
+                  <p className='text-xs text-red-500 mt-1'>
+                    End date cannot be earlier than start date
+                  </p>
+                )}
+              </div>
             </FormField>
           </div>
         )}
