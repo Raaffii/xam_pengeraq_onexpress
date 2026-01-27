@@ -111,12 +111,13 @@ const putClassSchedule = async (conn, id, data, userId) => {
     examSubjId,
     locationId,
     startDateTime,
+    endDateTime,
     repeatValue,
     repeatFreq,
   } = data;
 
   try {
-    const sql = ` UPDATE classschhd SET teacherid = ?, examseriesid = ?, examsubjectid = ?, locationid=?, startdatetime=?, repeatValue=?, repeatFreq =?, editedby=?, editeddate=? WHERE classschhdid = ? ;`;
+    const sql = ` UPDATE classschhd SET teacherid = ?, examseriesid = ?, examsubjectid = ?, locationid=?, startdatetime=?, repeatValue=?, repeatFreq =?, enddatetime=?, editedby=?, editeddate=? WHERE classschhdid = ? ;`;
     const [result] = await conn.query(sql, [
       teacherId,
       examSeriesId,
@@ -125,6 +126,7 @@ const putClassSchedule = async (conn, id, data, userId) => {
       startDateTime,
       repeatValue,
       repeatFreq,
+      endDateTime,
       userId,
       new Date(),
       id,

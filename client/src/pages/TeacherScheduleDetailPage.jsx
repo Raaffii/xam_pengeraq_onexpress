@@ -1,9 +1,8 @@
 import { DataTable } from "@/components/table";
-import { useClassSchedule } from "@/hooks/useClassSchedule";
-import { useEffect, useState, useRef } from "react";
+
+import { useEffect, useRef } from "react";
 import PageHeader from "@/components/common/PageHeader";
 import { useNavigate, useParams } from "react-router-dom";
-import AddSchedule from "@/components/schedule/AddSchedule";
 
 import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
 
@@ -28,13 +27,11 @@ export default function TeacherScheduleDetailPage() {
     fetchClassScheduleDetail,
     onSearch,
     onPageChange,
-    onFilterChange,
+
     onPageSizeChange,
     setParams,
     params,
   } = useClassScheduleDetail();
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const hasFetchedData = useRef(false);
   const navigate = useNavigate();

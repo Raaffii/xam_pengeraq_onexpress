@@ -23,8 +23,11 @@ export default function ClassAttendancePage() {
     isLoading,
   } = useClassAttendance();
 
-  const { fetchClassScheduleDetailById, classScheduleDetail } =
-    useClassScheduleDetail();
+  const {
+    fetchClassScheduleDetailById,
+    classScheduleDetail,
+    isLoading: isLoading2,
+  } = useClassScheduleDetail();
   useEffect(() => {
     if (hasFetchedData.current) return;
     hasFetchedData.current = true;
@@ -98,7 +101,7 @@ export default function ClassAttendancePage() {
 
   let classDetail;
 
-  if (isLoading) {
+  if (isLoading2) {
     classDetail = (
       <div className='flex flex-col gap-2'>
         <h1 className='text-2xl font-semibold tracking-tight'>
@@ -111,7 +114,7 @@ export default function ClassAttendancePage() {
       </div>
     );
   } else {
-    classDetail = classScheduleDetail?.classStartDateTime ? (
+    classDetail = classScheduleDetail.classStartDateTime ? (
       <>
         {`Class Attendance — ${formatDate(classScheduleDetail?.classDateTime)}`}
       </>
@@ -150,6 +153,7 @@ export default function ClassAttendancePage() {
           pagination={pagination}
           onPageChange={onPageChange}
           onPageSizeChange={onPageSizeChange}
+          isLoading={isLoading}
         />
       </div>
     </div>

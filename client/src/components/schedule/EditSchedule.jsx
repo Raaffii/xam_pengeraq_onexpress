@@ -246,10 +246,10 @@ export default function EditSchedule({
 
             <FormField label='End Date' required className='w-full'>
               <Input
-                type='datetime-local'
+                type='date'
                 name='endDateTime'
                 onChange={handlechange}
-                value={formData.endDateTime}
+                value={formData.endDateTime?.split("T")[0] || ""}
               />
             </FormField>
           </div>

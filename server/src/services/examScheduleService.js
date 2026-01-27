@@ -25,6 +25,7 @@ const postClassSchedule = async (data, userId) => {
 
     let current = new Date(data.startDateTime);
     const end = new Date(data.endDateTime);
+    end.setHours(23, 59, 59, 999);
 
     if (data.repeatFreq == 1) {
       while (current <= end) {
@@ -87,11 +88,13 @@ const putClassSchedule = async (id, data, userId) => {
     // change ig only date change ---------------------------------------
     await ClassScheduleDetail.deleteClassScheduleDetail(connection, id);
 
+    console.log("data", data.endDateTime);
     //start making loop
     const dataForBulk = [];
 
     let current = new Date(data.startDateTime);
     const end = new Date(data.endDateTime);
+    end.setHours(23, 59, 59, 999);
 
     if (data.repeatFreq == 1) {
       while (current <= end) {

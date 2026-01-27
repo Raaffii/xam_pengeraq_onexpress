@@ -8,7 +8,7 @@ export const useClassAttendance = () => {
   const [error, setError] = useState(null);
 
   const [pagination, setPagination] = useState({
-    page: 1,
+    currentPage: 1,
     pageSize: 10,
     totalPages: 1,
     totalItems: 0,

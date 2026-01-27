@@ -231,11 +231,7 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
             </FormField>
 
             <FormField label='End Date' required className='w-full'>
-              <Input
-                type='datetime-local'
-                name='endDateTime'
-                onChange={handlechange}
-              />
+              <Input type='date' name='endDateTime' onChange={handlechange} />
             </FormField>
           </div>
         )}

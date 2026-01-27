@@ -9,7 +9,7 @@ export const useLocation = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [params, setParams] = useState({ page: 1, pageSize: 10 });
   const [pagination, setPagination] = useState({
-    page: 1,
+    curentPage: 1,
     pageSize: 10,
     totalPage: 1,
     totalItem: 0,
