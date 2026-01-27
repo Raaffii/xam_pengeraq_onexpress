@@ -2,8 +2,8 @@ const pool = require("../config/db");
 const Students = require("../models/studentModel");
 const StudentExam = require("../models/studentExamModel");
 
-const getStudent = async (page, limit, searchTerm, filter) => {
-  return await Students.getStudent(page, limit, searchTerm, filter);
+const getStudent = async (options = {}) => {
+  return await Students.getStudent(options);
 };
 
 const getStudentById = async (studentId) => {
@@ -43,10 +43,10 @@ const putStudent = async (id, data, userId) => {
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
-    await StudentExam.deleteByStudentId(connection, id);
     const result = await Students.putStudent(connection, id, data, userId);
 
     if (Array.isArray(data.examSeries) && data.examSeries.length > 0) {
+      await StudentExam.deleteByStudentId(connection, id);
       await StudentExam.postStudentExam(connection, {
         examSeriesIds: data.examSeries,
         studentId: id,

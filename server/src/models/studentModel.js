@@ -1,11 +1,13 @@
 const pool = require("../config/db");
 
-const getStudent = async (page, limit, searchTerm = "", filter = {}) => {
-  page = Number(page) || 1;
-  limit = Number(limit) || 10;
-  const offset = (page - 1) * limit;
-
-  const { enrolledClass, enrolledSelected } = filter;
+const getStudent = async (options = {}) => {
+  const {
+    page = 1,
+    pageSize = 10,
+    enrolledClass,
+    searchTerm,
+    enrolledSelected,
+  } = options;
 
   const conditions = [];
   const params = [];
@@ -13,34 +15,32 @@ const getStudent = async (page, limit, searchTerm = "", filter = {}) => {
   if (enrolledSelected === "SELECTED") {
     conditions.push("sc.classschhdid = ? ");
     params.push(enrolledClass);
-  } else if (enrolledSelected === "NOT_SELECTED") {
-    // conditions.push("sc.classschhdid <> ? ");
-    // params.push(enrolledClass);
   }
 
   if (searchTerm) {
-    const searchValue = searchTerm ? `%${searchTerm}%` : "%";
-    conditions.push("studentname LIKE ?");
+    const searchValue = `%${searchTerm}%`;
+    conditions.push("s.studentname LIKE ?");
     params.push(searchValue);
   }
 
   const whereClause =
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  const studentIdQuery = `
+  let studentIdQuery = `
   SELECT DISTINCT s.studentid
   FROM students s
   LEFT JOIN studentclass sc
   ON s.studentid = sc.studentid
   ${whereClause}
-  LIMIT ? OFFSET ?
   `;
 
-  const [studentIds] = await pool.query(studentIdQuery, [
-    ...params,
-    limit,
-    offset,
-  ]);
+  const queryParams = [...params];
+
+  const offset = (page - 1) * pageSize;
+  studentIdQuery += ` LIMIT ? OFFSET ?`;
+  queryParams.push(pageSize, offset);
+
+  const [studentIds] = await pool.query(studentIdQuery, queryParams);
 
   if (studentIds.length === 0) {
     return { data: [], total: 0 };
@@ -125,12 +125,8 @@ const getStudent = async (page, limit, searchTerm = "", filter = {}) => {
   const formattedRows = Array.from(map.values());
 
   const countQuery = `
-    SELECT COUNT(*) AS total
+    SELECT COUNT(DISTINCT s.studentid) AS total
     FROM students s
-    LEFT JOIN studentexamseries se
-      ON s.studentid = se.studentid
-    LEFT JOIN examseries es
-      ON se.examseriesid = es.examseriesid
     LEFT JOIN studentclass sc
       ON s.studentid = sc.studentid
    
@@ -161,39 +157,44 @@ const getStudentById = async (studentId) => {
 };
 
 const postStudent = async (conn, data, userId) => {
-  const { studentName, studentIdNo, examSeriesId } = data;
+  const { studentName, studentIdNo } = data;
 
-  try {
-    const sql =
-      "INSERT INTO students (studentname, studentidno, examseriesid, createdby) VALUES (?, ?,?,?)";
-    const [result] = await conn.query(sql, [
-      studentName,
-      studentIdNo,
-      null,
-      userId,
-    ]);
-    return result.insertId;
-  } catch (err) {
-    throw err;
-  }
+  const sql =
+    "INSERT INTO students (studentname, studentidno, createddate, createdby) VALUES (?, ?, NOW(), ?)";
+  const [result] = await conn.execute(sql, [studentName, studentIdNo, userId]);
+  return result.insertId;
 };
 
 const putStudent = async (conn, id, data, userId) => {
-  const { studentName, studentIdNo } = data;
-  try {
-    const sql = ` UPDATE students SET studentname = ?, studentidno = ?, examseriesid = ?, editedby=?, editeddate=? WHERE studentid = ? ;`;
-    const [result] = await conn.query(sql, [
-      studentName,
-      studentIdNo,
-      null,
-      userId,
-      new Date(),
-      id,
-    ]);
-    return result;
-  } catch (err) {
-    throw err;
+  const { studentName, studentIdNo, editedBy } = data;
+  const fields = [];
+  const params = [];
+
+  if (studentName) {
+    fields.push("studentname = ?");
+    params.push(studentName);
   }
+
+  if (studentIdNo) {
+    fields.push("studentidno = ?");
+    params.push(studentIdNo);
+  }
+
+  fields.push("editedby = ?");
+  params.push(editedBy || userId);
+
+  fields.push("editeddate = NOW()");
+
+  const sql = `
+      UPDATE students
+      SET ${fields.join(", ")}
+      WHERE studentid = ?
+    `;
+
+  params.push(id);
+
+  const [result] = await conn.execute(sql, params);
+  return result;
 };
 
 const deleteStudent = async (conn, id) => {
