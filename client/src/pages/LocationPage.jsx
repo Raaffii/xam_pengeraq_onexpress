@@ -2,7 +2,6 @@ import { useLocation } from "@/hooks/useLocation";
 import PageHeader from "@/components/common/PageHeader";
 import { useEffect, useRef, useState } from "react";
 import { DataTable } from "@/components/table";
-import AddTeacher from "@/components/teachers/AddTeacher";
 import AddLocation from "@/components/location/AddLocation";
 import Delete_modal from "@/components/modals/Delete_modal";
 import EditLocation from "@/components/location/EditLocation";
@@ -96,11 +95,11 @@ export default function LocationPage() {
         title='Location'
         subtitle='Manage location records'
         primaryAction={{
-          label: "Add Class",
+          label: "Add Location",
           onClick: () => setIsModalOpen(true),
         }}
         showSearch={true}
-        searchPlaceholder='Search by class..'
+        searchPlaceholder='Search by location..'
         onSearch={onSearch}
         searchMaxLength={50}>
         {" "}

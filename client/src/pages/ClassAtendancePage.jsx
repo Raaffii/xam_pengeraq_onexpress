@@ -5,7 +5,7 @@ import { DataTable } from "@/components/table";
 import PageHeader from "@/components/common/PageHeader";
 import { useNavigate } from "react-router-dom";
 import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, LoaderCircle } from "lucide-react";
 import { Undo2 } from "lucide-react";
 
 export default function ClassAttendancePage() {
@@ -20,6 +20,7 @@ export default function ClassAttendancePage() {
     onSearch,
     onPageChange,
     onPageSizeChange,
+    isLoading,
   } = useClassAttendance();
 
   const { fetchClassScheduleDetailById, classScheduleDetail } =
@@ -28,8 +29,8 @@ export default function ClassAttendancePage() {
     if (hasFetchedData.current) return;
     hasFetchedData.current = true;
     const fetchData = async () => {
-      await fetchClassAttendance({ classSchDetailsId: id });
       await fetchClassScheduleDetailById(id);
+      await fetchClassAttendance({ classSchDetailsId: id });
     };
 
     fetchData();
@@ -95,24 +96,39 @@ export default function ClassAttendancePage() {
     });
   };
 
-  const classDetail = classScheduleDetail?.classStartDateTime ? (
-    <>
-      {`Class Attendance — ${formatDate(classScheduleDetail?.classDateTime)}`}
-    </>
-  ) : (
-    <div className='flex flex-col gap-2'>
-      <h1 className='text-2xl font-semibold tracking-tight'>
-        {`Class Attendance — ${formatDate(classScheduleDetail?.classDateTime)}`}
-      </h1>
+  let classDetail;
 
-      <div className='inline-flex items-center gap-2 bg-red-100 text-red-700 border border-red-300 px-3 py-1.5 rounded-md w-fit shadow-sm'>
-        <AlertTriangle className='w-4 h-4' />
-        <span className='text-sm font-semibold'>
-          Class Has Never Been Started
-        </span>
+  if (isLoading) {
+    classDetail = (
+      <div className='flex flex-col gap-2'>
+        <h1 className='text-2xl font-semibold tracking-tight'>
+          {`Class Attendance — ${formatDate(classScheduleDetail?.classDateTime)}`}
+        </h1>
+        <div className='inline-flex items-center gap-2 text-blue-700 px-3 py-1.5 rounded-md w-fit shadow-sm'>
+          <LoaderCircle className='w-4 h-4 animate-spin' />
+          <span className='text-sm font-semibold'>Loading</span>
+        </div>
       </div>
-    </div>
-  );
+    );
+  } else {
+    classDetail = classScheduleDetail?.classStartDateTime ? (
+      <>
+        {`Class Attendance — ${formatDate(classScheduleDetail?.classDateTime)}`}
+      </>
+    ) : (
+      <div className='flex flex-col gap-2'>
+        <h1 className='text-2xl font-semibold tracking-tight'>
+          {`Class Attendance — ${formatDate(classScheduleDetail?.classDateTime)}`}
+        </h1>
+        <div className='inline-flex items-center gap-2 bg-red-100 text-red-700 border border-red-300 px-3 py-1.5 rounded-md w-fit shadow-sm'>
+          <AlertTriangle className='w-4 h-4' />
+          <span className='text-sm font-semibold'>
+            Class Has Never Been Started
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='min-h-screen bg-gray-50'>

@@ -23,12 +23,8 @@ export default function TeacherScheduleDetailPage() {
   const { id } = useParams();
   const { fetchClassSchedule, onSearch, onPageSizeChange } = useClassSchedule();
 
-  const {
-    fetchClassScheduleDetail,
-    classScheduleDetail,
-    pagination,
-    onPageChange,
-  } = useClassScheduleDetail();
+  const { classScheduleDetail, pagination, onPageChange, onFilterChange } =
+    useClassScheduleDetail();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -39,11 +35,22 @@ export default function TeacherScheduleDetailPage() {
     if (hasFetchedData.current) return;
     hasFetchedData.current = true;
     const fetchData = async () => {
-      await fetchClassScheduleDetail({ scheduleId: id });
+      await onFilterChange({ scheduleId: id });
     };
 
     fetchData();
   }, [fetchClassSchedule]);
+
+  const isToday = (date) => {
+    const today = new Date();
+    const target = new Date(date);
+
+    return (
+      today.getDate() === target.getDate() &&
+      today.getMonth() === target.getMonth() &&
+      today.getFullYear() === target.getFullYear()
+    );
+  };
 
   const columns = [
     {
@@ -63,14 +70,37 @@ export default function TeacherScheduleDetailPage() {
     },
     {
       accessorKey: "classDateTime",
-      header: <div className='text-left w-full'>Start Date</div>,
+      header: <div className='text-left w-full'>Scheduled Date</div>,
       cellClassName: "text-left",
+      render: (row) => {
+        const today = isToday(row.classDateTime);
+
+        return (
+          <div className='flex items-center gap-2'>
+            <span>{row.classDateTime}</span>
+
+            {today && (
+              <span className='bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-sm'>
+                Today
+              </span>
+            )}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "classStartDateTime",
       header: <div className='text-left w-full'>Start Date</div>,
       cellClassName: "text-left",
-      render: (row) => <>{row.classStartDateTime || "Class Not Started yet"}</>,
+      render: (row) => (
+        <>
+          {row.classStartDateTime || (
+            <span className='text-red-600 font-semibold'>
+              Class Not Started yet
+            </span>
+          )}
+        </>
+      ),
     },
   ];
 
@@ -78,12 +108,12 @@ export default function TeacherScheduleDetailPage() {
     {
       title: "Attendance",
       onClick: (row) =>
-        navigate(`/teacher/class-attendance/${row.classschhdid}`),
+        navigate(`/teacher/class-attendance/${row.classSchDetailsId}`),
       render: () => {
         return (
           <div>
-            <div className='relative bg-blue-200 rounded-sm p-2 flex hover:bg-blue-400 shadow-lg'>
-              <UserCheck size={18} /> Atendance
+            <div className='relative bg-blue-500 rounded-sm p-1 flex hover:bg-blue-400 shadow-lg text-white'>
+              <UserCheck size={18} className='font-bold' /> Atendance
             </div>
           </div>
         );
@@ -126,7 +156,7 @@ export default function TeacherScheduleDetailPage() {
       onClick: () => navigate(`/teacher/schedule`),
     },
   ];
-  console.log("pagi2", pagination);
+
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='mx-auto'>

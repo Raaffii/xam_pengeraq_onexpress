@@ -28,7 +28,7 @@ export default function TeacherCalendarPage() {
   const [view, setView] = useState(Views.MONTH);
   const [events, setEvents] = useState();
   const hasFetchedData = useRef(false);
-  const { fetchClassScheduleDetail, onSearch, classScheduleDetail } =
+  const { fetchClassScheduleDetail, onSearch, classScheduleDetail, isLoading } =
     useClassScheduleDetail();
 
   const localizer = dateFnsLocalizer({
@@ -137,6 +137,7 @@ export default function TeacherCalendarPage() {
       const resultOri = await fetchClassScheduleDetail({
         date: new Date().setMonth(new Date().getMonth() + calendarShow + 1),
         usePagination: false,
+        scheduleId: id || null,
       });
 
       await handleEvent(resultOri.data);
@@ -145,6 +146,7 @@ export default function TeacherCalendarPage() {
       const resultOri = await fetchClassScheduleDetail({
         date: new Date().setMonth(new Date().getMonth() + calendarShow - 1),
         usePagination: false,
+        scheduleId: id || null,
       });
 
       await handleEvent(resultOri.data);
@@ -153,6 +155,7 @@ export default function TeacherCalendarPage() {
       const resultOri = await fetchClassScheduleDetail({
         date: new Date().setMonth(new Date().getMonth()),
         usePagination: false,
+        scheduleId: id || null,
       });
 
       await handleEvent(resultOri.data);
@@ -223,7 +226,7 @@ export default function TeacherCalendarPage() {
     <div>
       <PageHeader
         title={`Teacher Schedules ${id ? `Detail - ${classScheduleDetail[0]?.subjDesc || "loading"} ` : ""} `}
-        subtitle='Your Schedule'
+        subtitle={`${isLoading ? "...Loading" : "Your Schedule"}`}
         showSearch={false}
         onSearch={onSearch}
         searchPlaceholder='Search by name'

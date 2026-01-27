@@ -1,6 +1,6 @@
 import { DataTable } from "@/components/table";
 import { useClassSchedule } from "@/hooks/useClassSchedule";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import PageHeader from "@/components/common/PageHeader";
 import { useNavigate, useLocation } from "react-router-dom";
 import AddSchedule from "@/components/schedule/AddSchedule";
@@ -28,7 +28,7 @@ export default function SchedulesPages() {
     onPageChange,
     onPageSizeChange,
   } = useClassSchedule();
-
+  const hasFetchedData = useRef(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -41,6 +41,8 @@ export default function SchedulesPages() {
     location.pathname === "/schedule/calendar" ? "calendar" : "list";
 
   useEffect(() => {
+    if (hasFetchedData.current) return;
+    hasFetchedData.current = true;
     const fetchData = async () => {
       await fetchClassSchedule();
     };
@@ -149,7 +151,7 @@ export default function SchedulesPages() {
       <div className='mx-auto'>
         <PageHeader
           title='Schedule'
-          subtitle='Manage schedule'
+          subtitle='Manage schedule record'
           showSearch={true}
           onSearch={onSearch}
           searchPlaceholder='Search by teacher name or subject'

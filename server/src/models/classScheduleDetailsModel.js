@@ -31,15 +31,12 @@ const getClassScheduleDetail = async (
   nowDate = false,
   usePagination = true,
 ) => {
-  // ✅ Fix boolean dari query param (string -> boolean)
   usePagination = String(usePagination) !== "false";
 
-  // ✅ Pagination safe cast
   page = Number(page) || 1;
   limit = Number(limit) || 10;
   const offset = (page - 1) * limit;
 
-  // ✅ Date safe handling
   let year, month;
   if (date) {
     const timestamp = Number(date);
@@ -54,7 +51,6 @@ const getClassScheduleDetail = async (
   const conditions = [];
   const params = [];
 
-  // ✅ Filters
   if (teacherId) {
     conditions.push("cs.teacherid = ?");
     params.push(teacherId);
@@ -79,7 +75,6 @@ const getClassScheduleDetail = async (
     conditions.push("DATE(cd.classdatetime) = CURDATE()");
   }
 
-  // ✅ Optional search
   if (searchTerm) {
     conditions.push("(es.subjDesc LIKE ? OR t.teachername LIKE ?)");
     params.push(`%${searchTerm}%`, `%${searchTerm}%`);
@@ -87,10 +82,6 @@ const getClassScheduleDetail = async (
 
   const whereClause =
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
-
-  // ==============================
-  // MAIN QUERY
-  // ==============================
 
   let query = `
     SELECT 
@@ -116,12 +107,11 @@ const getClassScheduleDetail = async (
     LEFT JOIN examseries ese ON cs.examseriesid = ese.examseriesid 
     LEFT JOIN classlocation cl ON cs.locationid = cl.classlocationid
     ${whereClause}
-    ORDER BY cd.classdatetime DESC
+    ORDER BY cd.classdatetime ASC
   `;
 
   const queryParams = [...params];
 
-  // ✅ Apply pagination if enabled
   if (usePagination) {
     query += ` LIMIT ? OFFSET ?`;
     queryParams.push(limit, offset);
@@ -129,19 +119,11 @@ const getClassScheduleDetail = async (
 
   const [rows] = await pool.execute(query, queryParams);
 
-  // ==============================
-  // NO PAGINATION MODE
-  // ==============================
-
   if (!usePagination) {
     return {
       data: rows,
     };
   }
-
-  // ==============================
-  // COUNT QUERY FOR PAGINATION
-  // ==============================
 
   const countQuery = `
     SELECT COUNT(*) AS total
@@ -156,10 +138,6 @@ const getClassScheduleDetail = async (
 
   const totalItems = countResult[0]?.total || 0;
   const totalPages = Math.ceil(totalItems / limit);
-
-  // ==============================
-  // FINAL RESPONSE
-  // ==============================
 
   return {
     data: rows,

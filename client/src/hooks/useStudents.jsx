@@ -14,7 +14,7 @@ export const useStudents = () => {
     totalPage: 1,
     totalItem: 0,
   });
-  const [params, setParams] = useState({ page: 1, limit: 10 });
+  const [params, setParams] = useState({ page: 1, pageSize: 10 });
 
   const formatStudentData = useCallback((rawStudent) => {
     return rawStudent.map((item) => ({
@@ -169,10 +169,10 @@ export const useStudents = () => {
   );
 
   const onPageSizeChange = useCallback(
-    async (limit) => {
-      const newParams = { ...params, limit, page: 1 };
+    async (pageSize) => {
+      const newParams = { ...params, pageSize, page: 1 };
       setParams(newParams);
-      return await fetchStudents({ limit, page: 1 });
+      return await fetchStudents({ pageSize, page: 1 });
     },
     [params, fetchStudents],
   );

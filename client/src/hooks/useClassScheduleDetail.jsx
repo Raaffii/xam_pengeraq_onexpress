@@ -50,7 +50,7 @@ export const useClassScheduleDetail = () => {
         return { success: true, data: data };
       } catch (err) {
         console.error("Error fetching exams:", err);
-
+        setIsLoading(false);
         setError(err.message);
         setClassScheduleDetail([]);
 
@@ -154,12 +154,14 @@ export const useClassScheduleDetail = () => {
     async (filters) => {
       const newParams = {
         ...params,
+        scheduleId: filters.scheduleId,
         byExamSeriesId: filters.byExamSeriesId || null,
         page: 1,
       };
       setParams(newParams);
       return await fetchClassScheduleDetail({
         byExamSeriesId: filters.byExamSeriesId || null,
+        scheduleId: filters.scheduleId,
         page: 1,
       });
     },

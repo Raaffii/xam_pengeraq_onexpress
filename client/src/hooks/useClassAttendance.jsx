@@ -55,7 +55,7 @@ export const useClassAttendance = () => {
 
         setError(err.message);
         setClassAttendance([]);
-
+        setIsLoading(false);
         return { success: false, error: err.message };
       } finally {
         setIsLoading(false);

@@ -1,5 +1,4 @@
 const { z } = require("zod");
-const { passwordSchema } = require("./authSchema");
 const { paginationSchema } = require(".");
 
 const studentNameSchema = z
@@ -26,7 +25,7 @@ const createStudentSchema = z.object({
 const updateStudentSchema = z.object({
   studentName: studentNameSchema.optional(),
   studentIdNo: studentIdNoSchema.optional(),
-  examSeries: z.array(examSeriesIdSchema.optional()),
+  examSeries: z.array(examSeriesIdSchema).optional(),
 });
 
 const idParamsSchema = z.object({
@@ -36,7 +35,7 @@ const idParamsSchema = z.object({
       z.coerce
         .number("Invalid  student ID")
         .int()
-        .positive("Student ID must be a positive number")
+        .positive("Student ID must be a positive number"),
     ),
 });
 

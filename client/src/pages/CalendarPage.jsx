@@ -6,7 +6,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { monthsAndYear } from "@/utils/monthsYear";
 import { useState } from "react";
 import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import CalendarDetailPage from "@/components/calendar/CalendarDetailPage";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import {
@@ -27,7 +27,7 @@ export default function CalendarPage() {
   };
   const navigate = useNavigate();
   const location = useLocation();
-
+  const hasFetchedData = useRef(false);
   const currentView =
     location.pathname === "/schedule/calendar" ? "calendar" : "list";
 
@@ -36,7 +36,7 @@ export default function CalendarPage() {
   const [events, setEvents] = useState();
   const [openDetailDate, setOpenDetailDate] = useState(false);
   const [selectedDate, setSelectedDate] = useState();
-  const { fetchClassScheduleDetail } = useClassScheduleDetail();
+  const { fetchClassScheduleDetail, isLoading } = useClassScheduleDetail();
 
   const localizer = dateFnsLocalizer({
     format,
@@ -47,6 +47,8 @@ export default function CalendarPage() {
   });
 
   useEffect(() => {
+    if (hasFetchedData.current) return;
+    hasFetchedData.current = true;
     const fetchData = async () => {
       const result = await fetchClassScheduleDetail({
         date: new Date().setMonth(new Date().getMonth() + calendarShow),
@@ -200,11 +202,11 @@ export default function CalendarPage() {
     <div>
       <PageHeader
         title='Schedule'
-        subtitle='Manage Schedule'
+        subtitle={`${isLoading ? "...Loading" : "Manage Schedule"}`}
         showSearch={false}
         searchPlaceholder='Search by name'
         searchMaxLength={50}
-        children={actionsChildren}
+        childrenCustom={actionsChildren}
       />
       <div className='flex justify-between m-2'>
         <div className='flex gap-3 items-center'>

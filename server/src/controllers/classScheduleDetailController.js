@@ -21,8 +21,8 @@ const getClassScheduleDetail = async (req, res) => {
     res.status(200).json({
       data: result.data,
       pagination: {
-        currentPage: page,
-        pageSize: limit,
+        currentPage: Number(page),
+        pageSize: Number(limit),
         totalPages: result?.pagination?.totalPages,
         totalItems: result?.pagination?.totalItems,
       },

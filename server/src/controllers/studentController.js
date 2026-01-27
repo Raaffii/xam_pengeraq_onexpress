@@ -2,21 +2,31 @@ const studentService = require("../services/studentService");
 
 const getStudent = async (req, res) => {
   try {
-    let { page, limit, searchTerm } = req.query;
-    const filter = req.query;
-
-    const result = await studentService.getStudent(
+    const {
       page,
-      limit,
+      pageSize,
       searchTerm,
-      filter,
-    );
+      enrolledClass,
+      enrolledSelected,
+      subject,
+    } = req.query;
+    const filterOptions = {
+      page: parseInt(page),
+      pageSize: parseInt(pageSize),
+      searchTerm,
+      enrolledClass,
+      enrolledSelected,
+      subject,
+    };
+
+    const result = await studentService.getStudent(filterOptions);
     res.status(200).json({
       data: result.data,
       pagination: {
-        currentPage: Number(page),
-        pageSize: Number(limit),
-        totalPages: Math.ceil(result.total / limit),
+        currentPage: parseInt(page),
+        pageSize: parseInt(pageSize),
+        totalPages: Math.ceil(result.total / parseInt(pageSize)),
+
         totalItems: result.total,
       },
     });
