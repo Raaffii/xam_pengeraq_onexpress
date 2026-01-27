@@ -34,9 +34,6 @@ const ExamsPage = () => {
     if (hasFetchedData.current) return;
     hasFetchedData.current = true;
     fetchExams();
-    if (hasFetchedData.current) return;
-    hasFetchedData.current = true;
-    fetchExams();
   }, [fetchExams]);
 
   const openDeleteModal = (student) => {
@@ -56,13 +53,13 @@ const ExamsPage = () => {
   const columns = [
     {
       accessorKey: "examName",
-      header: <div className="text-left w-full">Name</div>,
+      header: <div className='text-left w-full'>Name</div>,
       cellClassName: "text-left",
     },
     {
       accessorKey: "examDesc",
 
-      header: <div className="text-left w-full">Description</div>,
+      header: <div className='text-left w-full'>Description</div>,
 
       cellClassName: "text-left",
     },
@@ -85,10 +82,10 @@ const ExamsPage = () => {
   };
 
   return (
-    <div className="min-h-screen ">
+    <div className='min-h-screen '>
       <PageHeader
-        title="Exams"
-        subtitle="Manage exams records and exam series assignments"
+        title='Exams'
+        subtitle='Manage exams records and exam series assignments'
         primaryAction={{
           label: "Add Exam",
           onClick: () => {
@@ -98,7 +95,7 @@ const ExamsPage = () => {
           },
         }}
         showSearch={true}
-        searchPlaceholder="Search by exam name"
+        searchPlaceholder='Search by exam name'
         onSearch={onSearch}
         searchMaxLength={50}
       />
@@ -106,8 +103,8 @@ const ExamsPage = () => {
       <DataTable
         data={exams}
         columns={columns}
-        detailPage="exams"
-        idAccessor="examId"
+        detailPage='exams'
+        idAccessor='examId'
         onEdit={(data) => {
           setModalMode("edit");
           setInitialFormValues({
@@ -139,7 +136,7 @@ const ExamsPage = () => {
           setOpen={setIsDeleteModalOpen}
           onSubmit={handleExamDelete}
           entityData={selectedExam}
-          title="Delete Student"
+          title='Delete Student'
           confirmationText={`Are you sure you want to delete student "${selectedExam.examName}"? This action cannot be undone.`}
         />
       )}

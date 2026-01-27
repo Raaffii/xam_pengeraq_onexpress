@@ -1,4 +1,9 @@
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import {
   Folder,
   Home,
@@ -28,8 +33,8 @@ export const Sidebar = ({ isOpen, setIsOpen }) => {
         { name: "Schedule", href: "/schedule", icon: Calendar },
         { name: "Location", href: "/location", icon: MapPin },
         { name: "Exams", href: "/exams", icon: ClipboardList },
-        { name: "Subjects", href: "/subjects", icon: FileText },
         { name: "Exam Series", href: "/series", icon: Folder },
+        { name: "Subjects", href: "/subjects", icon: FileText },
         { name: "Users", href: "/users", icon: UserCircle },
         { name: "Print Certificate", href: "/transcripts", icon: Inbox },
       ];
@@ -122,6 +127,8 @@ export const Sidebar = ({ isOpen, setIsOpen }) => {
 
       {/* Mobile sidebar */}
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <SheetTitle className='hidden' />
+        <SheetDescription className='hidden' />
         <SheetContent side='left' className='p-0 w-64 bg-transparent border-0'>
           <SidebarContent />
         </SheetContent>
