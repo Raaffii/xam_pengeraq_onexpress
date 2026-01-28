@@ -5,43 +5,29 @@ const getTeacher = async (options = {}) => {
 };
 
 const postTeacher = async (data) => {
-  try {
-    const result = await Teacher.postTeacher(data);
-    return result;
-  } catch (error) {
-    console.error("Service error:", error);
-    throw new Error("Failed to get student exam series");
-  }
+  return await Teacher.postTeacher(data);
 };
 
 const putTeacher = async (data, id) => {
-  try {
-    const result = await Teacher.putTeacher(data, id);
-    return result;
-  } catch (error) {
-    console.error("Service error:", error);
-    throw new Error("Failed to get student exam series");
+  const res = await Teacher.putTeacher(data, id);
+  if (!res) {
+    throw new Error("Teacher not found");
   }
+
+  return res;
 };
 
 const getTeacherById = async (id) => {
-  try {
-    const result = await Teacher.getTeacherById(id);
-    return result;
-  } catch (error) {
-    console.error("Service error:", error);
-    throw new Error("Failed to get student exam series");
-  }
+  return await Teacher.getTeacherById(id);
 };
 
 const deleteTeacher = async (id) => {
-  try {
-    const result = await Teacher.deleteTeacher(id);
-    return result;
-  } catch (error) {
-    console.error("Service error:", error);
-    throw error;
+  const res = await Teacher.deleteTeacher(id);
+  if (!res) {
+    throw new Error("Teacher not found");
   }
+
+  return res;
 };
 
 module.exports = {

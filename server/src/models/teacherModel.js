@@ -18,7 +18,7 @@ const getTeacher = async (options = {}) => {
   let query = `
     SELECT 
     t.teachername as teacherName,
-    t.emailaddress as emailAddress,
+    t.emailaddress as teacherEmail,
     t.teacherid as teacherId,
     s.name as userName,
     s.userid as userId
@@ -44,12 +44,6 @@ const getTeacher = async (options = {}) => {
 };
 
 const getTeacherById = async (id) => {
-  // page = Number(page) || 1;
-  // limit = Number(limit) || 10;
-  // const offset = (page - 1) * limit;
-
-  // const searchValue = `%${searchTerm}%`;
-
   const query = `
     SELECT 
     t.teachername as teacherName,
@@ -61,22 +55,18 @@ const getTeacherById = async (id) => {
     LEFT JOIN users s ON t.teacherid = s.teacherid
     
     WHERE t.teacherid = ?`;
-  const [rows] = await pool.query(query, [id]);
-  //  const [rows] = await pool.query(query, [searchValue, limit, offset]);
-  // const countQuery = `SELECT COUNT(*) AS total FROM studentexamseries `;
-  // const [countResult] = await pool.query(countQuery, [searchValue]);
-  // const total = countResult[0].total;
+  const [rows] = await pool.execute(query, [id]);
 
   return { data: rows[0] };
 };
 
 const postTeacher = async (data) => {
-  const { teacherName, teacherEmail, createdBy } = data;
+  const { teacherName, teacherEmail, enteredBy } = data;
   const query = `INSERT INTO teacher (teachername, emailaddress, createdby, createddate) VALUES (?, ?,?,?)`;
-  const [rows] = await pool.query(query, [
+  const [rows] = await pool.execute(query, [
     teacherName,
     teacherEmail,
-    createdBy,
+    enteredBy,
     new Date(),
   ]);
 
@@ -85,22 +75,34 @@ const postTeacher = async (data) => {
 
 const putTeacher = async (data, id) => {
   const { teacherName, teacherEmail, editedBy } = data;
+  const fields = [];
+  const params = [];
 
-  const query = `
-    UPDATE teacher 
-    SET teachername = ?, emailaddress = ?, editedby = ?, editeddate=?
-    WHERE teacherid = ?
-  `;
+  if (teacherName) {
+    fields.push("teachername = ?");
+    params.push(teacherName);
+  }
 
-  const [rows] = await pool.query(query, [
-    teacherName,
-    teacherEmail,
-    editedBy,
-    new Date(),
-    id,
-  ]);
+  if (teacherEmail) {
+    fields.push("teacheremail = ?");
+    params.push(teacherEmail);
+  }
+  fields.push("editedby = ?");
+  params.push(editedBy);
 
-  return { data: rows };
+  fields.push("editeddate = NOW()");
+
+  const sql = `
+      UPDATE teacher
+      SET ${fields.join(", ")}
+      WHERE teacherid = ?
+    `;
+
+  params.push(id);
+
+  const [result] = await pool.execute(sql, params);
+
+  return { data: result };
 };
 
 const deleteTeacher = async (id) => {
@@ -110,7 +112,7 @@ const deleteTeacher = async (id) => {
     WHERE teacherid = ?
   `;
 
-    const [rows] = await pool.query(query, [id]);
+    const [rows] = await pool.execute(query, [id]);
 
     return { data: rows };
   } catch (err) {
