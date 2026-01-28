@@ -7,7 +7,7 @@ export const useStudentsExamSeries = () => {
   const [error, setError] = useState(null);
 
   const [pagination, setPagination] = useState({
-    page: 1,
+    currentPage: 1,
     pageSize: 10,
     totalPage: 1,
     totalItem: 0,
@@ -30,9 +30,8 @@ export const useStudentsExamSeries = () => {
         const apiParams = {
           ...finalParams,
         };
-        const response = await studentsExamSeriesService.getStudentsExam(
-          apiParams,
-        );
+        const response =
+          await studentsExamSeriesService.getStudentsExam(apiParams);
         const data = formatStudentrData(response.data);
 
         setStudentsExamSeries(data);

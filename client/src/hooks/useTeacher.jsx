@@ -8,7 +8,7 @@ export const useTeacher = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [params, setParams] = useState({ page: 1, pageSize: 10 });
   const [pagination, setPagination] = useState({
-    page: 1,
+    currentPage: 1,
     pageSize: 10,
     totalPage: 1,
     totalItem: 0,

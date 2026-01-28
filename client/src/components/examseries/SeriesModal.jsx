@@ -296,6 +296,7 @@ export const SeriesModal = ({
               }
               disabled={isSubmitting}
               inputClassName="pl-10 bg-gray-50"
+              maxLength={50}
             />
             <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
               <FileText className="w-5 h-5" />
@@ -366,6 +367,7 @@ export const SeriesModal = ({
               disabled={isSubmitting}
               inputClassName="pl-10 bg-gray-50"
               min="0"
+              maxLength={5}
             />
             <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
               <CreditCard className="w-5 h-5" />
