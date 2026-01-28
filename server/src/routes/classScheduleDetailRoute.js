@@ -4,21 +4,12 @@ const {
   getClassScheduleDetail,
   getClassScheduleDetailById,
   openClassSession,
-  deleteClassSchedule,
   startClassSession,
 } = require("../controllers/classScheduleDetailController");
 
-const {
-  validateQuery,
-  validateMultiple,
-  validateBody,
-  validateParams,
-} = require("../middlewares/validateSchema");
+const { validateQuery } = require("../middlewares/validateSchema");
 
 const {
-  createClassScheduleSchema,
-  updateClassScheduleSchema,
-  idParamsSchema,
   classScheduleDetailQuerySchema,
 } = require("../schemas/classScheduleDetailSchema");
 
@@ -30,7 +21,7 @@ router.get(
   "/",
   validateQuery(classScheduleDetailQuerySchema),
   getClassScheduleDetail,
-); //console.log class schedule detail
+);
 
 router.get(
   "/:id",

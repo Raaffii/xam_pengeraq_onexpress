@@ -25,7 +25,11 @@ const getLocation = async (options = {}) => {
     LIMIT ? OFFSET ?
     `;
 
-  const [rows] = await pool.execute(query, [...params, limit, offset]);
+  const [rows] = await pool.execute(query, [
+    ...params,
+    String(limit),
+    String(offset),
+  ]);
   const countQuery = `SELECT COUNT(*) AS total  FROM classlocation cl ${whereClause} `;
   const [countResult] = await pool.execute(countQuery, [...params]);
   const total = countResult[0].total;
@@ -34,12 +38,6 @@ const getLocation = async (options = {}) => {
 };
 
 const getLocationById = async (id) => {
-  // page = Number(page) || 1;
-  // limit = Number(limit) || 10;
-  // const offset = (page - 1) * limit;
-
-  // const searchValue = `%${searchTerm}%`;
-
   const query = `
     SELECT 
     t.Locationname as LocationName,
@@ -52,36 +50,44 @@ const getLocationById = async (id) => {
     
     WHERE t.Locationid = ?`;
   const [rows] = await pool.query(query, [id]);
-  //  const [rows] = await pool.query(query, [searchValue, limit, offset]);
-  // const countQuery = `SELECT COUNT(*) AS total FROM studentexamseries `;
-  // const [countResult] = await pool.query(countQuery, [searchValue]);
-  // const total = countResult[0].total;
-
   return { data: rows[0] };
 };
 
 const postLocation = async (data) => {
   const { locationName, createdBy } = data;
   const query = `INSERT INTO classlocation (locationname, createdby, createddate) VALUES (?,?,?)`;
-  const [rows] = await pool.query(query, [locationName, createdBy, new Date()]);
+  const [rows] = await pool.execute(query, [
+    locationName,
+    createdBy,
+    new Date(),
+  ]);
 
   return rows.insertId;
 };
 
 const putLocation = async (data, id) => {
   const { locationName, editedBy } = data;
-  const query = `
-    UPDATE classlocation 
-    SET locationname = ?, editedby = ?, editeddate=?
-    WHERE classlocationid = ?
-  `;
+  const fields = [];
+  const params = [];
 
-  const [rows] = await pool.query(query, [
-    locationName,
-    editedBy,
-    new Date(),
-    id,
-  ]);
+  if (locationName !== undefined) {
+    fields.push("locationname = ?");
+    params.push(locationName);
+  }
+
+  fields.push("editedby = ?");
+  params.push(editedBy);
+
+  fields.push("editeddate = NOW()");
+
+  const sql = `
+      UPDATE classlocation 
+      SET ${fields.join(", ")} 
+      WHERE classlocationid = ?
+    `;
+  params.push(id);
+
+  const [rows] = await pool.execute(sql, params);
 
   return { data: rows };
 };

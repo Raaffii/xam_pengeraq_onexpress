@@ -115,7 +115,7 @@ const getClassScheduleDetail = async (options = {}) => {
 
   if (usePagination) {
     query += ` LIMIT ? OFFSET ?`;
-    queryParams.push(limit, offset);
+    queryParams.push(String(limit), String(offset));
   }
 
   const [rows] = await pool.execute(query, queryParams);

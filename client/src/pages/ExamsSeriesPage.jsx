@@ -99,34 +99,34 @@ const ExamsSeriesPage = () => {
   const columns = [
     {
       accessorKey: "examName",
-      header: <div className='text-left w-full'>Exam</div>,
+      header: <div className="text-left w-full">Exam</div>,
       cellClassName: "text-left",
     },
     {
       accessorKey: "seriesDesc",
 
-      header: <div className='text-left w-full'>Description</div>,
+      header: <div className="text-left w-full">Description</div>,
 
       cellClassName: "text-left",
     },
     {
       accessorKey: "seriesStartDate",
 
-      header: <div className='text-left w-full'>Start Date</div>,
+      header: <div className="text-left w-full">Start Date</div>,
 
       cellClassName: "text-left",
     },
     {
       accessorKey: "seriesEndDate",
 
-      header: <div className='text-left w-full'>End Date</div>,
+      header: <div className="text-left w-full">End Date</div>,
 
       cellClassName: "text-left",
     },
     {
       accessorKey: "seriesCredit",
 
-      header: <div className='text-left w-full'>Credits</div>,
+      header: <div className="text-left w-full">Credits</div>,
 
       cellClassName: "text-left",
     },
@@ -141,24 +141,25 @@ const ExamsSeriesPage = () => {
     : [];
 
   return (
-    <div className='min-h-screen'>
+    <div className="min-h-screen">
       <PageHeader
-        title='Exams'
-        subtitle='Manage exams series records and exam item assignments'
+        title="Exams"
+        subtitle="Manage exams series records and exam item assignments"
         primaryAction={{
           label: "Add Exam Series",
           onClick: openCreateModal,
         }}
         showSearch={true}
-        searchPlaceholder='Search by Exam Series Name'
+        searchPlaceholder="Search by Exam Series Name"
         onSearch={onSearch}
-        searchMaxLength={50}>
+        searchMaxLength={50}
+      >
         <ExamSeriesFilter
           data={exams}
-          valueKey='examId'
-          labelKey='examName'
-          filterKey='byExam'
-          placeholder='Filter by Exam'
+          valueKey="examId"
+          labelKey="examName"
+          filterKey="byExam"
+          placeholder="Filter by Exam"
           initialFilters={{ byExam: params.byExam }}
           onFilterChange={onFilterChange}
           isLoading={examLoad}
@@ -168,8 +169,8 @@ const ExamsSeriesPage = () => {
       <DataTable
         data={examSeries}
         columns={columns}
-        detailPage='series'
-        idAccessor='seriesId'
+        detailPage="series"
+        idAccessor="seriesId"
         onEdit={openEditModal}
         onDelete={openDeleteModal}
         onPageChange={onPageChange}
@@ -194,7 +195,7 @@ const ExamsSeriesPage = () => {
           setOpen={setIsDeleteModalOpen}
           onSubmit={handleExamSeriesDelete}
           entityData={selectedSeries}
-          title='Delete Exam Series'
+          title="Delete Exam Series"
           confirmationText={`Are you sure you want to delete series "${selectedSeries.seriesDesc}"? This action cannot be undone.`}
         />
       )}
