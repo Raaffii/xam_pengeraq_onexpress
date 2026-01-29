@@ -92,7 +92,6 @@ exports.defaultExamFinalGrades = [
   },
   {
     gradeSeq: 2,
-    subjmin: "45.00",
     finalPercent: "49.99",
     grade: "D",
     gradePoint: "1.0",
@@ -100,7 +99,6 @@ exports.defaultExamFinalGrades = [
   },
   {
     gradeSeq: 3,
-    subjmin: "50.00",
     finalPercent: "54.99",
     grade: "C",
     gradePoint: "2.0",
@@ -108,7 +106,6 @@ exports.defaultExamFinalGrades = [
   },
   {
     gradeSeq: 4,
-    subjmin: "55.00",
     finalPercent: "59.99",
     grade: "C+",
     gradePoint: "2.3",
@@ -116,7 +113,6 @@ exports.defaultExamFinalGrades = [
   },
   {
     gradeSeq: 5,
-    subjmin: "60.00",
     finalPercent: "64.99",
     grade: "B-",
     gradePoint: "2.6",
@@ -124,7 +120,6 @@ exports.defaultExamFinalGrades = [
   },
   {
     gradeSeq: 6,
-    subjmin: "65.00",
     finalPercent: "69.99",
     grade: "B",
     gradePoint: "3.0",
@@ -132,7 +127,6 @@ exports.defaultExamFinalGrades = [
   },
   {
     gradeSeq: 7,
-    subjmin: "70.00",
     finalPercent: "74.99",
     grade: "B+",
     gradePoint: "3.3",
@@ -140,7 +134,6 @@ exports.defaultExamFinalGrades = [
   },
   {
     gradeSeq: 8,
-    subjmin: "75.00",
     finalPercent: "84.99",
     grade: "A-",
     gradePoint: "3.6",
@@ -148,7 +141,6 @@ exports.defaultExamFinalGrades = [
   },
   {
     gradeSeq: 9,
-    subjmin: "85.00",
     finalPercent: "100.00",
     grade: "A",
     gradePoint: "4.0",
