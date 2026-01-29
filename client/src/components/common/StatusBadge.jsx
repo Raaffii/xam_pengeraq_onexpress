@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 
 export const StatusBadge = ({ label, variant = "default", size = "sm" }) => {
   const variantStyles = {
-    gree: "bg-green-600 hover:bg-green-600 text-white",
+    green: "bg-green-600 hover:bg-green-600 text-white",
     red: "bg-red-500 hover:bg-red-500 text-white",
     yellow: "bg-yellow-400 hover:bg-yellow-400 text-yellow-900",
     blue: "bg-blue-500 hover:bg-blue-500 text-white",

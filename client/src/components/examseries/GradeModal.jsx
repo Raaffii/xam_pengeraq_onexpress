@@ -194,6 +194,7 @@ export const GradeModal = ({
                 error={errors.gradeSeq}
                 disabled={isSubmitting}
                 inputClassName="pl-10 bg-gray-50"
+                maxLength={3}
               />
               <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
                 <Hash className="w-5 h-5" />
@@ -218,6 +219,7 @@ export const GradeModal = ({
                 disabled={isSubmitting}
                 inputClassName="pl-10 bg-gray-50"
                 decimalPlaces={2}
+                maxLength={10}
                 min="0"
               />
               <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
@@ -239,6 +241,7 @@ export const GradeModal = ({
                 error={errors.grade}
                 disabled={isSubmitting}
                 inputClassName="pl-10 bg-gray-50"
+                maxLength={2}
               />
               <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
                 <Award className="w-5 h-5" />
@@ -263,6 +266,7 @@ export const GradeModal = ({
                 disabled={isSubmitting}
                 inputClassName="pl-10 bg-gray-50"
                 decimalPlaces={2}
+                maxLength={8}
                 min="0"
               />
               <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
@@ -283,6 +287,7 @@ export const GradeModal = ({
               error={errors.gradeResult}
               disabled={isSubmitting}
               inputClassName="pl-10 bg-gray-50"
+              maxLength={20}
             />
             <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
               <CheckCircle className="w-5 h-5" />
