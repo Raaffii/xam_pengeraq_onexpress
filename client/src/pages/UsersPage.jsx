@@ -64,10 +64,12 @@ const UsersPage = () => {
       accessorKey: "studentId",
       align: "center",
       cell: (row) => (
-        <div className="flex justify-center">
-          {row.studentId && row.studentName ?
-            <CheckCircle2Icon className="text-green-800" />
-          : <XCircleIcon className="text-red-800" />}
+        <div className='flex justify-center'>
+          {row.studentId && row.studentName ? (
+            <CheckCircle2Icon className='text-green-800' />
+          ) : (
+            <XCircleIcon className='text-red-800' />
+          )}
         </div>
       ),
     },
@@ -75,34 +77,34 @@ const UsersPage = () => {
       header: "Actions",
       align: "center",
       cell: (row) => (
-        <div className="flex items-center justify-center gap-1">
+        <div className='flex items-center justify-center gap-1'>
           <ActionItem
-            label="Edit"
+            label='Edit'
             icon={Pencil}
             onClick={() => {
               setSelectedUser(row);
               setModalMode("edit");
               setIsModalOpen(true);
             }}
-            className="text-amber-600 hover:bg-amber-100"
+            className='text-amber-600 hover:bg-amber-100'
           />
           <ActionItem
-            label="Reset Password"
+            label='Reset Password'
             icon={LockOpen}
             onClick={() => {
               setSelectedUser(row);
               setResetModalOpen(true);
             }}
-            className="text-gray-600 hover:bg-gray-200"
+            className='text-gray-600 hover:bg-gray-200'
           />
           <ActionItem
-            label="Delete"
+            label='Delete'
             icon={Trash2}
             onClick={() => {
               setSelectedUser(row);
               setIsDeleteModalOpen(true);
             }}
-            className="text-red-600 hover:bg-red-100"
+            className='text-red-600 hover:bg-red-100'
           />
         </div>
       ),
@@ -118,6 +120,8 @@ const UsersPage = () => {
         role: selectedUser.role || "",
         studentId: selectedUser.studentId || null,
         studentName: selectedUser.studentName || "",
+        teacherName: selectedUser.teacherName || "",
+        teacherId: selectedUser.teacherId || null,
       };
     }
 
@@ -132,6 +136,7 @@ const UsersPage = () => {
 
   const handleFormSubmit = async (formData) => {
     let response;
+
     if (modalMode === "create") {
       response = await newUser(formData);
     } else {
@@ -160,10 +165,10 @@ const UsersPage = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className='min-h-screen'>
       <PageHeader
-        title="Users"
-        subtitle="Manage system users and their access"
+        title='Users'
+        subtitle='Manage system users and their access'
         primaryAction={{
           label: "Add User",
           onClick: () => {
@@ -173,10 +178,9 @@ const UsersPage = () => {
           },
         }}
         showSearch={true}
-        searchPlaceholder="Search by name or email"
+        searchPlaceholder='Search by name or email'
         onSearch={onSearch}
-        searchMaxLength={50}
-      >
+        searchMaxLength={50}>
         <UserFilter
           onFilterChange={onFilterChange}
           initialFilters={{
@@ -188,7 +192,7 @@ const UsersPage = () => {
         data={users}
         isLoading={isLoading}
         columns={columns}
-        idAccessor="userId"
+        idAccessor='userId'
         onPageChange={onPageChange}
         onSizeChange={onPageSizeChange}
         pagination={pagination}
@@ -217,7 +221,7 @@ const UsersPage = () => {
           setOpen={setIsDeleteModalOpen}
           onSubmit={handleDelete}
           entityData={selectedUser}
-          title="Delete User"
+          title='Delete User'
           confirmationText={`Are you sure you want to delete user "${selectedUser?.userName}"? This action cannot be undone.`}
         />
       )}

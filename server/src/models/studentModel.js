@@ -33,7 +33,7 @@ const getStudent = async (options = {}) => {
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
   let studentIdQuery = `
-  SELECT DISTINCT s.studentid
+  SELECT DISTINCT s.studentid, s.studentname
   FROM students s
   LEFT JOIN studentclass sc
     ON s.studentid = sc.studentid
@@ -42,6 +42,7 @@ const getStudent = async (options = {}) => {
   LEFT JOIN examsubj esj
     ON se.examseriesid=esj.examseriesid
   ${whereClause}
+    ORDER BY s.studentname ASC
   `;
 
   const queryParams = [...params];
@@ -58,7 +59,7 @@ const getStudent = async (options = {}) => {
 
   const ids = studentIds.map((row) => row.studentid);
 
-  let orderBy = "ORDER BY s.createddate DESC";
+  let orderBy = "ORDER BY s.studentname ASC";
   const orderParams = [];
 
   const detailQuery = `

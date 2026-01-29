@@ -24,12 +24,20 @@ const studentIdSchema = z
   .optional()
   .nullable();
 
+const teacherIdSchema = z
+  .number()
+  .int("Student ID must be an integer")
+  .positive("Student ID must be positive")
+  .optional()
+  .nullable();
+
 const createUserSchema = z.object({
   userName: nameSchema,
   emailAddress: emailSchema,
   password: passwordSchema,
   role: roleSchema.optional().default("student"),
   studentId: studentIdSchema,
+  teacherId: teacherIdSchema,
 });
 
 const updateUserSchema = z.object({
@@ -37,6 +45,7 @@ const updateUserSchema = z.object({
   emailAddress: emailSchema.optional(),
   role: roleSchema.optional(),
   studentId: studentIdSchema,
+  teacherId: teacherIdSchema,
 });
 
 const fetchUsersQuerySchema = z
