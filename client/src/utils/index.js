@@ -118,3 +118,19 @@ export const formatDateTimeV2 = (
     return "";
   }
 };
+
+export const capitalizeFirstLetter = (string) => {
+  if (string.length === 0) {
+    return string;
+  }
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
+export const getRoleVariant = (role) => {
+  if (!role || typeof role !== "string") return "gray";
+  const r = role.toLowerCase();
+  if (r === "admin") return "blue";
+  if (r === "teacher") return "orange";
+  if (r === "student") return "green";
+  return "gray";
+};

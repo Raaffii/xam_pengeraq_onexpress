@@ -9,7 +9,6 @@ import { useExamSeries } from "@/hooks/useExamsSeries";
 import { ScheduleModal } from "@/components/schedule/ScheduleModal";
 import { SearchableDropdown } from "@/components/common";
 import { Filter } from "lucide-react";
-import { render } from "@react-pdf/renderer";
 import { formatDateTimeV2 } from "@/utils";
 
 export default function SchedulesPages() {
@@ -229,7 +228,7 @@ export default function SchedulesPages() {
           onSubmit={handleScheduleDelete}
           entityData={selectedSchedule}
           title="Delete Schedule"
-          confirmationText={`Are you sure you want to delete schedule "${selectedSchedule.classschhdid}"? This action cannot be undone.`}
+          confirmationText={`Are you sure you want to delete this schedule? This action cannot be undone.`}
         />
       )}
     </div>
