@@ -3,36 +3,38 @@ import { useClassSchedule } from "@/hooks/useClassSchedule";
 import { useEffect, useState, useRef } from "react";
 import PageHeader from "@/components/common/PageHeader";
 import { useNavigate } from "react-router-dom";
-import AddSchedule from "@/components/schedule/AddSchedule";
-import { QrCode, Flag, UserCheck } from "lucide-react";
+import { QrCode, Flag, UserCheck, Filter } from "lucide-react";
 import QrCodeModal from "@/components/teacher/QrCodeModal";
-
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SearchableDropdown, StatusBadge } from "@/components/common";
+import { usePageTitle } from "@/hooks/usePageTitle";
+import { useExamSeries } from "@/hooks/useExamsSeries";
+import { ScheduleModal } from "@/components/schedule/ScheduleModal";
 
 export default function TeacherSchedulesPages() {
+  usePageTitle("My Schedules");
   const {
     fetchClassSchedule,
-
     classSchedule,
     pagination,
     onSearch,
     onPageChange,
     onPageSizeChange,
+    postClassSchedule,
+    isSubmitting,
+    isLoading,
+    setParams,
   } = useClassSchedule();
+  const {
+    fetchExamSeries,
+    examSeries,
+    isLoading: seriesLoad,
+  } = useExamSeries();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [isOpenQrCode, setIsOpenQrCode] = useState(false);
   const [selectedClass, setSelectedClass] = useState({});
   const hasFetchedData = useRef(false);
+  const hasFetchedExamSeries = useRef(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,6 +46,13 @@ export default function TeacherSchedulesPages() {
 
     fetchData();
   }, [fetchClassSchedule]);
+
+  useEffect(() => {
+    if (isModalOpen && !hasFetchedExamSeries.current) {
+      hasFetchedExamSeries.current = true;
+      fetchExamSeries();
+    }
+  }, [isModalOpen, fetchExamSeries]);
 
   const isClassToday = (row) => {
     const today = new Date();
@@ -75,58 +84,46 @@ export default function TeacherSchedulesPages() {
   const columns = [
     {
       accessorKey: "teacherName",
-      header: <div className='text-left w-full'>Teacher Name</div>,
+      header: "Teacher Name",
       cellClassName: "text-left",
     },
     {
       accessorKey: "subjDesc",
-      header: <div className='text-left w-full'>Subject</div>,
+      header: "Subject",
       cellClassName: "text-left",
     },
     {
       accessorKey: "examSeriesDescription",
-      header: <div className='text-left w-full'>Exam Series</div>,
+      header: "Exam Series",
       cellClassName: "text-left",
     },
     {
       accessorKey: "startDateTime",
-      header: <div className='text-left w-full'>Start Date</div>,
+      header: "Start Date",
       cellClassName: "text-left",
     },
     {
       accessorKey: "repeatValue",
-      header: <div className='text-left w-full'>Repeat Value</div>,
-      cellClassName: "text-left",
+      header: "Repeat Value",
+      align: "center",
       render: (row) => (
-        <div className='flex flex-wrap gap-1'>
-          <span
-            className='px-2 py-0.5 text-xs rounded-full
-                   bg-blue-50 text-blue-700 border border-blue-200'>
-            {row.repeatValue || "No"}
-          </span>
-        </div>
+        <StatusBadge
+          label={row.repeatValue || "No"}
+          variant={row.repeatValue ? "blue" : "default"}
+        />
       ),
     },
     {
-      header: <div className='text-center w-full'>Class Today</div>,
-      cellClassName: "text-left",
+      header: "Class Today",
+      align: "center",
       render: (row) => {
         const canStart = isClassToday(row);
 
         return (
-          <div className='flex items-center justify-center gap-3 w-full'>
-            {/* Status Badge */}
-            <span
-              className={`px-3 py-1 text-xs font-semibold rounded-sm border
-      ${
-        canStart
-          ? "bg-green-100 text-green-800 border-green-300"
-          : "bg-red-100 text-red-800 border-red-300"
-      }
-    `}>
-              {canStart ? "Class Today" : "No Class Today"}
-            </span>
-          </div>
+          <StatusBadge
+            label={canStart ? "Class Today" : "No Class Today"}
+            variant={canStart ? "green" : "default"}
+          />
         );
       },
     },
@@ -151,24 +148,23 @@ export default function TeacherSchedulesPages() {
         const canStart = isClassToday(row);
         return (
           <div>
-            {canStart ? (
-              <div className='relative bg-green-200 rounded-lg p-1'>
+            {canStart ?
+              <div className="relative bg-green-200 rounded-lg p-1">
                 {/* Flag Badge */}
-                <div className='absolute -top-1 -right-1 bg-green-500/50 rounded-full p-[2px] shadow'>
-                  <Flag size={10} className='text-white' />
+                <div className="absolute -top-1 -right-1 bg-green-500/50 rounded-full p-[2px] shadow">
+                  <Flag size={10} className="text-white" />
                 </div>
 
                 {/* QR Icon */}
                 <QrCode size={18} />
               </div>
-            ) : (
-              <div className='relative bg-red-200 rounded-lg p-1'>
+            : <div className="relative bg-red-200 rounded-lg p-1">
                 {/* Flag Badge */}
 
                 {/* QR Icon */}
                 <QrCode size={18} />
               </div>
-            )}
+            }
           </div>
         );
       },
@@ -180,7 +176,7 @@ export default function TeacherSchedulesPages() {
       render: () => {
         return (
           <div>
-            <div className='relative bg-blue-200 rounded-lg p-1'>
+            <div className="relative bg-blue-200 rounded-lg p-1">
               <UserCheck size={18} />
             </div>
           </div>
@@ -192,45 +188,61 @@ export default function TeacherSchedulesPages() {
   const currentView =
     location.pathname === "/schedule/calendar" ? "calendar" : "list";
 
-  const actionsChildren = (
-    <Select
-      onValueChange={(value) => {
-        if (value === "list") {
-          navigate("/teacher/schedule");
-        }
+  const optionsExamSeries = examSeries?.map((item) => ({
+    value: item.seriesId,
+    label: item.seriesDesc,
+  }));
 
-        if (value === "calendar") {
-          navigate("/teacher/schedule/calendar");
-        }
-      }}
-      value={currentView}>
-      <SelectTrigger className='w-full max-w-48'>
-        <SelectValue placeholder='View By' />
-      </SelectTrigger>
+  const handleFormSubmit = async (formData) => {
+    const result = await postClassSchedule(formData);
 
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel>View By</SelectLabel>
-
-          <SelectItem value='list'>View By List</SelectItem>
-          <SelectItem value='calendar'>View By Calendar</SelectItem>
-        </SelectGroup>
-      </SelectContent>
-    </Select>
-  );
+    if (result.success) {
+      setIsModalOpen(false);
+      setParams((prev) => ({ ...prev, page: 1 }));
+      await fetchClassSchedule({ page: 1 });
+    }
+    return result.success;
+  };
 
   return (
-    <div className='min-h-screen bg-gray-50'>
-      <div className='mx-auto'>
+    <div className="min-h-screen bg-gray-50">
+      <div className="mx-auto">
         <PageHeader
-          title='Teacher Schedules'
-          subtitle='Your Schedule'
+          title="Teacher Schedules"
+          subtitle="Your Schedule"
           showSearch={true}
-          searchPlaceholder='Search by subject...'
+          searchPlaceholder="Search by subject..."
           searchMaxLength={50}
           onSearch={onSearch}
-          childrenCustom={actionsChildren}
-        />
+        >
+          <div className="w-full md:min-w-[200px] md:w-auto">
+            <SearchableDropdown
+              id={"value"}
+              name={"value"}
+              value={currentView}
+              onChange={(e) => {
+                const { value } = e.target;
+                if (value === "list") {
+                  navigate("/teacher/schedule");
+                }
+
+                if (value === "calendar") {
+                  navigate("/teacher/schedule/calendar");
+                }
+              }}
+              options={[
+                { value: "list", label: "View By List" },
+                { value: "calendar", label: "View By Calendar" },
+              ]}
+              placeholder={"View By"}
+              searchPlaceholder="Search..."
+              emptyMessage="No items found"
+              icon={Filter}
+              minSearchLength={0}
+              className="h-10"
+            />
+          </div>
+        </PageHeader>
 
         <DataTable
           data={classSchedule}
@@ -238,19 +250,21 @@ export default function TeacherSchedulesPages() {
           onPageChange={onPageChange}
           onSizeChange={onPageSizeChange}
           pagination={pagination}
-          idAccessor='classschhdid'
+          idAccessor="classschhdid"
           additionalActions={startClassAction}
-          detailPage='teacher/schedule/detail'
+          detailPage="teacher/schedule/detail"
+          isLoading={isLoading}
         />
 
-        {isModalOpen && (
-          <AddSchedule
-            open={isModalOpen}
-            setOpen={setIsModalOpen}
-            title='Add New Student'
-            fetchClassSchedule={fetchClassSchedule}
-          />
-        )}
+        <ScheduleModal
+          open={isModalOpen}
+          onOpenChange={setIsModalOpen}
+          onSubmit={handleFormSubmit}
+          isSubmitting={isSubmitting}
+          seriesOptions={optionsExamSeries}
+          mode={"create"}
+          isLoadingSeries={seriesLoad}
+        />
 
         <QrCodeModal
           open={isOpenQrCode}

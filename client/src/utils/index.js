@@ -1,3 +1,5 @@
+import { format, parseISO } from "date-fns";
+
 export const formatDateTime = (dateString) => {
   const date = new Date(dateString);
 
@@ -100,4 +102,19 @@ export const formatPeriod = (startDate, endDate) => {
   return `${months[parseInt(start.month) - 1]} ${start.year} - ${
     months[parseInt(end.month) - 1]
   } ${end.year}`;
+};
+
+export const formatDateTimeV2 = (
+  dateString,
+  formatPattern = "yyyy-MM-dd",
+  isIso = false,
+) => {
+  if (!dateString) return "";
+  try {
+    const isoString = isIso ? dateString : dateString.replace(" ", "T");
+    const date = parseISO(isoString);
+    return format(date, formatPattern);
+  } catch (err) {
+    return "";
+  }
 };
