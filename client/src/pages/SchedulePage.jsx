@@ -9,7 +9,6 @@ import { useExamSeries } from "@/hooks/useExamsSeries";
 import { ScheduleModal } from "@/components/schedule/ScheduleModal";
 import { SearchableDropdown } from "@/components/common";
 import { Filter } from "lucide-react";
-import { render } from "@react-pdf/renderer";
 import { formatDateTimeV2 } from "@/utils";
 
 export default function SchedulesPages() {

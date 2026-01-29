@@ -126,34 +126,32 @@ export default function TeacherCalendarPage() {
   };
 
   const handleChangeCalendar = async (con) => {
-    if (con == "next") {
-      const resultOri = await fetchClassScheduleDetail({
-        date: new Date().setMonth(new Date().getMonth() + calendarShow + 1),
-        usePagination: false,
-        scheduleId: id || null,
-      });
+    const baseDate = new Date();
 
-      await handleEvent(resultOri.data);
+    baseDate.setDate(1);
+
+    let newMonthOffset = calendarShow;
+
+    if (con === "next") {
+      newMonthOffset = calendarShow + 1;
       setCalendarShow(calendarShow + 1);
-    } else if (con == "prev") {
-      const resultOri = await fetchClassScheduleDetail({
-        date: new Date().setMonth(new Date().getMonth() + calendarShow - 1),
-        usePagination: false,
-        scheduleId: id || null,
-      });
-
-      await handleEvent(resultOri.data);
+    } else if (con === "prev") {
+      newMonthOffset = calendarShow - 1;
       setCalendarShow(calendarShow - 1);
     } else {
-      const resultOri = await fetchClassScheduleDetail({
-        date: new Date().setMonth(new Date().getMonth()),
-        usePagination: false,
-        scheduleId: id || null,
-      });
-
-      await handleEvent(resultOri.data);
+      newMonthOffset = 0;
       setCalendarShow(0);
     }
+
+    baseDate.setMonth(baseDate.getMonth() + newMonthOffset);
+
+    const resultOri = await fetchClassScheduleDetail({
+      date: baseDate,
+      usePagination: false,
+      scheduleId: id || null,
+    });
+
+    await handleEvent(resultOri.data);
   };
 
   const handleViewChange = (newView) => {

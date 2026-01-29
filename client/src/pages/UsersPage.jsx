@@ -1,4 +1,5 @@
 import { ResetUserPassword } from "@/components/auth";
+import { StatusBadge } from "@/components/common";
 import { ActionItem } from "@/components/common/ActionItem";
 import PageHeader from "@/components/common/PageHeader";
 import Delete_modal from "@/components/modals/Delete_modal";
@@ -6,13 +7,8 @@ import { DataTable } from "@/components/table";
 import { UserFilter, UserForm } from "@/components/users";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { useUser } from "@/hooks/useUsers";
-import {
-  CheckCircle2Icon,
-  LockOpen,
-  Pencil,
-  Trash2,
-  XCircleIcon,
-} from "lucide-react";
+import { capitalizeFirstLetter, getRoleVariant } from "@/utils";
+import { LockOpen, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const UsersPage = () => {
@@ -60,17 +56,14 @@ const UsersPage = () => {
       cellClassName: "text-left",
     },
     {
-      header: "Student",
-      accessorKey: "studentId",
+      header: "Role",
+      accessorKey: "role",
       align: "center",
       cell: (row) => (
-        <div className='flex justify-center'>
-          {row.studentId && row.studentName ? (
-            <CheckCircle2Icon className='text-green-800' />
-          ) : (
-            <XCircleIcon className='text-red-800' />
-          )}
-        </div>
+        <StatusBadge
+          label={row.role ? capitalizeFirstLetter(row.role) : "N/A"}
+          variant={getRoleVariant(row.role)}
+        />
       ),
     },
     {
