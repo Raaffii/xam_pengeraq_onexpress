@@ -104,6 +104,7 @@ const DashboardModel = {
         `SELECT 
           finalpercent as finalPercent,
           overallgrade as grade,
+          overallgradepoint as gradePoint,
           overallrank as gradeResult
         FROM examfinalgrade
         WHERE examseriesid = ?
@@ -185,10 +186,9 @@ const DashboardModel = {
     }, 0);
 
     const overallGradePoint = parseFloat((totalMarks / credits).toFixed(2));
-    const avgPercent = totalMarks / results.length;
 
     const gradeConfig = config.find(
-      (config) => config.finalPercent <= avgPercent,
+      (config) => overallGradePoint >= Number(config.gradePoint),
     );
 
     if (gradeConfig) {
@@ -201,9 +201,9 @@ const DashboardModel = {
     }
 
     return {
-      overallGrade: null,
+      overallGrade: "F",
       overallGradePoint: overallGradePoint,
-      gradeResult: null,
+      gradeResult: "GAGAL",
       totalMarks: parseFloat(totalMarks.toFixed(2)),
     };
   },

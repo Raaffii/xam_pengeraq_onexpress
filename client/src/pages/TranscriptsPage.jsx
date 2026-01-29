@@ -59,10 +59,10 @@ const TranscriptsPage = () => {
         "sm:w-64 min-w-48 text-left sticky left-0 z-10 font-medium shadow-sm bg-gray-50",
       render: (row) => (
         <div>
-          <div className='text-sm font-medium text-gray-900'>
+          <div className="text-sm font-medium text-gray-900">
             {row.studentName}
           </div>
-          <div className='text-sm text-gray-500'>{row.studentIdNo}</div>
+          <div className="text-sm text-gray-500">{row.studentIdNo}</div>
         </div>
       ),
     },
@@ -71,8 +71,8 @@ const TranscriptsPage = () => {
       width: "200px",
       align: "center",
       render: (row) => (
-        <div className='flex flex-col items-center space-y-2'>
-          <span className='text-xl font-bold text-blue-500'>
+        <div className="flex flex-col items-center space-y-2">
+          <span className="text-xl font-bold text-blue-500">
             {Number(row.summary.overallGradePoint).toFixed(2)}
           </span>
         </div>
@@ -83,74 +83,71 @@ const TranscriptsPage = () => {
       width: "200px",
       align: "center",
       render: (row) => (
-        <div className='font-semibold'>{row.summary.gradeResult}</div>
+        <div className="font-semibold">{row.summary.gradeResult}</div>
       ),
     },
-    ...(seriesSubj.length > 0
-      ? seriesSubj.map((subject) => ({
-          header: (
-            <div className='flex flex-col items-center'>
-              <span className='font-bold text-white-900'>
-                {subject.subjCode}
-              </span>
-              <span className='text-xs text-gray-300'>{subject.subjDesc}</span>
-            </div>
-          ),
-          width: "150px",
-          align: "center",
-          render: (row) => {
-            const result = getResultForSubject(row, subject.subjId);
-            return result ? (
+    ...(seriesSubj.length > 0 ?
+      seriesSubj.map((subject) => ({
+        header: (
+          <div className="flex flex-col items-center">
+            <span className="font-bold text-white-900">{subject.subjCode}</span>
+            <span className="text-xs text-gray-300">{subject.subjDesc}</span>
+          </div>
+        ),
+        width: "150px",
+        align: "center",
+        render: (row) => {
+          const result = getResultForSubject(row, subject.subjId);
+          return result ?
               <GradeDisplay
                 grade={result.subjGrade}
                 marks={Number(result.marks).toFixed(2)}
                 gpa={Number(result.subjGpa).toFixed(2)}
                 isRetake={result.isRetake}
               />
-            ) : (
-              <span className='text-gray-400 text-sm'>N/A</span>
-            );
-          },
-        }))
-      : [
-          {
-            header: "No subjects available",
-            className: "text-center",
-          },
-        ]),
+            : <span className="text-gray-400 text-sm">N/A</span>;
+        },
+      }))
+    : [
+        {
+          header: "No subjects available",
+          className: "text-center",
+        },
+      ]),
   ];
 
   return (
-    <div className='min-h-screen bg-gray-50 mx-auto'>
+    <div className="min-h-screen bg-gray-50 mx-auto">
       {/* Page Header */}
       <PageHeader
-        title='Print Certificate'
-        subtitle='Manage and export student certificate'
+        title="Print Certificate"
+        subtitle="Manage and export student certificate"
         showSearch={true}
-        searchPlaceholder='Search by student name or id'
+        searchPlaceholder="Search by student name or id"
         onSearch={onSearch}
         searchMaxLength={50}
         primaryAction={
-          selectedRows?.length > 0
-            ? {
-                component: (
-                  <MultiTranscriptDownload
-                    selectedStudents={selectedRows}
-                    pdfDataMap={dashboardData}
-                    selectedSeries={selectedSeries}
-                    setup={setup}
-                  />
-                ),
-              }
-            : undefined
-        }>
+          selectedRows?.length > 0 ?
+            {
+              component: (
+                <MultiTranscriptDownload
+                  selectedStudents={selectedRows}
+                  pdfDataMap={dashboardData}
+                  selectedSeries={selectedSeries}
+                  setup={setup}
+                />
+              ),
+            }
+          : undefined
+        }
+      >
         {/* Exam Series Filter */}
         <ExamSeriesFilter
           data={seriesOption}
-          valueKey='seriesId'
-          labelKey='seriesDesc'
-          filterKey='bySeries'
-          placeholder='Select by Series First'
+          valueKey="seriesId"
+          labelKey="seriesDesc"
+          filterKey="bySeries"
+          placeholder="Select by Series First"
           initialFilters={params}
           onFilterChange={onFilterChange}
           isLoading={isLoading}
@@ -159,12 +156,12 @@ const TranscriptsPage = () => {
       </PageHeader>
 
       {/* Series Details Card */}
-      <SeriesDetailCard selectedSeries={selectedSeries} className='my-4' />
+      <SeriesDetailCard selectedSeries={selectedSeries} className="my-4" />
       {!selectedSeries && !isLoading && (
         <ErrorState
-          type='no-series'
-          message='Please select an exam series to view student transcripts.'
-          suggestion='Use the dropdown menu above to choose an exam series.'
+          type="no-series"
+          message="Please select an exam series to view student transcripts."
+          suggestion="Use the dropdown menu above to choose an exam series."
         />
       )}
 
