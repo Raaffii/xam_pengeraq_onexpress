@@ -137,6 +137,7 @@ const DashboardPage = () => {
   ];
 
   const handleFormSubmit = async (formData) => {
+    console.log(formData);
     let result;
     if (modalMode === "create") {
       result = await postExamResult(formData);
@@ -156,6 +157,7 @@ const DashboardPage = () => {
                     return {
                       ...res,
                       ...formData,
+                      isRetake: formData.isRetake ? true : false,
                       editedDate: new Date()
                         .toISOString()
                         .slice(0, 19)

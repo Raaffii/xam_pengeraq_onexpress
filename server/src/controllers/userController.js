@@ -51,7 +51,8 @@ const createUser = async (req, res) => {
     console.error("Create user error:", error.message);
     if (
       error.message.includes("duplicate") ||
-      error.message.includes("already exists")
+      error.message.includes("already exists") ||
+      error.message.includes("Duplicate entry")
     ) {
       return res.status(409).json({
         message: "User with this email already exists",
@@ -111,6 +112,11 @@ const deleteUser = async (req, res) => {
     console.error("Delete user error:", error.message);
     if (error.message === "User not found") {
       return res.status(404).json({ message: error.message });
+    }
+    if (error.message.includes("Bind parameters")) {
+      return res.status(409).json({
+        message: "User data is being used, can't be deleted",
+      });
     }
     res.status(500).json({ message: "Failed to delete" });
   }

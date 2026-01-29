@@ -614,7 +614,7 @@ export const ExamResultModal = ({
                     type="button"
                     variant="destructive"
                     onClick={handleDeleteClick}
-                    disabled={isSubmitting || isDeleting}
+                    disabled={isSubmitting || isDeleting || isGrading}
                     className="h-10 text-red-600 bg-red-50 hover:bg-red-100"
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
