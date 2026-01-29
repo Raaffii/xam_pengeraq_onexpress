@@ -15,17 +15,17 @@ import { Trash } from "lucide-react";
 import Delete_modal from "../modals/Delete_modal";
 
 import { useRowSelection } from "@/hooks";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export default function ScheduleStudentListPage() {
   const { id } = useParams();
-
   const hasFetchedData = useRef(false);
-
   const [enrolledMode, setEnrolledMode] = useState(true);
   const [curentEnroled, setCurentEnroled] = useState([]);
   const [selectedDropStudent, setSelectedDropStudent] = useState();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState();
   const [value, setValue] = useState();
+  usePageTitle(enrolledMode ? "Enrolled Student" : "Assign Student");
 
   const {
     fetchStudentClass,

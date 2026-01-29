@@ -84,7 +84,7 @@ export default function ClassAttendancePage() {
   const actions = [
     {
       icon: Undo2,
-      label: "back",
+      label: "Back",
       onClick: () => navigate(-1),
     },
   ];

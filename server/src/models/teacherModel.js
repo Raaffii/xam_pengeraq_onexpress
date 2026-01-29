@@ -19,13 +19,10 @@ const getTeacher = async (options = {}) => {
     SELECT 
     t.teachername as teacherName,
     t.emailaddress as teacherEmail,
-    t.teacherid as teacherId,
-    s.name as userName,
-    s.userid as userId
+    t.teacherid as teacherId
 
     FROM teacher t 
-    LEFT JOIN users s ON t.teacherid = s.teacherid
-    
+  
      ${whereClause}
     `;
   const queryParams = [...params];

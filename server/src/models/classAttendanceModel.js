@@ -43,7 +43,7 @@ const getClassAttendance = async (options = {}) => {
   if (page && limit) {
     const offset = (page - 1) * limit;
     query += ` LIMIT ? OFFSET ?`;
-    queryParams.push(limit, offset);
+    queryParams.push(String(limit), String(offset));
   }
 
   const [rows] = await pool.execute(query, queryParams);

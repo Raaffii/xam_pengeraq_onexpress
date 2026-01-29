@@ -6,6 +6,7 @@ import { DataTable } from "@/components/table";
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useClassSchedule } from "@/hooks/useClassSchedule";
+import { Undo2 } from "lucide-react";
 
 export default function TeacherAttendance() {
   const { id } = useParams();
@@ -104,7 +105,8 @@ export default function TeacherAttendance() {
 
   const actions = [
     {
-      label: "<- Back",
+      icon: Undo2,
+      label: "Back",
       onClick: () => navigate(-1),
     },
   ];
@@ -124,7 +126,7 @@ export default function TeacherAttendance() {
       <div className='mx-auto'>
         <PageHeader
           title={pageTitle}
-          subtitle={`student attandeance`}
+          subtitle={`student attendance`}
           showSearch={true}
           onSearch={onSearch}
           actions2={actions}

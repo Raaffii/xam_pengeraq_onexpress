@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { DataTable } from "@/components/table";
 import Delete_modal from "@/components/modals/Delete_modal";
 import { LocationModal } from "@/components/location/LocationModal";
-
+import { usePageTitle } from "@/hooks/usePageTitle";
 export default function LocationPage() {
   const hasFetchedData = useRef(false);
+  usePageTitle("Location");
   const {
     fetchLocation,
     location,
@@ -75,10 +76,10 @@ export default function LocationPage() {
   };
 
   return (
-    <div className="min-h-screen ">
+    <div className='min-h-screen '>
       <PageHeader
-        title="Location"
-        subtitle="Manage location records"
+        title='Location'
+        subtitle='Manage location records'
         primaryAction={{
           label: "Add Location",
           onClick: () => {
@@ -88,14 +89,14 @@ export default function LocationPage() {
           },
         }}
         showSearch={true}
-        searchPlaceholder="Search by location.."
+        searchPlaceholder='Search by location..'
         onSearch={onSearch}
         searchMaxLength={50}
       />
       <DataTable
         data={location}
         columns={columns}
-        idAccessor="classLocationId"
+        idAccessor='classLocationId'
         onEdit={(data) => {
           setselectedLocation(data);
           setInitialFormValues({
@@ -125,7 +126,7 @@ export default function LocationPage() {
           setOpen={setIsModalDeleteOpen}
           onSubmit={handleLocationDelete}
           entityData={selectedLocation}
-          title="Delete Schedule"
+          title='Delete Schedule'
           confirmationText={`Are you sure you want to delete teacher "${selectedLocation?.locationName}"? This action cannot be undone.`}
         />
       )}
