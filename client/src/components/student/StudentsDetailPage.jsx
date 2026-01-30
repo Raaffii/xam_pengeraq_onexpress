@@ -19,11 +19,13 @@ export default function StudentsDetailPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("create");
   const [initialFormValues, setInitialFormValues] = useState({});
-
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedExamsResult, setSelectedExamsResult] = useState();
-  const { fetchStudentExamSeriesById, studentsExamSeries } =
-    useStudentsExamSeries();
+  const {
+    fetchStudentExamSeriesById,
+    studentsExamSeries,
+    isLoading: seriesLoad,
+  } = useStudentsExamSeries();
   const { getStudentById, student, isLoading: loadStudent } = useStudents();
   const {
     fetchExamsResult,
@@ -218,11 +220,11 @@ export default function StudentsDetailPage() {
             data={studentsExamSeries}
             valueKey="seriesId"
             labelKey="seriesDesc"
-            filterKey="bySeries"
+            filterKey="byExamSeriesId"
             placeholder="Filter by Series"
-            initialFilters={params}
+            initialFilters={{ byExamSeriesId: params.byExamSeriesId }}
             onFilterChange={onFilterChange}
-            isLoading={isLoading}
+            isLoading={seriesLoad}
           />
         </PageHeader>
 
