@@ -12,7 +12,7 @@ export const examResultService = {
       });
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch users");
+      handleServiceError(error, "Failed to fetch exam results");
     }
   },
   postExamResult: async (data) => {
@@ -29,7 +29,7 @@ export const examResultService = {
       const response = await api.put(`${BASE_URL}/${id}`, data);
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to update student");
+      handleServiceError(error, "Failed to update exam result");
     }
   },
 
@@ -38,7 +38,7 @@ export const examResultService = {
       const response = await api.delete(`${BASE_URL}/${id}`);
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to update student");
+      handleServiceError(error, "Failed to delete exam result");
     }
   },
 };

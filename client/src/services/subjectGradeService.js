@@ -9,7 +9,7 @@ export const subjectGradeService = {
       const response = await api.get(`${BASE_URL}/${subjectId}/grades`);
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch student");
+      handleServiceError(error, "Failed to fetch subject grade");
     }
   },
 };

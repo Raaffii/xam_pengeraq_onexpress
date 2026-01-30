@@ -74,7 +74,7 @@ export const useClassSchedule = () => {
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error fetching Student:", err);
+      console.error("Error fetching schedule:", err);
 
       setError(err.message);
       setClassSchedule([]);
@@ -115,7 +115,6 @@ export const useClassSchedule = () => {
       setIsSubmitting(true);
       setError(null);
       toastId = toast.loading("Creating new schedule...");
-      console.log("ce", classScheduleId);
       const response = await classScheduleService.putClassSchedule(
         classScheduleId,
         data,

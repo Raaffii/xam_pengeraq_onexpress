@@ -10,7 +10,7 @@ export const ClassAttendanceService = {
       });
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch student");
+      handleServiceError(error, "Failed to fetch attendance");
     }
   },
 };

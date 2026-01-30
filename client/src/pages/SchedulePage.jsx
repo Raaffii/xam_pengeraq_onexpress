@@ -97,10 +97,11 @@ export default function SchedulesPages() {
       header: "Frequency",
       cellClassName: "text-left",
       render: (row) => (
-        <div className='flex flex-wrap gap-1'>
+        <div className="flex flex-wrap gap-1">
           <span
-            className='px-2 py-0.5 text-xs rounded-full
-                   bg-blue-50 text-blue-700 border border-blue-200'>
+            className="px-2 py-0.5 text-xs rounded-full
+                   bg-blue-50 text-blue-700 border border-blue-200"
+          >
             {row.repeatValue || "One-time"}
           </span>
         </div>
@@ -117,9 +118,9 @@ export default function SchedulesPages() {
       header: "End Date",
       align: "center",
       render: (row) =>
-        row.endDateTime
-          ? formatDateTimeV2(row.endDateTime, "yyyy-MM-dd")
-          : formatDateTimeV2(row.startDateTime, "yyyy-MM-dd"),
+        row.endDateTime ?
+          formatDateTimeV2(row.endDateTime, "yyyy-MM-dd")
+        : formatDateTimeV2(row.startDateTime, "yyyy-MM-dd"),
     },
   ];
 
@@ -146,13 +147,13 @@ export default function SchedulesPages() {
   };
 
   return (
-    <div className='min-h-screen bg-gray-50'>
+    <div className="min-h-screen bg-gray-50">
       <PageHeader
-        title='Schedule'
-        subtitle='Manage schedule records'
+        title="Schedule"
+        subtitle="Manage schedule records"
         showSearch={true}
         onSearch={onSearch}
-        searchPlaceholder='Search by teacher name or subject'
+        searchPlaceholder="Search by teacher name or subject"
         searchMaxLength={50}
         primaryAction={{
           label: "New Schedule",
@@ -161,8 +162,9 @@ export default function SchedulesPages() {
             setModalMode("create");
             setIsModalOpen(true);
           },
-        }}>
-        <div className='w-full md:min-w-[200px] md:w-auto'>
+        }}
+      >
+        <div className="w-full md:min-w-[200px] md:w-auto">
           <SearchableDropdown
             id={"value"}
             name={"value"}
@@ -182,11 +184,11 @@ export default function SchedulesPages() {
               { value: "calendar", label: "View By Calendar" },
             ]}
             placeholder={"View By"}
-            searchPlaceholder='Search...'
-            emptyMessage='No items found'
+            searchPlaceholder="Search..."
+            emptyMessage="No items found"
             icon={Filter}
             minSearchLength={0}
-            className='h-10'
+            className="h-10"
           />
         </div>
       </PageHeader>
@@ -203,8 +205,8 @@ export default function SchedulesPages() {
         onPageChange={onPageChange}
         onSizeChange={onPageSizeChange}
         pagination={pagination}
-        detailPage='schedule'
-        idAccessor='classschhdid'
+        detailPage="schedule"
+        idAccessor="classschhdid"
         isLoading={isLoading}
       />
 
@@ -225,7 +227,7 @@ export default function SchedulesPages() {
           setOpen={setIsDeleteModalOpen}
           onSubmit={handleScheduleDelete}
           entityData={selectedSchedule}
-          title='Delete Schedule'
+          title="Delete Schedule"
           confirmationText={`Are you sure you want to delete this schedule? This action cannot be undone.`}
         />
       )}

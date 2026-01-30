@@ -99,35 +99,27 @@ const ExamsSeriesPage = () => {
   const columns = [
     {
       accessorKey: "examName",
-      header: <div className="text-left w-full">Exam</div>,
+      header: "Exam",
       cellClassName: "text-left",
     },
     {
       accessorKey: "seriesDesc",
-
-      header: <div className="text-left w-full">Description</div>,
-
+      header: "Description",
       cellClassName: "text-left",
     },
     {
       accessorKey: "seriesStartDate",
-
-      header: <div className="text-left w-full">Start Date</div>,
-
+      header: "Start Date",
       cellClassName: "text-left",
     },
     {
       accessorKey: "seriesEndDate",
-
-      header: <div className="text-left w-full">End Date</div>,
-
+      header: "End Date",
       cellClassName: "text-left",
     },
     {
       accessorKey: "seriesCredit",
-
-      header: <div className="text-left w-full">Credits</div>,
-
+      header: "Credit",
       cellClassName: "text-left",
     },
   ];

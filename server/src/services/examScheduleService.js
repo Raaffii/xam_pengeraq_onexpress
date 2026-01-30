@@ -79,7 +79,6 @@ const getScheduleById = async (scheduleId) => {
 };
 
 const putClassSchedule = async (id, data, userId) => {
-  console.log("data", data);
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();

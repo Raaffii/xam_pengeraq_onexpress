@@ -11,7 +11,7 @@ export const examGradesService = {
       });
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch users");
+      handleServiceError(error, "Failed to fetch exam grade");
     }
   },
 
@@ -20,7 +20,7 @@ export const examGradesService = {
       const response = await api.put(`${BASE_URL}/${id}`, data);
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch users");
+      handleServiceError(error, "Failed to update exam grade");
     }
   },
 
@@ -29,7 +29,7 @@ export const examGradesService = {
       const response = await api.post(BASE_URL, data);
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch users");
+      handleServiceError(error, "Failed to create exam grade");
     }
   },
   deleteExamGrades: async (id) => {
@@ -37,7 +37,7 @@ export const examGradesService = {
       const response = await api.delete(`${BASE_URL}/${id}`);
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch users");
+      handleServiceError(error, "Failed to delete exam grade");
     }
   },
 };
