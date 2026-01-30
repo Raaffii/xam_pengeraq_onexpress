@@ -23,11 +23,11 @@ const getClassSchedule = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("get student error:", error);
+    console.error("get schedule error:", error);
 
     res.status(500).json({
       success: false,
-      message: "get student failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -48,7 +48,7 @@ const postClassSchedule = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      message: "add student failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -64,11 +64,11 @@ const getClassScheduleById = async (req, res) => {
       data: result,
     });
   } catch (error) {
-    console.error("get student error:", error);
+    console.error("get schedule error:", error);
 
     res.status(500).json({
       success: false,
-      message: "get student failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -93,7 +93,7 @@ const putClassSchedule = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      message: "edit student failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -110,9 +110,16 @@ const deleteClassSchedule = async (req, res) => {
         message: "Duplicate entry",
       });
     }
+
+    if (error.message.includes("Cannot delete or update a parent row")) {
+      return res.status(409).json({
+        message:
+          "Cannot delete the schedule, please delete the related data first!",
+      });
+    }
     res.status(500).json({
       success: false,
-      message: "delete student failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }

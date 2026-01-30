@@ -1,22 +1,42 @@
 const pool = require("../config/db");
 
+const updateClassScheduleDetailFields = async (conn, classschhdid, data) => {
+  try {
+    const updates = [];
+    const values = [];
+
+    if (data.locationId !== undefined) {
+      updates.push("locationid = ?");
+      values.push(data.locationId);
+    }
+
+    if (updates.length === 0) {
+      return { affectedRows: 0 };
+    }
+
+    values.push(classschhdid);
+
+    const sql = `UPDATE classschdetails SET ${updates.join(", ")} WHERE classschhdid = ?`;
+    const [result] = await conn.query(sql, values);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
 const bulkInsertScheduleDetail = async (conn, data) => {
   const values = data.map((item) => [
     item.classchhdid,
     item.startDateTime,
     item.locationId,
   ]);
-
   const placeholders = data.map(() => "(?, ?, ?)").join(", ");
-
   const query = `
-      INSERT INTO classschdetails
-      (classschhdid, classdatetime, locationid)
-      VALUES ${placeholders}
-    `;
-
+    INSERT INTO classschdetails
+    (classschhdid, classdatetime, locationid)
+    VALUES ${placeholders}
+  `;
   const flatValues = values.flat();
-
   const [result] = await conn.execute(query, flatValues);
   return result.affectedRows;
 };
@@ -272,4 +292,5 @@ module.exports = {
   startClassSession,
   openClassSession,
   newTokenClassSession,
+  updateClassScheduleDetailFields,
 };

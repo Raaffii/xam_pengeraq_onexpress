@@ -109,7 +109,7 @@ const DashboardModel = {
         FROM examfinalgrade
         WHERE examseriesid = ?
           AND active = 1
-        ORDER BY finalpercent ASC`,
+        ORDER BY examfinalgradeseq ASC`,
         [examSeriesId],
       );
 

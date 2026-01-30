@@ -22,8 +22,8 @@ const getTeacher = async (options = {}) => {
     t.teacherid as teacherId
 
     FROM teacher t 
-  
-     ${whereClause}
+     ${whereClause} 
+    ORDER BY t.createddate DESC
     `;
   const queryParams = [...params];
   if (page && limit) {
