@@ -99,6 +99,12 @@ const deleteSetup = async (req, res) => {
         message: error.message,
       });
     }
+    if (error.message.includes("Cannot delete or update a parent row")) {
+      return res.status(409).json({
+        message:
+          "Cannot delete the setup, please delete the related data first!",
+      });
+    }
     res.status(500).json({
       message: "get setup failed",
       error: error.message,

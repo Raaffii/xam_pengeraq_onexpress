@@ -118,7 +118,13 @@ const deleteSubj = async (req, res) => {
     if (error.message === "Subject not found") {
       return res.status(404).json({ message: error.message });
     }
-    res.status(500).json({ message: "Failed to delete" });
+    if (error.message.includes("Cannot delete or update a parent row")) {
+      return res.status(409).json({
+        message:
+          "Cannot delete selected subject, please delete the related data first!",
+      });
+    }
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -136,7 +142,7 @@ const getSubjectsByExamSeriesId = async (req, res) => {
   } catch (error) {
     console.error("Fetch examSubj error:", error.message);
     res.status(500).json({
-      message: "Failed to fetch exam subject",
+      message: "Internal Server Error",
       error: error.message,
     });
   }

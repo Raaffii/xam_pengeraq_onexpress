@@ -25,11 +25,10 @@ const getExamResult = async (req, res) => {
     }
     res.status(200).json(response);
   } catch (error) {
-    console.error("get exam result error:", error);
+    console.error("Error", error);
 
     res.status(500).json({
-      success: false,
-      message: "get exam result failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -47,11 +46,10 @@ const postExamResult = async (req, res) => {
 
     res.status(201).json(result);
   } catch (error) {
-    console.error("get exam result error:", error);
+    console.error("Error", error);
 
     res.status(500).json({
-      success: false,
-      message: "add exam result failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -69,8 +67,7 @@ const putExamResult = async (req, res) => {
       });
     }
     res.status(500).json({
-      success: false,
-      message: "edit exam result failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -88,8 +85,7 @@ const deleteExamResult = async (req, res) => {
       });
     }
     res.status(500).json({
-      success: false,
-      message: "delete exam result failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }

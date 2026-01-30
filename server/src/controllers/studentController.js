@@ -34,8 +34,7 @@ const getStudent = async (req, res) => {
     console.error("get student error:", error);
 
     res.status(500).json({
-      success: false,
-      message: "get student failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -55,8 +54,7 @@ const getStudentById = async (req, res) => {
     }
 
     res.status(500).json({
-      success: false,
-      message: "get student failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -70,13 +68,11 @@ const postStudent = async (req, res) => {
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {
       return res.status(400).json({
-        error: true,
         message: "Duplicate entry",
       });
     }
     res.status(500).json({
-      success: false,
-      message: "add student failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -99,8 +95,7 @@ const putStudent = async (req, res) => {
       });
     }
     res.status(500).json({
-      success: false,
-      message: "edit student failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -117,9 +112,14 @@ const deleteStudent = async (req, res) => {
         message: "Duplicate entry",
       });
     }
+    if (error.message.includes("Cannot delete or update a parent row")) {
+      return res.status(409).json({
+        message:
+          "Cannot delete selected student, please delete the related data first!",
+      });
+    }
     res.status(500).json({
-      success: false,
-      message: "delete student failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }

@@ -89,6 +89,7 @@ const putTeacher = async (req, res) => {
 
     res.status(200).json(data);
   } catch (error) {
+    console.error("Failed to update teacher: ", error);
     if (error.message.includes("not found")) {
       return res.status(404).json({
         message: error.message,
@@ -125,9 +126,9 @@ const deleteTeacher = async (req, res) => {
       });
     }
     if (error.code === "ER_ROW_IS_REFERENCED_2") {
-      return res.status(400).json({
+      return res.status(409).json({
         message:
-          "Cannot delete teacher because it is linked to an existing schedule.",
+          "Cannot delete selected teacher because it is linked to an existing schedule.",
       });
     }
 

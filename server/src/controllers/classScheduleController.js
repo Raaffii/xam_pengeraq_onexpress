@@ -26,7 +26,6 @@ const getClassSchedule = async (req, res) => {
     console.error("get schedule error:", error);
 
     res.status(500).json({
-      success: false,
       message: "Internal Server Error",
       error: error.message,
     });
@@ -40,6 +39,7 @@ const postClassSchedule = async (req, res) => {
 
     res.status(200).json(data);
   } catch (error) {
+    console.error(error);
     if (error.code === "ER_DUP_ENTRY") {
       return res.status(400).json({
         error: true,
@@ -47,7 +47,6 @@ const postClassSchedule = async (req, res) => {
       });
     }
     res.status(500).json({
-      success: false,
       message: "Internal Server Error",
       error: error.message,
     });
@@ -67,7 +66,6 @@ const getClassScheduleById = async (req, res) => {
     console.error("get schedule error:", error);
 
     res.status(500).json({
-      success: false,
       message: "Internal Server Error",
       error: error.message,
     });
@@ -92,7 +90,6 @@ const putClassSchedule = async (req, res) => {
       });
     }
     res.status(500).json({
-      success: false,
       message: "Internal Server Error",
       error: error.message,
     });
@@ -118,7 +115,6 @@ const deleteClassSchedule = async (req, res) => {
       });
     }
     res.status(500).json({
-      success: false,
       message: "Internal Server Error",
       error: error.message,
     });

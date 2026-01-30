@@ -27,11 +27,10 @@ const getExamSeries = async (req, res) => {
 
     res.status(200).json(response);
   } catch (error) {
-    console.error("get expaloc error:", error);
+    console.error("Error", error);
 
     res.status(500).json({
-      success: false,
-      message: "get exam series failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -44,10 +43,10 @@ const getExamSeriesById = async (req, res) => {
 
     res.status(200).json(result);
   } catch (error) {
-    console.error("get series error:", error);
+    console.error("Error:", error);
 
     res.status(500).json({
-      message: "get series failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -72,7 +71,7 @@ const createExamSeries = async (req, res) => {
       });
     }
     res.status(500).json({
-      message: "create series failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -96,7 +95,7 @@ const updateExamSeries = async (req, res) => {
       });
     }
     res.status(500).json({
-      message: "update series failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -118,7 +117,13 @@ const deleteExamSeries = async (req, res) => {
     if (error.message === "Series not found") {
       return res.status(404).json({ message: error.message });
     }
-    res.status(500).json({ message: "Failed to delete" });
+    if (error.message.includes("Cannot delete or update a parent row")) {
+      return res.status(409).json({
+        message:
+          "Cannot delete the series, please delete the related data first!",
+      });
+    }
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 

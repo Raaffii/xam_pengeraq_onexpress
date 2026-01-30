@@ -88,7 +88,7 @@ const putExam = async (req, res) => {
       });
     }
     res.status(500).json({
-      message: "Failed to update exam",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -104,8 +104,14 @@ const deleteExam = async (req, res) => {
         message: error.message,
       });
     }
+    if (error.message.includes("Cannot delete or update a parent row")) {
+      return res.status(409).json({
+        message:
+          "Cannot delete the exam, please delete the related data first!",
+      });
+    }
     res.status(500).json({
-      message: "get exam failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }

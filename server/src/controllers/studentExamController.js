@@ -27,7 +27,6 @@ const getStudentExamSeries = async (req, res) => {
     console.error("Failed to get student exam series:", error);
 
     res.status(500).json({
-      success: false,
       message: "Internal Server Error",
       error: error.message,
     });
@@ -37,9 +36,8 @@ const getStudentExamSeries = async (req, res) => {
 const getStudentExamSeriesById = async (req, res) => {
   try {
     const studentId = req.params.studentId;
-    const result = await studentExamService.getStudentExamByStudentId(
-      studentId,
-    );
+    const result =
+      await studentExamService.getStudentExamByStudentId(studentId);
     res.status(200).json({
       data: result.data,
     });
@@ -47,7 +45,6 @@ const getStudentExamSeriesById = async (req, res) => {
     console.error("Failed to fetch student exam series by studentId: ", error);
 
     res.status(500).json({
-      success: false,
       message: "Internal Server Error",
       error: error.message,
     });
@@ -67,7 +64,6 @@ const deleteStudentExamByStudentId = async (req, res) => {
       });
     }
     res.status(500).json({
-      success: false,
       message: "Internal Server Error",
       error: error.message,
     });
@@ -77,9 +73,8 @@ const deleteStudentExamByStudentId = async (req, res) => {
 const deleteStudentExamByExamId = async (req, res) => {
   try {
     const studentExamId = req.params.id;
-    const result = await studentExamService.deleteStudentExamById(
-      studentExamId,
-    );
+    const result =
+      await studentExamService.deleteStudentExamById(studentExamId);
     res.status(200).json(result);
   } catch (error) {
     console.error("Failed to delete student exam by examId: ", error);
@@ -89,7 +84,6 @@ const deleteStudentExamByExamId = async (req, res) => {
       });
     }
     res.status(500).json({
-      success: false,
       message: "Internal Server Error",
       error: error.message,
     });
