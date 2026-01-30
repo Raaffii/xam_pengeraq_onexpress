@@ -89,6 +89,7 @@ export default function TeacherPage() {
           onClick: () => {
             setIsModalOpen(true);
             setModalMode("create");
+            setSelectedTeacher({});
           },
         }}
         showSearch={true}
