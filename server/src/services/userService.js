@@ -97,10 +97,6 @@ const userService = {
   async findUserByEmail(email) {
     const user = await UserModel.findUserByEmail(email);
 
-    if (!user) {
-      throw new Error("User not found");
-    }
-
     return user;
   },
 

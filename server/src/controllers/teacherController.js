@@ -51,6 +51,7 @@ const postTeacher = async (req, res) => {
     const data = { ...req.body, enteredBy: req.user.userId };
     const accountAdd = req.body.addAccount;
     const teacherData = req.body;
+
     if (accountAdd) {
       const existingUser = await userService.findUserByEmail(
         teacherData.teacherEmail,
