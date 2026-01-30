@@ -20,6 +20,7 @@ const StudentExamService = {
         throw new Error("No exam series found for this student");
       }
 
+      await conn.commit();
       return {
         success: true,
       };
@@ -41,7 +42,7 @@ const StudentExamService = {
       if (result.affectedRows === 0) {
         throw new Error("No exam series found for this student");
       }
-
+      await conn.commit();
       return {
         success: true,
       };

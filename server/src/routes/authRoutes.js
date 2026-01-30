@@ -14,7 +14,7 @@ const { loginLimiter } = require("../middlewares/rateLimiter");
 
 const router = express.Router();
 
-router.post("/login", loginLimiter, validateBody(loginSchema), loginUser);
+router.post("/login", validateBody(loginSchema), loginUser);
 router.post(
   "/forgot-password",
   validateBody(passwordResetRequestSchema),

@@ -4,12 +4,13 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const Router = require("./routes/index");
 const cookieParser = require("cookie-parser");
+
 const {
   responseFormatter,
   notFoundHandler,
   errorHandler,
 } = require("./middlewares/responseHandler");
-const { publicLimiter, apiLimiter } = require("./middlewares/rateLimiter");
+// const { publicLimiter, apiLimiter } = require("./middlewares/rateLimiter");
 
 const app = express();
 
@@ -17,8 +18,9 @@ app.set("trust proxy", 1);
 
 let allowedOrigins;
 try {
-  allowedOrigins = process.env.FRONTEND_URL
-    ? JSON.parse(process.env.FRONTEND_URL)
+  allowedOrigins =
+    process.env.FRONTEND_URL ?
+      JSON.parse(process.env.FRONTEND_URL)
     : ["http://localhost:5173"];
 } catch (e) {
   allowedOrigins = process.env.FRONTEND_URL || "http://localhost:5173";
@@ -42,8 +44,13 @@ app.use(responseFormatter);
 // app.get("/debug/trust-proxy-test", createTrustProxyDebugger());
 // app.get("/debug/ip", createIPInfoEndpoint());
 
+<<<<<<< HEAD
 app.use(publicLimiter);
 app.use("/api", apiLimiter);
+=======
+// app.use(publicLimiter);
+// app.use("/api", apiLimiter);
+>>>>>>> 8e163bc41c44778fdd9b6d7ccae9554dd47a9dbe
 
 // Routes
 app.get("/", (req, res) => {
