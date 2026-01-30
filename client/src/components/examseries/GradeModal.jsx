@@ -170,16 +170,30 @@ export const GradeModal = ({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-gray-700">
-            {mode === "create" ? "Create New Exam Series" : "Edit Exam Series"}
+            {mode === "create" ? "Create New Grade" : "Edit Grade"}
           </DialogTitle>
           <DialogDescription>
-            {mode === "create" ?
-              "Add a new exam series"
-            : "Update exam series information"}
+            {mode === "create" ? "Add a new grade" : "Update grade information"}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
+          <SearchableDropdown
+            id={"seriesId"}
+            name={"seriesId"}
+            label="Exam Series"
+            value={formData.seriesId}
+            onChange={handleChange}
+            options={examOptions}
+            disabled={optionDisabled || isSubmitting}
+            error={errors.seriesId}
+            isRequired
+            placeholder="Select exam series..."
+            searchPlaceholder="Search exam series..."
+            emptyMessage="No exam series found"
+            icon={BookOpen}
+            defaultOption={defaultOption}
+          />
           <div className="grid md:grid-cols-2 gap-4">
             <div className="relative">
               <InputField
@@ -210,7 +224,7 @@ export const GradeModal = ({
                 label="Final Percent"
                 value={formData.finalPercent}
                 onChange={handleChange}
-                placeholder="0.00"
+                placeholder="Grade Percentage (1-100)"
                 isRequired
                 error={errors.finalPercent}
                 onError={(error) =>
@@ -257,7 +271,7 @@ export const GradeModal = ({
                 label="Grade Point"
                 value={formData.gradePoint}
                 onChange={handleChange}
-                placeholder="0.00"
+                placeholder="0.00 - 4.00"
                 isRequired
                 error={errors.gradePoint}
                 onError={(error) =>
@@ -294,23 +308,6 @@ export const GradeModal = ({
             </div>
           </div>
 
-          <SearchableDropdown
-            id={"seriesId"}
-            name={"seriesId"}
-            label="Exam Series"
-            value={formData.seriesId}
-            onChange={handleChange}
-            options={examOptions}
-            disabled={optionDisabled || isSubmitting}
-            error={errors.seriesId}
-            isRequired
-            placeholder="Select exam series..."
-            searchPlaceholder="Search exam series..."
-            emptyMessage="No exam series found"
-            icon={BookOpen}
-            defaultOption={defaultOption}
-          />
-
           {mode === "edit" && !hasChanges && (
             <div className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3">
               No changes detected. Modify the form to enable submission.
@@ -339,8 +336,8 @@ export const GradeModal = ({
                   "Creating..."
                 : "Updating..."
               : mode === "create" ?
-                "Create Series"
-              : "Update Series"}
+                "Create Grade"
+              : "Update Grade"}
             </Button>
           </div>
         </div>

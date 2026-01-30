@@ -203,6 +203,21 @@ const UserModel = {
     return true;
   },
 
+  async deleteUser(conn, id) {
+    const sql = `
+      DELETE FROM users 
+      WHERE userid = ?
+    `;
+
+    const [result] = await conn.execute(sql, [id]);
+
+    if (result.affectedRows === 0) {
+      throw new Error("User not found");
+    }
+
+    return true;
+  },
+
   async fetchUserById(userId) {
     const [rows] = await pool.execute(
       `SELECT 
