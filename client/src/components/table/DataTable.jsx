@@ -31,7 +31,7 @@ export const DataTable = ({
   },
   onPageChange,
   onSizeChange,
-  pageSizeOptions = [2, 5, 10, 25, 50, 100],
+  pageSizeOptions = [5, 10, 25, 50, 100],
   showPagination = true,
   showNumber = true,
   isLoading = false,
