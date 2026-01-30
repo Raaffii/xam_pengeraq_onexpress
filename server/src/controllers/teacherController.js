@@ -69,8 +69,18 @@ const postTeacher = async (req, res) => {
     res.status(200).json(dataId);
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {
-      return res.status(400).json({
-        message: "Duplicate entry",
+      return res.status(409).json({
+        message: "Email already exists",
+      });
+    }
+    if (
+      error.message.includes("duplicate") ||
+      error.message.includes("already exists") ||
+      error.message.includes("Duplicate entry")
+    ) {
+      return res.status(409).json({
+        message:
+          "Email already exists, please select new email or link created teacher at user page",
       });
     }
     res.status(500).json({
