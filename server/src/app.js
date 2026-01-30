@@ -4,6 +4,8 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const Router = require("./routes/index");
 const cookieParser = require("cookie-parser");
+const requestIp = require("request-ip");
+
 const {
   responseFormatter,
   notFoundHandler,
@@ -28,7 +30,7 @@ app.use(
   cors({
     origin: allowedOrigins,
     credentials: true,
-  })
+  }),
 );
 
 // Security & Middleware
@@ -41,7 +43,7 @@ app.use(responseFormatter);
 
 // app.get("/debug/trust-proxy-test", createTrustProxyDebugger());
 // app.get("/debug/ip", createIPInfoEndpoint());
-
+app.use(requestIp.mw());
 app.use(publicLimiter);
 app.use("/api", apiLimiter);
 
