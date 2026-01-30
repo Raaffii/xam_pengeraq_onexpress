@@ -48,7 +48,7 @@ export const useStudentClass = () => {
         setStudentClass(data);
         return { success: true, data: data };
       } catch (err) {
-        console.error("Error fetching exams:", err);
+        console.error("Error:", err);
 
         setError(err.message);
         setStudentClass([]);
@@ -73,7 +73,7 @@ export const useStudentClass = () => {
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error assign student:", err);
+      console.error("Error:", err);
       toast.error(err.message, { id: toastId });
       setError(err.message);
 

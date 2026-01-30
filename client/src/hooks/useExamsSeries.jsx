@@ -138,16 +138,18 @@ export const useExamSeries = () => {
 
   const deleteExamsSeries = useCallback(async (id) => {
     if (!id) return;
+    let toastId;
     try {
       setIsSubmitting(true);
       setError(null);
+      toastId = toast.loading("Deleting exam series...");
       const response = await examSeriesService.deleteExamSeries(id);
-      toast.success("Exam Series deleted successfully");
+      toast.success("Exam Series deleted successfully", { id: toastId });
 
       return { success: true, data: response };
     } catch (err) {
       console.error("Error deleting Exam Series:", err);
-      toast.error(err.message);
+      toast.error(err.message, { id: toastId });
       setError(err.message);
 
       return { success: false, error: err.message };

@@ -49,7 +49,7 @@ export const useClassScheduleDetail = () => {
         setClassScheduleDetail(data);
         return { success: true, data: data };
       } catch (err) {
-        console.error("Error fetching exams:", err);
+        console.error("Error:", err);
         setIsLoading(false);
         setError(err.message);
         setClassScheduleDetail([]);
@@ -76,7 +76,7 @@ export const useClassScheduleDetail = () => {
         setClassScheduleDetail(response.data);
         return { success: true, data: response.data };
       } catch (err) {
-        console.error("Error fetching exams:", err);
+        console.error("Error:", err);
 
         setError(err.message);
         setClassScheduleDetail([]);
@@ -106,8 +106,10 @@ export const useClassScheduleDetail = () => {
         startDateTime: response.data.dataTo.startDateTime,
       };
     } catch (err) {
-      console.error("Error creating student:", err);
-      toast.error(err.message || "Failed to create student", { id: toastId });
+      console.error("Error:", err);
+      toast.error(err.message || "Failed to startclass session", {
+        id: toastId,
+      });
       setError(err.message);
 
       return { success: false, error: err.message };
@@ -140,7 +142,7 @@ export const useClassScheduleDetail = () => {
         classDateTime: response.data.classDateTime,
       };
     } catch (err) {
-      console.error("Error creating student:", err);
+      console.error("Error:", err);
       toast.error("Failed to get QrCode information", { id: toastId });
       setError(err.message);
 

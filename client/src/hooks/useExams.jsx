@@ -112,7 +112,7 @@ export const useExams = () => {
       return { success: true, data: response.data };
     } catch (err) {
       console.error("Error updating exam:", err);
-      toast.error(err.message || "Failed to update approval", {
+      toast.error(err.message, {
         id: toastId,
       });
       setError(err.message);
@@ -125,17 +125,18 @@ export const useExams = () => {
 
   const deleteExams = useCallback(async (id) => {
     if (!id) return;
+    let toastId;
     try {
       setIsSubmitting(true);
       setError(null);
-
+      toastId = toast.loading("Deleting Exam...");
       const response = await examsService.deleteExams(id);
-      toast.success("Exam deleted successfully");
+      toast.success("Exam deleted successfully", { id: toastId });
 
       return { success: true, data: response };
     } catch (err) {
       console.error("Error deleting exam:", err);
-      toast.error(err.message);
+      toast.error(err.message, { id: toastId });
       setError(err.message);
 
       return { success: false, error: err.message };
