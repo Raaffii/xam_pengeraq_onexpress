@@ -49,10 +49,19 @@ const getTeacherById = async (req, res) => {
 const postTeacher = async (req, res) => {
   try {
     const data = { ...req.body, enteredBy: req.user.userId };
-    const dataId = await teacherService.postTeacher(data);
-
     const accountAdd = req.body.addAccount;
     const teacherData = req.body;
+    if (accountAdd) {
+      const existingUser = await userService.findUserByEmail(
+        teacherData.teacherEmail,
+      );
+      if (existingUser && existingUser.active === 1) {
+        throw new Error("Email already exists");
+      }
+    }
+
+    const dataId = await teacherService.postTeacher(data);
+
     if (accountAdd) {
       const userData = {
         userName: teacherData.teacherName,
@@ -63,7 +72,7 @@ const postTeacher = async (req, res) => {
         enteredBy: req.user.userId,
       };
 
-      await userService.createUser(userData);
+      const result = await userService.createUser(userData);
     }
 
     res.status(200).json(dataId);
@@ -79,8 +88,7 @@ const postTeacher = async (req, res) => {
       error.message.includes("Duplicate entry")
     ) {
       return res.status(409).json({
-        message:
-          "Email already exists, please select new email or link created teacher at user page",
+        message: "Email already registered",
       });
     }
     res.status(500).json({

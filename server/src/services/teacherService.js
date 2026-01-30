@@ -5,10 +5,20 @@ const getTeacher = async (options = {}) => {
 };
 
 const postTeacher = async (data) => {
+  const existingTeacher = await Teacher.findByEmail(data.teacherEmail);
+
+  if (existingTeacher) {
+    throw new Error("Email already exists");
+  }
+
   return await Teacher.postTeacher(data);
 };
 
 const putTeacher = async (data, id) => {
+  const existingTeacher = await Teacher.findByEmail(data.teacherEmail);
+  if (existingTeacher) {
+    throw new Error("Email already exists");
+  }
   const res = await Teacher.putTeacher(data, id);
   if (!res) {
     throw new Error("Teacher not found");

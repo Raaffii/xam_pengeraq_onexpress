@@ -117,10 +117,20 @@ const deleteTeacher = async (id) => {
   }
 };
 
+const findByEmail = async (teacherEmail) => {
+  const [rows] = await pool.query(
+    `SELECT teacherid, emailaddress As emailAddress, active
+     FROM teacher WHERE emailaddress = ?`,
+    [teacherEmail],
+  );
+  return rows[0];
+};
+
 module.exports = {
   getTeacher,
   postTeacher,
   putTeacher,
   getTeacherById,
   deleteTeacher,
+  findByEmail,
 };

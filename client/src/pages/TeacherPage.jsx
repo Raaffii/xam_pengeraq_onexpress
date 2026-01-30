@@ -125,7 +125,7 @@ export default function TeacherPage() {
           setOpen={setIsModalDeleteOpen}
           onSubmit={handleTeacherDelete}
           entityData={selectedTeacher}
-          title='Delete Schedule'
+          title='Delete Teacher'
           confirmationText={`Are you sure you want to delete teacher "${selectedTeacher?.teacherName}"? This action cannot be undone.`}
         />
       )}
