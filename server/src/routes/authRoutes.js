@@ -10,13 +10,17 @@ const {
   requestPasswordReset,
   resetPassword,
 } = require("../controllers/authController");
-const { loginLimiter } = require("../middlewares/rateLimiter");
+const {
+  loginLimiter,
+  forgotPasswordLimiter,
+} = require("../middlewares/rateLimiter");
 
 const router = express.Router();
 
 router.post("/login", loginLimiter, validateBody(loginSchema), loginUser);
 router.post(
   "/forgot-password",
+  forgotPasswordLimiter,
   validateBody(passwordResetRequestSchema),
   requestPasswordReset,
 );
