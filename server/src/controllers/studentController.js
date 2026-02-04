@@ -9,33 +9,34 @@ const getStudent = async (req, res) => {
       enrolledClass,
       enrolledSelected,
       subject,
+      isMember,
     } = req.query;
+
     const filterOptions = {
-      page: parseInt(page),
-      pageSize: parseInt(pageSize),
+      page: page ? parseInt(page) : undefined,
+      pageSize: pageSize ? parseInt(pageSize) : undefined,
       searchTerm,
       enrolledClass,
       enrolledSelected,
       subject,
+      isMember: isMember === "true",
     };
 
     const result = await studentService.getStudent(filterOptions);
+
     res.status(200).json({
       data: result.data,
       pagination: {
-        currentPage: parseInt(page),
-        pageSize: parseInt(pageSize),
-        totalPages: Math.ceil(result.total / parseInt(pageSize)),
-
+        currentPage: filterOptions.page,
+        pageSize: filterOptions.pageSize,
+        totalPages: Math.ceil(result.total / filterOptions.pageSize),
         totalItems: result.total,
       },
     });
   } catch (error) {
     console.error("get student error:", error);
-
     res.status(500).json({
-      success: false,
-      message: "get student failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }

@@ -43,21 +43,19 @@ const fetchStudentsQuerySchema = z
   .object({
     searchTerm: z.string().max(100, "Search term too long").trim().optional(),
     isActive: z
-      .string()
+      .enum(["true", "false", "1", "0"])
       .optional()
       .transform((val) => {
-        if (val === undefined || val === "true" || val === "1") {
-          return true;
-        }
-        if (val === "false" || val === "0") {
-          return false;
-        }
-        if (val === "null" || val === "") {
-          return null;
-        }
-        return true;
-      })
-      .nullable(),
+        if (val === undefined) return false;
+        return val === "true" || val === "1";
+      }),
+    isMember: z
+      .enum(["true", "false", "1", "0"])
+      .optional()
+      .transform((val) => {
+        if (val === undefined) return false;
+        return val === "true" || val === "1";
+      }),
   })
   .and(paginationSchema);
 

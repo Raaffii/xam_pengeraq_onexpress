@@ -1,10 +1,15 @@
 import { Badge } from "@/components/ui/badge";
 
-export const StatusBadge = ({ label, variant = "default", size = "sm" }) => {
+export const StatusBadge = ({
+  label,
+  variant = "default",
+  size = "sm",
+  onClick,
+}) => {
   const variantStyles = {
-    gree: "bg-green-600 hover:bg-green-600 text-white",
+    green: "bg-green-600 hover:bg-green-600 text-white",
     red: "bg-red-500 hover:bg-red-500 text-white",
-    yellow: "bg-yellow-400 hover:bg-yellow-400 text-yellow-900",
+    yellow: "bg-yellow-400 hover:bg-yellow-400 text-black",
     blue: "bg-blue-500 hover:bg-blue-500 text-white",
     gray: "bg-gray-500 hover:bg-gray-500 text-white",
     orange: "bg-orange-500 hover:bg-orange-500 text-white",
@@ -21,7 +26,8 @@ export const StatusBadge = ({ label, variant = "default", size = "sm" }) => {
 
   return (
     <Badge
-      className={`font-medium ${sizeStyles[size]} ${variantStyles[variant]}`}
+      className={`font-medium ${sizeStyles[size]} ${variantStyles[variant]} ${onClick ? "cursor-pointer" : ""}`}
+      onClick={onClick}
     >
       {label}
     </Badge>

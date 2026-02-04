@@ -6,12 +6,17 @@ import { useStudents } from "@/hooks/useStudents";
 import { StudentModal } from "@/components/student/StudentModal";
 import { useExamSeries } from "@/hooks/useExamsSeries";
 import { usePageTitle } from "@/hooks/usePageTitle";
+import { ExamSeriesFilter } from "@/components/examseries";
+import { StatusBadge } from "@/components/common";
+import { SeriesBadge } from "@/components/student/SeriesBadge";
+import MemberModal from "@/components/student/MemberModal";
 
 const StudentsPage = () => {
   const hasFetchedData = useRef(false);
   usePageTitle("Students");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMemberOpen, setIsMemberOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [modalMode, setModalMode] = useState("create");
@@ -28,6 +33,8 @@ const StudentsPage = () => {
     onPageChange,
     onPageSizeChange,
     isLoading,
+    onFilterChange,
+    params,
   } = useStudents();
   const {
     fetchExamSeries,
@@ -56,6 +63,16 @@ const StudentsPage = () => {
     setSelectedStudent(student);
     setModalMode("edit");
     setIsModalOpen(true);
+  };
+
+  const openMemberModal = (student) => {
+    setSelectedStudent(student);
+    if (
+      student?.member?.status === "FOUND_APPROVED" ||
+      student?.member?.status === "FOUND_NOT_APPROVED"
+    ) {
+      setIsMemberOpen(true);
+    }
   };
 
   const openDeleteModal = (student) => {
@@ -108,34 +125,28 @@ const StudentsPage = () => {
       header: "Exam Series",
       cellClassName: "text-left",
       render: (row) => {
-        const maxVisible = 3;
-        const examSeries = row.examSeries || [];
-        const visibleSeries = examSeries.slice(0, maxVisible);
-        const remaining = examSeries.length - maxVisible;
-
-        return (
-          <div className='flex flex-wrap gap-1 max-w-md items-center'>
-            {visibleSeries.map((item) => (
-              <span
-                key={item.examSeriesId}
-                className='px-2 py-0.5 text-xs rounded-full
-             bg-blue-50 text-blue-700 border border-blue-200
-             inline-block max-w-[180px]'
-                title={item.examSeriesDescription}>
-                <span className='truncate block'>
-                  {item.examSeriesDescription}
-                </span>
-              </span>
-            ))}
-            {remaining > 0 && (
-              <span className='px-2 py-0.5 text-xs text-gray-600'>
-                +{remaining} more
-              </span>
-            )}
-          </div>
-        );
+        return <SeriesBadge series={row.examSeries} rowId={row.id} />;
       },
     },
+    ...(params.isMember ?
+      [
+        {
+          header: "Member Status",
+          cellClassName: "text-left",
+          render: (row) => {
+            return (
+              <StatusBadge
+                key={`${row.studentId}`}
+                label={row.member?.status || "NOT_FOUND"}
+                variant={row.member?.isMemberApproved ? "green" : "default"}
+                size="xs"
+                onClick={() => openMemberModal(row)}
+              />
+            );
+          },
+        },
+      ]
+    : []),
   ];
 
   const optionSeries = examSeries?.map((item) => ({
@@ -144,26 +155,45 @@ const StudentsPage = () => {
   }));
 
   return (
-    <div className='min-h-screen '>
+    <div className="min-h-screen ">
       <PageHeader
-        title='Students'
-        subtitle='Manage student records and exam series assignments'
+        title="Students"
+        subtitle="Manage student records and exam series assignments"
         primaryAction={{
           label: "Add Student",
           onClick: openCreateModal,
         }}
         showSearch={true}
-        searchPlaceholder='Search by name'
+        searchPlaceholder="Search by name"
         onSearch={onSearch}
-        searchMaxLength={50}>
-        {" "}
+        searchMaxLength={50}
+      >
+        <ExamSeriesFilter
+          data={[
+            {
+              value: true,
+              label: "Check Membership Status",
+            },
+            {
+              value: false,
+              label: "Uncheck Membership Status",
+            },
+          ]}
+          valueKey="value"
+          labelKey="label"
+          filterKey="isMember"
+          placeholder="Show Membership Status"
+          initialFilters={{ isMember: params.isMember }}
+          onFilterChange={onFilterChange}
+          isLoading={isLoading}
+        />
       </PageHeader>
 
       <DataTable
         data={students}
         columns={columns}
-        detailPage='students'
-        idAccessor='studentId'
+        detailPage="students"
+        idAccessor="studentId"
         onEdit={openEditModal}
         onDelete={openDeleteModal}
         onPageChange={onPageChange}
@@ -188,8 +218,15 @@ const StudentsPage = () => {
           setOpen={setIsDeleteModalOpen}
           onSubmit={handleStudentDelete}
           entityData={selectedStudent}
-          title='Delete Student'
+          title="Delete Student"
           confirmationText={`Are you sure you want to delete student "${selectedStudent.studentName}"? This action cannot be undone.`}
+        />
+      )}
+      {isMemberOpen && (
+        <MemberModal
+          open={isMemberOpen}
+          onOpenChange={setIsMemberOpen}
+          data={selectedStudent}
         />
       )}
     </div>

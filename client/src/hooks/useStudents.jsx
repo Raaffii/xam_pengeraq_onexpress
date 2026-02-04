@@ -182,12 +182,13 @@ export const useStudents = () => {
       const newParams = {
         ...params,
         subject: filters.subject || null,
-
+        isMember: filters.isMember || null,
         page: 1,
       };
       setParams(newParams);
       return await fetchStudents({
         subject: filters.subject || null,
+        isMember: filters.isMember || null,
         page: 1,
       });
     },
