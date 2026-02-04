@@ -23,7 +23,7 @@ const apiService = {
 
       return response.data;
     } catch (error) {
-      console.error("Member API error:", error);
+      console.error("Member API error:", error.response?.data?.error?.message);
       throw new Error(error.response?.data?.message || error.message);
     }
   },
@@ -47,7 +47,7 @@ const apiService = {
 
       return response.data;
     } catch (error) {
-      console.error("Member API error:", error);
+      console.error("Member API error:", error.response?.data?.error?.message);
       throw new Error(error.response?.data?.message || error.message);
     }
   },

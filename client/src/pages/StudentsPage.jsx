@@ -134,15 +134,30 @@ const StudentsPage = () => {
           header: "Member Status",
           cellClassName: "text-left",
           render: (row) => {
-            return (
-              <StatusBadge
-                key={`${row.studentId}`}
-                label={row.member?.status || "NOT_FOUND"}
-                variant={row.member?.isMemberApproved ? "green" : "default"}
-                size="xs"
-                onClick={() => openMemberModal(row)}
-              />
-            );
+            if (row.member?.status === "NOT_FOUND" || !row.member) {
+              return (
+                <StatusBadge
+                  key={`${row.studentId}`}
+                  label={"N/A"}
+                  variant={"default"}
+                  size="xs"
+                />
+              );
+            } else {
+              return (
+                <StatusBadge
+                  key={`${row.studentId}`}
+                  label={
+                    row.member?.isMemberApproved ?
+                      "APPROVED MEMBER"
+                    : "NOT APPROVED"
+                  }
+                  variant={row.member?.isMemberApproved ? "green" : "orange"}
+                  size="xs"
+                  onClick={() => openMemberModal(row)}
+                />
+              );
+            }
           },
         },
       ]
