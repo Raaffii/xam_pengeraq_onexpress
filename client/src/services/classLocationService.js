@@ -9,7 +9,7 @@ export const classLocationService = {
       const response = await api.get(`${BASE_URL}`);
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch student");
+      handleServiceError(error, "Failed to fetch location");
     }
   },
 };

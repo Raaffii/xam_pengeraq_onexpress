@@ -35,11 +35,9 @@ const getClassScheduleDetail = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("get student error:", error);
-
+    console.error("Error:", error);
     res.status(500).json({
-      success: false,
-      message: "get student failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -56,11 +54,9 @@ const getClassScheduleDetailById = async (req, res) => {
       data: result.data,
     });
   } catch (error) {
-    console.error("get student error:", error);
-
+    console.error("Error:", error);
     res.status(500).json({
-      success: false,
-      message: "get student failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -69,7 +65,6 @@ const getClassScheduleDetailById = async (req, res) => {
 const startClassSession = async (req, res) => {
   try {
     const { userId } = req.user;
-
     const classschhdid = req.params.id;
 
     const token = crypto.randomUUID();
@@ -90,13 +85,11 @@ const startClassSession = async (req, res) => {
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {
       return res.status(400).json({
-        error: true,
         message: "Duplicate entry",
       });
     }
     res.status(500).json({
-      success: false,
-      message: "edit student failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -142,8 +135,7 @@ const openClassSession = async (req, res) => {
       });
     }
     res.status(500).json({
-      success: false,
-      message: "edit student failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }

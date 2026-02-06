@@ -31,7 +31,7 @@ export const examSeriesService = {
       const response = await api.post(BASE_URL, data);
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Invalid Server Error");
+      handleServiceError(error, "Internal Server Error");
     }
   },
 
@@ -40,7 +40,7 @@ export const examSeriesService = {
       const response = await api.put(`${BASE_URL}/${id}`, data);
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Invalid Server Error");
+      handleServiceError(error, "Internal Server Error");
     }
   },
 
@@ -49,7 +49,7 @@ export const examSeriesService = {
       const response = await api.delete(`${BASE_URL}/${id}`);
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Invalid Server Error");
+      handleServiceError(error, "Internal Server Error");
     }
   },
 };

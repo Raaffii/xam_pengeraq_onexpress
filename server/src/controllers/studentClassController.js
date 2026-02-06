@@ -20,11 +20,10 @@ const getStudentClass = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("get student error:", error);
+    console.error("Error:", error);
 
     res.status(500).json({
-      success: false,
-      message: "get student failed",
+      message: "Internal Server Errror",
       error: error.message,
     });
   }
@@ -42,8 +41,7 @@ const assignStudentClass = async (req, res) => {
       });
     }
     res.status(500).json({
-      success: false,
-      message: "add student failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }

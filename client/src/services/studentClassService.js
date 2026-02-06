@@ -11,7 +11,7 @@ export const studentClassService = {
       });
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch student");
+      handleServiceError(error, "Failed to fetch student class");
     }
   },
 
@@ -22,7 +22,7 @@ export const studentClassService = {
 
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to create student");
+      handleServiceError(error, "Failed to updating class schedule");
     }
   },
 };

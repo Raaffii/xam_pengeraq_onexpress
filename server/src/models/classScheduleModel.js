@@ -104,33 +104,65 @@ const deleteClassSchedule = async (conn, id) => {
   }
 };
 
-const putClassSchedule = async (conn, id, data, userId) => {
-  const {
-    teacherId,
-    examSeriesId,
-    examSubjId,
-    locationId,
-    startDateTime,
-    endDateTime,
-    repeatValue,
-    repeatFreq,
-  } = data;
-
+const getClassScheduleById = async (conn, id) => {
   try {
-    const sql = ` UPDATE classschhd SET teacherid = ?, examseriesid = ?, examsubjectid = ?, locationid=?, startdatetime=?, repeatValue=?, repeatFreq =?, enddatetime=?, editedby=?, editeddate=? WHERE classschhdid = ? ;`;
-    const [result] = await conn.query(sql, [
-      teacherId,
-      examSeriesId,
-      examSubjId,
-      locationId,
-      startDateTime,
-      repeatValue,
-      repeatFreq,
-      endDateTime,
-      userId,
-      new Date(),
-      id,
-    ]);
+    const sql = `SELECT * FROM classschhd WHERE classschhdid = ?`;
+    const [rows] = await conn.query(sql, [id]);
+    return rows[0] || null;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const putClassSchedule = async (conn, id, data, userId) => {
+  try {
+    const updates = [];
+    const values = [];
+
+    if (data.teacherId !== undefined) {
+      updates.push("teacherid = ?");
+      values.push(data.teacherId);
+    }
+    if (data.examSeriesId !== undefined) {
+      updates.push("examseriesid = ?");
+      values.push(data.examSeriesId);
+    }
+    if (data.examSubjId !== undefined) {
+      updates.push("examsubjectid = ?");
+      values.push(data.examSubjId);
+    }
+    if (data.locationId !== undefined) {
+      updates.push("locationid = ?");
+      values.push(data.locationId);
+    }
+    if (data.startDateTime !== undefined) {
+      updates.push("startdatetime = ?");
+      values.push(data.startDateTime);
+    }
+    if (data.repeatValue !== undefined) {
+      updates.push("repeatValue = ?");
+      values.push(data.repeatValue);
+    }
+    if (data.repeatFreq !== undefined) {
+      updates.push("repeatFreq = ?");
+      values.push(data.repeatFreq);
+    }
+    if (data.endDateTime !== undefined) {
+      updates.push("enddatetime = ?");
+      values.push(data.endDateTime);
+    }
+
+    updates.push("editedby = ?", "editeddate = ?");
+    values.push(userId, new Date());
+
+    values.push(id);
+
+    if (updates.length === 2) {
+      return { affectedRows: 0 };
+    }
+
+    const sql = `UPDATE classschhd SET ${updates.join(", ")} WHERE classschhdid = ?`;
+    const [result] = await conn.query(sql, values);
     return result;
   } catch (err) {
     throw err;
@@ -171,4 +203,5 @@ module.exports = {
   deleteClassSchedule,
   putClassSchedule,
   getScheduleById,
+  getClassScheduleById,
 };

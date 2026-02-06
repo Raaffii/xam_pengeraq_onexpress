@@ -76,22 +76,22 @@ export default function ExamDetailPage() {
   const columns = [
     {
       accessorKey: "seriesDesc",
-      header: <div className="text-left w-full">Description</div>,
+      header: "Description",
       cellClassName: "text-left",
     },
     {
       accessorKey: "seriesStartDate",
-      header: <div className="text-left w-full">Start Date</div>,
+      header: "Start Date",
       cellClassName: "text-left",
     },
     {
       accessorKey: "seriesEndDate",
-      header: <div className="text-left w-full">End Date</div>,
+      header: "End Date",
       cellClassName: "text-left",
     },
     {
       accessorKey: "seriesCredit",
-      header: <div className="text-left w-full">Credits</div>,
+      header: "Credit",
       cellClassName: "text-left",
     },
   ];
@@ -107,7 +107,7 @@ export default function ExamDetailPage() {
     if (result.success) {
       setIsModalOpen(false);
       setParams((prev) => ({ ...prev, page: 1 }));
-      await fetchExamSeries({ page: 1 });
+      fetchExamSeries({ page: 1 });
     }
     return result.success;
   };

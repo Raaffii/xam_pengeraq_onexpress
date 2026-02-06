@@ -4,12 +4,13 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const Router = require("./routes/index");
 const cookieParser = require("cookie-parser");
+
 const {
   responseFormatter,
   notFoundHandler,
   errorHandler,
 } = require("./middlewares/responseHandler");
-const { publicLimiter, apiLimiter } = require("./middlewares/rateLimiter");
+// const { publicLimiter, apiLimiter } = require("./middlewares/rateLimiter");
 
 const app = express();
 
@@ -43,7 +44,8 @@ app.use(responseFormatter);
 // app.get("/debug/trust-proxy-test", createTrustProxyDebugger());
 // app.get("/debug/ip", createIPInfoEndpoint());
 
-app.use(publicLimiter);
+// app.use(publicLimiter);
+// app.use("/api", apiLimiter);
 
 // Routes
 app.get("/", (req, res) => {

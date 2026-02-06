@@ -75,12 +75,12 @@ export const useTeacher = () => {
       toastId = toast.loading("Updating teacher data...");
 
       const response = await teacherService.updateTeacher(data, id);
-      toast.success("teacher edit successfully!", { id: toastId });
+      toast.success("Teacher edit successfully!", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating teacher:", err);
-      toast.error(err.message || "Failed to create teacher", { id: toastId });
+      console.error("Error:", err);
+      toast.error(err.message, { id: toastId });
       setError(err.message);
 
       return { success: false, error: err.message };
@@ -94,15 +94,15 @@ export const useTeacher = () => {
     try {
       setIsSubmitting(true);
       setError(null);
-      toastId = toast.loading("Deleting new teacher...");
+      toastId = toast.loading("Deleting Teacher...");
 
       const response = await teacherService.deleteTeacher(id);
-      toast.success("teacher delete successfully!", { id: toastId });
+      toast.success("Teacher delete successfully!", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
       console.error("Error deleting teacher:", err);
-      toast.error(err.message || "Failed to create teacher", { id: toastId });
+      toast.error(err.message, { id: toastId });
       setError(err.message);
 
       return { success: false, error: err.message };

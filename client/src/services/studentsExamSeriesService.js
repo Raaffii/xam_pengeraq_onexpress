@@ -10,7 +10,7 @@ export const studentsExamSeriesService = {
       });
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch student");
+      handleServiceError(error, "Failed to fetch student exam");
     }
   },
 
@@ -19,7 +19,7 @@ export const studentsExamSeriesService = {
       const response = await api.get(`${BASE_URL}/${studentId}`);
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch student");
+      handleServiceError(error, "Failed to fetch student exam");
     }
   },
 };

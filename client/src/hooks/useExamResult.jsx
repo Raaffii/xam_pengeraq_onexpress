@@ -75,8 +75,8 @@ export const useExamsResult = () => {
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating exam result:", err);
-      toast.error(err.message || "Failed to create exam result", {
+      console.error("Error:", err);
+      toast.error(err.message, {
         id: toastId,
       });
       setError(err.message);
@@ -92,18 +92,18 @@ export const useExamsResult = () => {
     try {
       setIsSubmitting(true);
       setError(null);
-      toastId = toast.loading("Creating new exam result...");
+      toastId = toast.loading("Updating exam result...");
 
       const response = await examResultService.putExamResult(
         examResultsId,
         data,
       );
-      toast.success("Exam Result added successfully!", { id: toastId });
+      toast.success("Exam Result edited successfully!", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating exam result:", err);
-      toast.error(err.message || "Failed to create exam result", {
+      console.error("Error:", err);
+      toast.error(err.message, {
         id: toastId,
       });
       setError(err.message);
@@ -119,7 +119,7 @@ export const useExamsResult = () => {
     try {
       setIsSubmitting(true);
       setError(null);
-      toastId = toast.loading("Deleting new exam result...");
+      toastId = toast.loading("Deleting exam result...");
       const response = await examResultService.deleteExamResult(examResultsId);
       toast.success("Exam Result delete successfully!", { id: toastId });
       setExamsResult((prev) =>
@@ -127,8 +127,8 @@ export const useExamsResult = () => {
       );
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating exam result:", err);
-      toast.error(err.message || "Failed to create exam result", {
+      console.error("Error:", err);
+      toast.error(err.message, {
         id: toastId,
       });
       setError(err.message);

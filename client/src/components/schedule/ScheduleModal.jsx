@@ -84,7 +84,7 @@ export const ScheduleModal = ({
         ) || "",
       endDateTime:
         formatDateTimeV2(initialValues?.endDateTime, "yyyy-MM-dd", false) || "",
-      repeatValue: initialValues?.repeatValue || "",
+      repeatValue: initialValues?.repeatValue || 0,
       repeatFreq: initialValues?.repeatFreq || 1,
     };
 
@@ -290,7 +290,8 @@ export const ScheduleModal = ({
               value={formData.teacherId}
               onChange={handleChange}
               options={optionsTeacher}
-              disabled={teacherLoad || isSubmitting}
+              disabled={isSubmitting}
+              isLoading={teacherLoad}
               error={errors.teacherId}
               isRequired
               placeholder="Select teacher..."
@@ -308,7 +309,7 @@ export const ScheduleModal = ({
               value={formData.examSeriesId}
               onChange={handleChange}
               options={seriesOptions}
-              disabled={isLoadingSeries || isSubmitting}
+              disabled={isSubmitting}
               error={errors.examSeriesId}
               isRequired
               placeholder="Select series..."
@@ -317,6 +318,7 @@ export const ScheduleModal = ({
               icon={Columns2}
               minSearchLength={0}
               className="h-12"
+              isLoading={isLoadingSeries}
             />
           </div>
 
@@ -328,7 +330,7 @@ export const ScheduleModal = ({
               value={formData.examSubjId}
               onChange={handleChange}
               options={optionsExamSubject}
-              disabled={!formData.examSeriesId || subjLoad || isSubmitting}
+              disabled={!formData.examSeriesId || isSubmitting}
               error={errors.examSubjId}
               isRequired
               placeholder={
@@ -341,6 +343,7 @@ export const ScheduleModal = ({
               icon={Book}
               minSearchLength={0}
               className="h-12"
+              isLoading={subjLoad}
             />
 
             <SearchableDropdown
@@ -350,7 +353,7 @@ export const ScheduleModal = ({
               value={formData.locationId}
               onChange={handleChange}
               options={optionsLocation}
-              disabled={locationLoad || isSubmitting}
+              disabled={isSubmitting}
               error={errors.locationId}
               isRequired
               placeholder="Select location..."
@@ -359,6 +362,7 @@ export const ScheduleModal = ({
               icon={MapPin}
               minSearchLength={0}
               className="h-12"
+              isLoading={locationLoad}
             />
           </div>
 

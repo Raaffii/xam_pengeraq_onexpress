@@ -11,6 +11,7 @@ import {
 import { Loader2, Lock, EyeOff, Eye, Mail, User } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { useStudents } from "@/hooks/useStudents";
+import { useTeacher } from "@/hooks/useTeacher";
 
 export const UserForm = ({
   open = false,
@@ -21,6 +22,7 @@ export const UserForm = ({
   mode = "create",
 }) => {
   const { fetchStudents } = useStudents();
+  const { fetchTeacher } = useTeacher();
 
   const [formData, setFormData] = useState({
     userName: "",
@@ -34,10 +36,13 @@ export const UserForm = ({
   const [originalData, setOriginalData] = useState({});
   const [errors, setErrors] = useState({});
   const [studentSearch, setStudentSearch] = useState("");
+  const [teacherSearch, setTeacherSearch] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [showStudentSearch, setShowStudentSearch] = useState(false);
+  const [showTeacherSearch, setShowTeacherSearch] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   // Track if form has been modified
@@ -105,8 +110,18 @@ export const UserForm = ({
       setSelectedStudent(null);
     }
 
+    if (initialValues.teacherId && initialValues.teacherName) {
+      setSelectedTeacher({
+        teacherId: initialValues.teacherId,
+        teacherName: initialValues.teacherName,
+      });
+    } else {
+      setSelectedTeacher(null);
+    }
+
     setErrors({});
     setStudentSearch("");
+    setTeacherSearch("");
     setSearchResults([]);
   }, [initialValues, open]);
 
@@ -117,8 +132,8 @@ export const UserForm = ({
     }
 
     setShowStudentSearch(formData.role === "student");
-
-    if (formData.role !== "student") {
+    setShowTeacherSearch(formData.role === "teacher");
+    if (formData.role == "admin") {
       setSelectedStudent(null);
       setSearchResults([]);
       setStudentSearch("");
@@ -163,6 +178,44 @@ export const UserForm = ({
     return () => clearTimeout(timeoutId);
   }, [studentSearch, showStudentSearch, fetchStudents]);
 
+  useEffect(() => {
+    if (!showTeacherSearch || teacherSearch.length < 3) {
+      setSearchResults([]);
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        setIsSearching(true);
+        setErrors((prev) => ({ ...prev, studentSearch: null }));
+
+        const response = await fetchTeacher({
+          searchTerm: teacherSearch,
+          page: 1,
+          pageSize: 5,
+        });
+
+        setSearchResults(response.data);
+        if (response.length === 0) {
+          setErrors((prev) => ({
+            ...prev,
+            studentSearch: "No students found",
+          }));
+        }
+      } catch (error) {
+        console.error("Error searching students:", error);
+        setErrors((prev) => ({
+          ...prev,
+          studentSearch: "Failed to search students",
+        }));
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [teacherSearch, showTeacherSearch, fetchTeacher]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -193,11 +246,31 @@ export const UserForm = ({
     setErrors((prev) => ({ ...prev, studentId: null }));
   };
 
+  const handleSelectTeacher = (teacher) => {
+    const teacherData = {
+      teacherId: teacher.teacherId,
+      teacherName: teacher.teacherName,
+    };
+
+    setSelectedTeacher(teacherData);
+    setFormData((prev) => ({ ...prev, teacherId: teacherData.teacherId }));
+    setSearchResults([]);
+    setStudentSearch("");
+    setErrors((prev) => ({ ...prev, teacherId: null }));
+  };
+
   const handleClearStudent = () => {
     setSelectedStudent(null);
     setFormData((prev) => ({ ...prev, studentId: null }));
     setSearchResults([]);
     setStudentSearch("");
+  };
+
+  const handleClearTeacher = () => {
+    setSelectedTeacher(null);
+    setFormData((prev) => ({ ...prev, teacherId: null }));
+    setSearchResults([]);
+    setTeacherSearch("");
   };
 
   const validateEmail = (value) => {
@@ -261,9 +334,9 @@ export const UserForm = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className='max-w-2xl max-h-[90vh] overflow-y-auto'>
         <DialogHeader>
-          <DialogTitle className="text-gray-700">
+          <DialogTitle className='text-gray-700'>
             {mode === "create" ? "Create New User" : "Edit User"}
           </DialogTitle>
           <DialogDescription>
@@ -273,37 +346,37 @@ export const UserForm = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div className="relative">
+        <div className='space-y-4'>
+          <div className='relative'>
             <InputField
-              id="userName"
-              name="userName"
-              label="Name"
+              id='userName'
+              name='userName'
+              label='Name'
               value={formData.userName}
               onChange={handleChange}
-              placeholder="Enter user name"
+              placeholder='Enter user name'
               isRequired
               error={errors.userName}
               onError={(error) =>
                 setErrors((prev) => ({ ...prev, userName: error }))
               }
               disabled={isSubmitting}
-              inputClassName="pl-10 bg-gray-50"
+              inputClassName='pl-10 bg-gray-50'
             />
-            <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
-              <User className="w-5 h-5" />
+            <div className='absolute left-3 top-[46px] text-gray-400 pointer-events-none'>
+              <User className='w-5 h-5' />
             </div>
           </div>
 
-          <div className="relative">
+          <div className='relative'>
             <InputField
-              id="emailAddress"
-              name="emailAddress"
-              label="Email Address"
-              type="email"
+              id='emailAddress'
+              name='emailAddress'
+              label='Email Address'
+              type='email'
               value={formData.emailAddress}
               onChange={handleChange}
-              placeholder="Enter email address"
+              placeholder='Enter email address'
               isRequired
               error={errors.emailAddress}
               onError={(error) =>
@@ -311,23 +384,23 @@ export const UserForm = ({
               }
               validate={validateEmail}
               disabled={isSubmitting}
-              inputClassName="pl-10 bg-gray-50"
+              inputClassName='pl-10 bg-gray-50'
             />
-            <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
-              <Mail className="w-5 h-5" />
+            <div className='absolute left-3 top-[46px] text-gray-400 pointer-events-none'>
+              <Mail className='w-5 h-5' />
             </div>
           </div>
 
           {mode === "create" && (
-            <div className="relative">
+            <div className='relative'>
               <InputField
-                id="password"
-                name="password"
-                label="Password"
+                id='password'
+                name='password'
+                label='Password'
                 type={showPassword ? "text" : "password"}
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="Enter password"
+                placeholder='Enter password'
                 isRequired
                 error={errors.password}
                 onError={(error) =>
@@ -335,27 +408,26 @@ export const UserForm = ({
                 }
                 validate={validatePassword}
                 disabled={isSubmitting}
-                inputClassName="pl-10 pr-10"
+                inputClassName='pl-10 pr-10'
               />
-              <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
-                <Lock className="w-5 h-5" />
+              <div className='absolute left-3 top-[46px] text-gray-400 pointer-events-none'>
+                <Lock className='w-5 h-5' />
               </div>
               <button
-                type="button"
+                type='button'
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-[46px] text-gray-400 hover:text-gray-600"
-              >
+                className='absolute right-3 top-[46px] text-gray-400 hover:text-gray-600'>
                 {showPassword ? (
-                  <EyeOff className="w-5 h-5" />
+                  <EyeOff className='w-5 h-5' />
                 ) : (
-                  <Eye className="w-5 h-5" />
+                  <Eye className='w-5 h-5' />
                 )}
               </button>
             </div>
           )}
 
           <InputRadio
-            label="Role"
+            label='Role'
             value={formData.role}
             onChange={handleRadioChange}
             options={[
@@ -363,7 +435,7 @@ export const UserForm = ({
               { label: "Teacher", value: "teacher" },
               { label: "Student", value: "student" },
             ]}
-            optionsLayout="horizontal"
+            optionsLayout='horizontal'
             isRequired
             error={errors.role}
             onError={(error) => setErrors((prev) => ({ ...prev, role: error }))}
@@ -371,37 +443,36 @@ export const UserForm = ({
           />
 
           {showStudentSearch && (
-            <div className="space-y-4 border rounded-xl p-4 bg-gray-50">
-              <Label className="text-gray-700 font-medium">
+            <div className='space-y-4 border rounded-xl p-4 bg-gray-50'>
+              <Label className='text-gray-700 font-medium'>
                 {selectedStudent ? "Linked Student" : "Link Student"}
               </Label>
 
               {selectedStudent ? (
                 <>
-                  <div className="flex items-center justify-between bg-white border rounded-lg p-4">
+                  <div className='flex items-center justify-between bg-white border rounded-lg p-4'>
                     <div>
-                      <p className="font-semibold">
+                      <p className='font-semibold'>
                         {selectedStudent.studentName}
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className='text-sm text-gray-500'>
                         Student ID: {selectedStudent.studentId}
                       </p>
                     </div>
 
                     <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
+                      type='button'
+                      variant='outline'
+                      size='sm'
                       onClick={handleClearStudent}
                       disabled={isSubmitting}
-                      className="text-red-600 border-red-200 hover:bg-red-50"
-                    >
+                      className='text-red-600 border-red-200 hover:bg-red-50'>
                       Unlink
                     </Button>
                   </div>
 
                   {formData.role !== "student" && (
-                    <p className="text-sm text-gray-500">
+                    <p className='text-sm text-gray-500'>
                       This {formData.role} account is currently linked to a
                       student.
                     </p>
@@ -409,55 +480,54 @@ export const UserForm = ({
                 </>
               ) : (
                 <>
-                  <div className="relative">
+                  <div className='relative'>
                     <InputField
-                      id="studentSearch"
-                      name="studentSearch"
-                      label="Search Student"
+                      id='studentSearch'
+                      name='studentSearch'
+                      label='Search Student'
                       value={studentSearch}
                       onChange={(e) => setStudentSearch(e.target.value)}
-                      placeholder="Search by name or email (min 3 characters)"
+                      placeholder='Search by name or email (min 3 characters)'
                       error={errors.studentSearch}
                       disabled={isSubmitting}
                       inputClassName={isSearching ? "pr-10" : ""}
                     />
 
                     {isSearching && (
-                      <div className="absolute right-3 top-[48px]">
-                        <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                      <div className='absolute right-3 top-[48px]'>
+                        <Loader2 className='h-5 w-5 animate-spin text-gray-400' />
                       </div>
                     )}
                   </div>
 
                   {isSearching && (
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                    <div className='flex items-center gap-2 text-sm text-gray-500'>
+                      <Loader2 className='h-4 w-4 animate-spin' />
                       <span>Searching students...</span>
                     </div>
                   )}
 
                   {studentSearch.length > 0 && studentSearch.length < 3 && (
-                    <p className="text-sm text-gray-500">
+                    <p className='text-sm text-gray-500'>
                       Type {3 - studentSearch.length} more character
                       {3 - studentSearch.length > 1 ? "s" : ""}
                     </p>
                   )}
 
                   {searchResults.length > 0 && (
-                    <div className="space-y-2">
-                      <p className="text-sm text-gray-600">Select a student:</p>
+                    <div className='space-y-2'>
+                      <p className='text-sm text-gray-600'>Select a student:</p>
 
-                      <div className="max-h-56 overflow-y-auto space-y-1">
+                      <div className='max-h-56 overflow-y-auto space-y-1'>
                         {searchResults.map((student) => (
                           <button
                             key={student.studentIdNo}
-                            type="button"
+                            type='button'
                             onClick={() => handleSelectStudent(student)}
                             disabled={isSubmitting}
-                            className="w-full text-left p-3 border rounded-lg bg-white hover:bg-blue-50 hover:border-blue-300 transition"
-                          >
-                            <p className="font-medium">{student.studentName}</p>
-                            <p className="text-sm text-gray-500">
+                            className='w-full text-left p-3 border rounded-lg bg-white hover:bg-blue-50 hover:border-blue-300 transition'>
+                            <p className='font-medium'>{student.studentName}</p>
+                            <p className='text-sm text-gray-500'>
                               ID: {student.studentIdNo}
                             </p>
                           </button>
@@ -469,7 +539,108 @@ export const UserForm = ({
                   {!isSearching &&
                     studentSearch.length >= 3 &&
                     searchResults.length === 0 && (
-                      <p className="text-sm text-gray-500">No students found</p>
+                      <p className='text-sm text-gray-500'>No students found</p>
+                    )}
+                </>
+              )}
+            </div>
+          )}
+
+          {showTeacherSearch && (
+            <div className='space-y-4 border rounded-xl p-4 bg-gray-50'>
+              <Label className='text-gray-700 font-medium'>
+                {selectedTeacher ? "Linked Teacher" : "Link Teacher"}
+              </Label>
+
+              {selectedTeacher ? (
+                <>
+                  <div className='flex items-center justify-between bg-white border rounded-lg p-4'>
+                    <div>
+                      <p className='font-semibold'>
+                        {selectedTeacher.teacherName}
+                      </p>
+                      {/* <p className='text-sm text-gray-500'>
+                        Student ID: {selectedStudent.studentId}
+                      </p> */}
+                    </div>
+
+                    <Button
+                      type='button'
+                      variant='outline'
+                      size='sm'
+                      onClick={handleClearTeacher}
+                      disabled={isSubmitting}
+                      className='text-red-600 border-red-200 hover:bg-red-50'>
+                      Unlink
+                    </Button>
+                  </div>
+
+                  {formData.role !== "teacher" && (
+                    <p className='text-sm text-gray-500'>
+                      This {formData.role} account is currently linked to a
+                      student.
+                    </p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className='relative'>
+                    <InputField
+                      id='teacherSearch'
+                      name='teacherSearch'
+                      label='Search Teacher'
+                      value={teacherSearch}
+                      onChange={(e) => setTeacherSearch(e.target.value)}
+                      placeholder='Search by name or email (min 3 characters)'
+                      error={errors.studentSearch}
+                      disabled={isSubmitting}
+                      inputClassName={isSearching ? "pr-10" : ""}
+                    />
+
+                    {isSearching && (
+                      <div className='absolute right-3 top-[48px]'>
+                        <Loader2 className='h-5 w-5 animate-spin text-gray-400' />
+                      </div>
+                    )}
+                  </div>
+
+                  {isSearching && (
+                    <div className='flex items-center gap-2 text-sm text-gray-500'>
+                      <Loader2 className='h-4 w-4 animate-spin' />
+                      <span>Searching teacher...</span>
+                    </div>
+                  )}
+
+                  {teacherSearch.length > 0 && teacherSearch.length < 3 && (
+                    <p className='text-sm text-gray-500'>
+                      Type {3 - teacherSearch.length} more character
+                      {3 - teacherSearch.length > 1 ? "s" : ""}
+                    </p>
+                  )}
+
+                  {searchResults.length > 0 && (
+                    <div className='space-y-2'>
+                      <p className='text-sm text-gray-600'>Select a student:</p>
+
+                      <div className='max-h-56 overflow-y-auto space-y-1'>
+                        {searchResults.map((teacher, index) => (
+                          <button
+                            key={index}
+                            type='button'
+                            onClick={() => handleSelectTeacher(teacher)}
+                            disabled={isSubmitting}
+                            className='w-full text-left p-3 border rounded-lg bg-white hover:bg-blue-50 hover:border-blue-300 transition'>
+                            <p className='font-medium'>{teacher.teacherName}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {!isSearching &&
+                    studentSearch.length >= 3 &&
+                    searchResults.length === 0 && (
+                      <p className='text-sm text-gray-500'>No students found</p>
                     )}
                 </>
               )}
@@ -477,33 +648,31 @@ export const UserForm = ({
           )}
 
           {mode === "edit" && !hasChanges && (
-            <div className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3">
+            <div className='text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3'>
               No changes detected. Modify the form to enable submission.
             </div>
           )}
 
-          <div className="flex justify-end gap-2 pt-4">
+          <div className='flex justify-end gap-2 pt-4'>
             <Button
-              type="button"
-              variant="outline"
+              type='button'
+              variant='outline'
               onClick={handleClose}
               disabled={isSubmitting}
-              className="h-10"
-            >
+              className='h-10'>
               Cancel
             </Button>
             <Button
               onClick={handleSubmit}
               disabled={isSubmitting || (mode === "edit" && !hasChanges)}
-              className="h-10 bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+              className='h-10 bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed'>
               {isSubmitting
                 ? mode === "create"
                   ? "Creating..."
                   : "Updating..."
                 : mode === "create"
-                ? "Create User"
-                : "Update User"}
+                  ? "Create User"
+                  : "Update User"}
             </Button>
           </div>
         </div>

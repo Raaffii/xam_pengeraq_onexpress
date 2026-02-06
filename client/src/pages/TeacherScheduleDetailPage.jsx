@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import PageHeader from "@/components/common/PageHeader";
 import { useNavigate, useParams } from "react-router-dom";
 import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
-import { Filter, Undo, UserCheck } from "lucide-react";
+import { Filter, Undo2, UserCheck } from "lucide-react";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { SearchableDropdown, StatusBadge } from "@/components/common";
 import { ActionItem } from "@/components/common/ActionItem";
@@ -74,11 +74,11 @@ export default function TeacherScheduleDetailPage() {
         const today = isToday(row.classDateTime);
 
         return (
-          <div className="flex items-center gap-2">
+          <div className='flex items-center gap-2'>
             <span>{row.classDateTime}</span>
 
             {today && (
-              <StatusBadge label={"Today"} variant={"green"} size="xs" />
+              <StatusBadge label={"Today"} variant={"green"} size='xs' />
             )}
           </div>
         );
@@ -91,7 +91,7 @@ export default function TeacherScheduleDetailPage() {
       render: (row) => (
         <>
           {row.classStartDateTime || (
-            <span className="text-red-600 font-semibold">
+            <span className='text-red-600 font-semibold'>
               Class Not Started yet
             </span>
           )}
@@ -102,14 +102,14 @@ export default function TeacherScheduleDetailPage() {
       header: "Actions",
       align: "center",
       cell: (row) => (
-        <div className="flex items-center justify-center gap-1">
+        <div className='flex items-center justify-center gap-1'>
           <ActionItem
-            label="Attendance"
+            label='Attendance'
             icon={UserCheck}
             onClick={() =>
               navigate(`/teacher/class-attendance/${row.classSchDetailsId}`)
             }
-            className="text-blue-600 hover:bg-blue-100"
+            className='text-blue-600 hover:bg-blue-100'
           />
         </div>
       ),
@@ -120,26 +120,24 @@ export default function TeacherScheduleDetailPage() {
     location.pathname === "/schedule/calendar" ? "calendar" : "list";
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto">
+    <div className='min-h-screen bg-gray-50'>
+      <div className='mx-auto'>
         <PageHeader
           title={`Teacher Schedules Detail - ${classScheduleDetail[0]?.subjDesc || "loading"}`}
-          subtitle="Your Schedule"
+          subtitle='Your Schedule'
           showSearch={true}
-          searchPlaceholder="Search by subject..."
+          searchPlaceholder='Search by subject...'
           searchMaxLength={50}
-          onSearch={onSearch}
-        >
-          <div className="flex items-center gap-2">
+          onSearch={onSearch}>
+          <div className='flex items-center gap-2'>
             <Button
               variant={"outline"}
               onClick={() => navigate(`/teacher/schedule`)}
-              className="h-10"
-            >
-              <Undo className="h-4 w-4 mr-1" />
+              className='h-10'>
+              <Undo2 className='h-4 w-4 mr-1' />
               Back
             </Button>
-            <div className="w-full md:min-w-[200px] md:w-auto">
+            <div className='w-full md:min-w-[200px] md:w-auto'>
               <SearchableDropdown
                 id={"value"}
                 name={"value"}
@@ -159,11 +157,11 @@ export default function TeacherScheduleDetailPage() {
                   { value: "calendar", label: "View By Calendar" },
                 ]}
                 placeholder={"View By"}
-                searchPlaceholder="Search..."
-                emptyMessage="No items found"
+                searchPlaceholder='Search...'
+                emptyMessage='No items found'
                 icon={Filter}
                 minSearchLength={0}
-                className="h-10"
+                className='h-10'
               />
             </div>
           </div>
@@ -172,7 +170,7 @@ export default function TeacherScheduleDetailPage() {
         <DataTable
           data={classScheduleDetail}
           columns={columns}
-          idAccessor="classschhdid"
+          idAccessor='classschhdid'
           onPageChange={onPageChange}
           onSizeChange={onPageSizeChange}
           pagination={pagination}

@@ -49,10 +49,20 @@ const getTeacherById = async (req, res) => {
 const postTeacher = async (req, res) => {
   try {
     const data = { ...req.body, enteredBy: req.user.userId };
-    const dataId = await teacherService.postTeacher(data);
-
     const accountAdd = req.body.addAccount;
     const teacherData = req.body;
+
+    if (accountAdd) {
+      const existingUser = await userService.findUserByEmail(
+        teacherData.teacherEmail,
+      );
+      if (existingUser && existingUser.active === 1) {
+        throw new Error("Email already exists");
+      }
+    }
+
+    const dataId = await teacherService.postTeacher(data);
+
     if (accountAdd) {
       const userData = {
         userName: teacherData.teacherName,
@@ -63,14 +73,23 @@ const postTeacher = async (req, res) => {
         enteredBy: req.user.userId,
       };
 
-      await userService.createUser(userData);
+      const result = await userService.createUser(userData);
     }
 
     res.status(200).json(dataId);
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {
-      return res.status(400).json({
-        message: "Duplicate entry",
+      return res.status(409).json({
+        message: "Email already exists",
+      });
+    }
+    if (
+      error.message.includes("duplicate") ||
+      error.message.includes("already exists") ||
+      error.message.includes("Duplicate entry")
+    ) {
+      return res.status(409).json({
+        message: "Email already registered",
       });
     }
     res.status(500).json({
@@ -89,7 +108,7 @@ const putTeacher = async (req, res) => {
 
     res.status(200).json(data);
   } catch (error) {
-    console.error(error);
+    console.error("Failed to update teacher: ", error);
     if (error.message.includes("not found")) {
       return res.status(404).json({
         message: error.message,
@@ -127,9 +146,9 @@ const deleteTeacher = async (req, res) => {
       });
     }
     if (error.code === "ER_ROW_IS_REFERENCED_2") {
-      return res.status(400).json({
+      return res.status(409).json({
         message:
-          "Cannot delete teacher because it is linked to an existing schedule.",
+          "Cannot delete selected teacher because it is linked to an existing schedule.",
       });
     }
 

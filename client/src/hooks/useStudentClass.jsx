@@ -9,7 +9,7 @@ export const useStudentClass = () => {
   const [error, setError] = useState(null);
 
   const [pagination, setPagination] = useState({
-    page: 1,
+    currentPage: 1,
     pageSize: 10,
     totalPages: 1,
     totalItems: 0,
@@ -48,7 +48,7 @@ export const useStudentClass = () => {
         setStudentClass(data);
         return { success: true, data: data };
       } catch (err) {
-        console.error("Error fetching exams:", err);
+        console.error("Error:", err);
 
         setError(err.message);
         setStudentClass([]);
@@ -66,15 +66,15 @@ export const useStudentClass = () => {
     try {
       setIsSubmitting(true);
       setError(null);
-      toastId = toast.loading("Creating new students...");
+      toastId = toast.loading("Updating data...");
 
       const response = await studentClassService.assignStudentClass(data);
       toast.success("Changes saved successfully!", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating student:", err);
-      toast.error(err.message || "Changes Failed", { id: toastId });
+      console.error("Error:", err);
+      toast.error(err.message, { id: toastId });
       setError(err.message);
 
       return { success: false, error: err.message };

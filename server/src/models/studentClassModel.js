@@ -63,7 +63,11 @@ LEFT JOIN studattendstat sat
 
 ${whereClause}
 
-GROUP BY s.studentid
+GROUP BY 
+s.studentid,
+s.studentname, 
+  sc.studentclassid, 
+  sc.createddate
 
 LIMIT ? OFFSET ?
 `;
@@ -71,8 +75,8 @@ LIMIT ? OFFSET ?
     totalMeeting,
     totalMeeting,
     ...params,
-    limit,
-    offset,
+    String(limit),
+    String(offset),
   ]);
 
   const countQuery = `SELECT COUNT(*) AS total FROM studentclass s WHERE s.classschhdid=?`;

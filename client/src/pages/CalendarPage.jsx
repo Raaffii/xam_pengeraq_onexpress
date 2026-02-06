@@ -60,30 +60,29 @@ export default function CalendarPage() {
           <div
             onClick={() => handleDetailDate(event)}
             className={`flex gap-1 p-0.5 rounded-sm text-black hover:bg-white ${
-              event.repeatvalue === "daily" ?
-                "bg-red-300 border-2 border-red-500"
-              : event.repeatvalue === "weekly" ?
-                "bg-yellow-300 border-2 border-yellow-500"
-              : event.repeatvalue === "monthly" ?
-                "bg-green-300 border-2 border-green-500"
-              : "bg-blue-300 border-2 border-blue-500"
-            }`}
-          >
-            <div className=" gap-1">
+              event.repeatvalue === "daily"
+                ? "bg-red-300 border-2 border-red-500"
+                : event.repeatvalue === "weekly"
+                  ? "bg-yellow-300 border-2 border-yellow-500"
+                  : event.repeatvalue === "monthly"
+                    ? "bg-green-300 border-2 border-green-500"
+                    : "bg-blue-300 border-2 border-blue-500"
+            }`}>
+            <div className=' gap-1'>
               {/* <UserIcon className='w-4' /> */}
-              <h2 className="text-sm font-semibold">{event?.teacher} </h2>
-              <h3 className="text-xs">{event?.examsubject}</h3>
+              <h2 className='text-sm font-semibold'>{event?.teacher} </h2>
+              <h3 className='text-xs'>{event?.examsubject}</h3>
             </div>
             {view === "agenda" && (
               <>
                 <h2>
                   {" "}
-                  <span className="font-semibold">Series :</span>
+                  <span className='font-semibold'>Series :</span>
                   {event?.examseries}
                 </h2>
                 <h2>
                   {" "}
-                  <span className="font-semibold">Subject:</span>
+                  <span className='font-semibold'>Subject:</span>
                   {event?.examsubject}
                 </h2>
               </>
@@ -103,13 +102,12 @@ export default function CalendarPage() {
       return (
         <div
           className={`relative w-full h-full border border-gray-200/60 cursor-pointer transition-all duration-200 hover:bg-purple-50/40 ${
-            isToday ?
-              "bg-gradient-to-br from-purple-100 to-purple-50 border-purple-400 shadow-inner"
-            : ""
-          }`}
-        >
+            isToday
+              ? "bg-gradient-to-br from-purple-100 to-purple-50 border-purple-400 shadow-inner"
+              : ""
+          }`}>
           {isToday && (
-            <span className="absolute top-1 left-1 text-[10px] font-bold text-purple-700 px-2 py-0.5 rounded-md shadow-sm">
+            <span className='absolute top-1 left-1 text-[10px] font-bold text-purple-700 px-2 py-0.5 rounded-md shadow-sm'>
               Today
             </span>
           )}
@@ -134,25 +132,31 @@ export default function CalendarPage() {
   };
 
   const handleChangeCalendar = async (con) => {
-    if (con == "next") {
-      const resultOri = await fetchClassScheduleDetail({
-        date: new Date().setMonth(new Date().getMonth() + calendarShow + 1),
-        usePagination: false,
-      });
+    const baseDate = new Date();
 
-      await handleEvent(resultOri.data);
+    baseDate.setDate(1);
+
+    let newMonthOffset = calendarShow;
+
+    if (con === "next") {
+      newMonthOffset = calendarShow + 1;
       setCalendarShow(calendarShow + 1);
-    } else if (con == "prev") {
-      const resultOri = await fetchClassScheduleDetail({
-        date: new Date().setMonth(new Date().getMonth() + calendarShow - 1),
-        usePagination: false,
-      });
-
-      await handleEvent(resultOri.data);
+    } else if (con === "prev") {
+      newMonthOffset = calendarShow - 1;
       setCalendarShow(calendarShow - 1);
     } else {
+      newMonthOffset = 0;
       setCalendarShow(0);
     }
+
+    baseDate.setMonth(baseDate.getMonth() + newMonthOffset);
+
+    const resultOri = await fetchClassScheduleDetail({
+      date: baseDate,
+      usePagination: false,
+    });
+
+    await handleEvent(resultOri.data);
   };
 
   const handleViewChange = (newView) => {
@@ -166,16 +170,19 @@ export default function CalendarPage() {
     setSelectedDate(date.start);
   };
 
+  const calendarDate = new Date();
+  calendarDate.setDate(1);
+  calendarDate.setMonth(calendarDate.getMonth() + calendarShow);
+
   return (
     <div>
       <PageHeader
-        title="Schedule"
+        title='Schedule'
         subtitle={`${isLoading ? "...Loading" : "Manage Schedule"}`}
         showSearch={false}
-        searchPlaceholder="Search by name"
-        searchMaxLength={50}
-      >
-        <div className="w-full md:min-w-[200px] md:w-auto">
+        searchPlaceholder='Search by name'
+        searchMaxLength={50}>
+        <div className='w-full md:min-w-[200px] md:w-auto'>
           <SearchableDropdown
             id={"value"}
             name={"value"}
@@ -195,61 +202,55 @@ export default function CalendarPage() {
               { value: "calendar", label: "View By Calendar" },
             ]}
             placeholder={"View By"}
-            searchPlaceholder="Search..."
-            emptyMessage="No items found"
+            searchPlaceholder='Search...'
+            emptyMessage='No items found'
             icon={Filter}
             minSearchLength={0}
-            className="h-10"
+            className='h-10'
           />
         </div>
       </PageHeader>
-      <div className="flex justify-between m-2">
-        <div className="flex gap-3 items-center">
-          <h1 className="text-black font-semibold">
+      <div className='flex justify-between m-2'>
+        <div className='flex gap-3 items-center'>
+          <h1 className='text-black font-semibold'>
             {monthYear.nowMonth} {monthYear.nowYear}
           </h1>
 
           <button
             // variant='outline'
-            size="sm"
+            size='sm'
             onClick={() => handleChangeCalendar("now")}
-            className="p-1.5 bg-blue-600 rounded-md transition-colors text-white"
-          >
+            className='p-1.5 bg-blue-600 rounded-md transition-colors text-white'>
             Now
           </button>
           <button
             onClick={() => handleChangeCalendar("prev")}
-            className="p-1.5  text-black rounded-md transition-colors font-bold hover:text-blue-500"
-          >
+            className='p-1.5  text-black rounded-md transition-colors font-bold hover:text-blue-500'>
             Prev
           </button>
           <button
             onClick={() => handleChangeCalendar("next")}
-            className="p-1.5 text-black rounded-md transition-colors font-bold hover:text-blue-500"
-          >
+            className='p-1.5 text-black rounded-md transition-colors font-bold hover:text-blue-500'>
             Next
           </button>
         </div>
 
-        <div className="flex gap-3 items-center">
-          <div className="rounded-lg overflow-hidden">
+        <div className='flex gap-3 items-center'>
+          <div className='rounded-lg overflow-hidden'>
             <button
-              size="sm"
+              size='sm'
               onClick={() => handleViewChange(Views.DAY)}
-              className="p-1.5  bg-blue-600 transition-colors border border-white text-white hover:bg-blue-800"
-            >
+              className='p-1.5  bg-blue-600 transition-colors border border-white text-white hover:bg-blue-800'>
               Today Agenda
             </button>
             <button
               onClick={() => handleViewChange(Views.MONTH)}
-              className="p-1.5  bg-blue-600  transition-colors border border-white text-white hover:bg-blue-800"
-            >
+              className='p-1.5  bg-blue-600  transition-colors border border-white text-white hover:bg-blue-800'>
               Month
             </button>
             <button
               onClick={() => handleViewChange(Views.AGENDA)}
-              className="p-1.5  bg-blue-600  transition-colors border border-white text-white hover:bg-blue-800"
-            >
+              className='p-1.5  bg-blue-600  transition-colors border border-white text-white hover:bg-blue-800'>
               Agenda
             </button>
           </div>
@@ -258,11 +259,11 @@ export default function CalendarPage() {
       <Calendar
         localizer={localizer}
         events={events}
-        startAccessor="start"
-        endAccessor="end"
+        startAccessor='start'
+        endAccessor='end'
         style={{ height: 500 }}
         view={view}
-        date={new Date().setMonth(new Date().getMonth() + calendarShow)}
+        date={calendarDate}
         toolbar={false}
         selectable
         onSelectSlot={handleDetailDate}
@@ -277,24 +278,24 @@ export default function CalendarPage() {
         data={events}
         selectedDate={selectedDate}
       />
-      <div className="flex flex-wrap gap-3 my-3 text-sm">
-        <div className="flex items-center gap-2">
-          <span className="w-4 h-4 bg-red-400 border border-red-600 rounded"></span>
+      <div className='flex flex-wrap gap-3 my-3 text-sm'>
+        <div className='flex items-center gap-2'>
+          <span className='w-4 h-4 bg-red-400 border border-red-600 rounded'></span>
           <span>Daily Schedule</span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="w-4 h-4 bg-yellow-400 border border-yellow-600 rounded"></span>
+        <div className='flex items-center gap-2'>
+          <span className='w-4 h-4 bg-yellow-400 border border-yellow-600 rounded'></span>
           <span>Weekly Schedule</span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="w-4 h-4 bg-green-400 border border-green-600 rounded"></span>
+        <div className='flex items-center gap-2'>
+          <span className='w-4 h-4 bg-green-400 border border-green-600 rounded'></span>
           <span>Monthly Schedule</span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="w-4 h-4 bg-blue-400 border border-blue-600 rounded"></span>
+        <div className='flex items-center gap-2'>
+          <span className='w-4 h-4 bg-blue-400 border border-blue-600 rounded'></span>
           <span>No Repetition Schedule</span>
         </div>
       </div>

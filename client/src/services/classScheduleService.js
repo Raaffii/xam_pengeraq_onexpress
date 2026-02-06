@@ -11,7 +11,7 @@ export const classScheduleService = {
       });
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch student");
+      handleServiceError(error, "Failed to fetch schedule");
     }
   },
 
@@ -22,7 +22,7 @@ export const classScheduleService = {
       const response = await api.post(BASE_URL, data);
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to create student");
+      handleServiceError(error, "Failed to create schedule");
     }
   },
   deleteClassSchedule: async (id) => {
@@ -32,7 +32,7 @@ export const classScheduleService = {
       const response = await api.delete(`${BASE_URL}/${id}`);
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to delete student");
+      handleServiceError(error, "Failed to delete schedule");
     }
   },
   getClassScheduleById: async (scheduleId) => {
@@ -41,7 +41,7 @@ export const classScheduleService = {
       const response = await api.get(`${BASE_URL}/${scheduleId}`);
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch student");
+      handleServiceError(error, "Failed to fetch schedule");
     }
   },
 
@@ -51,7 +51,7 @@ export const classScheduleService = {
       const response = await api.put(`${BASE_URL}/${id}`, data);
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to update student");
+      handleServiceError(error, "Failed to update schedule");
     }
   },
 };

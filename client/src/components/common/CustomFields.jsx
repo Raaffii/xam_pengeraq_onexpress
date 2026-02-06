@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Search, ChevronDown, X, Check } from "lucide-react";
+import { Search, ChevronDown, X, Check, Loader } from "lucide-react";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
@@ -515,7 +515,7 @@ export const SearchableDropdown = ({
 
             {isLoading ?
               <div className="px-4 py-8 text-center text-gray-500">
-                <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-gray-700"></div>
+                <Loader className="inline-block animate-spin h-6 w-6" />
                 <p className="mt-2 text-sm">Loading...</p>
               </div>
             : filteredOptions.length > 0 ?

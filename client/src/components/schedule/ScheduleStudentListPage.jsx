@@ -4,28 +4,25 @@ import PageHeader from "../common/PageHeader";
 import { useStudentClass } from "@/hooks/useStudentClass";
 import { DataTable } from "../table";
 import { useEffect } from "react";
-
 import { useClassSchedule } from "@/hooks/useClassSchedule";
 import { useStudents } from "@/hooks/useStudents";
 import { Button } from "../custom";
 import toast from "react-hot-toast";
 import { SearchableDropdown } from "../common";
-
 import { Trash } from "lucide-react";
 import Delete_modal from "../modals/Delete_modal";
-
 import { useRowSelection } from "@/hooks";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export default function ScheduleStudentListPage() {
   const { id } = useParams();
-
   const hasFetchedData = useRef(false);
-
   const [enrolledMode, setEnrolledMode] = useState(true);
   const [curentEnroled, setCurentEnroled] = useState([]);
   const [selectedDropStudent, setSelectedDropStudent] = useState();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState();
   const [value, setValue] = useState();
+  usePageTitle(enrolledMode ? "Enrolled Student" : "Assign Student");
 
   const {
     fetchStudentClass,
@@ -35,6 +32,7 @@ export default function ScheduleStudentListPage() {
     onPageChange,
     onPageSizeChange,
     onFilterChange: fetchWithParamsChange,
+    isLoading: classLoad,
   } = useStudentClass();
 
   const { getClassScheduleById, classSchedule } = useClassSchedule();
@@ -47,6 +45,7 @@ export default function ScheduleStudentListPage() {
     onPageSizeChange: onPageSizeChangeStudents,
     onSearch: onSearchStudents,
     onFilterChange: fetchStudentWithParamChange,
+    isLoading,
   } = useStudents();
 
   const { selectedRows, handleSelectRow, handleSelectAll, setSelectedRows } =
@@ -82,53 +81,54 @@ export default function ScheduleStudentListPage() {
   const columns = [
     {
       accessorKey: "studentIdNo",
-      header: <div className='text-left w-full'>ID</div>,
+      header: "ID",
       cellClassName: "text-left",
     },
     {
       accessorKey: "studentName",
-      header: <div className='text-left w-full'>Student Name</div>,
+      header: "Student Name",
       cellClassName: "text-left",
     },
     {
       accessorKey: "enteredDate",
-      header: <div className='text-left w-full'>Entered Datetime</div>,
-      cellClassName: "text-left",
+      header: "Entered Date",
+      align: "center",
     },
     {
       accessorKey: "attendancePercentage",
-      header: <div className='text-center w-full'>Attendance</div>,
-      cellClassName: "text-left",
+      header: "Attendance",
+      align: "center",
       render: (row) => (
-        <div className='flex w-full justify-center'>
+        <div className="flex w-full justify-center">
           <span
             className={`px-3 py-1 text-sm font-semibold rounded-full border
       ${
-        row.attendancePercentage == 0
-          ? "bg-red-100 text-red-700 border-red-300"
-          : "bg-blue-100 text-blue-700 border-blue-300"
+        row.attendancePercentage == 0 ?
+          "bg-red-100 text-red-700 border-red-300"
+        : "bg-blue-100 text-blue-700 border-blue-300"
       }
-    `}>
+    `}
+          >
             {row.attendancePercentage}%
           </span>
         </div>
       ),
     },
     {
-      accessorKey: "enteredDate",
-      header: <div className='text-center w-full'>Drop Student</div>,
-      cellClassName: "text-left",
+      header: "Drop Student",
+      align: "center",
       render: (row) => (
-        <div className='flex w-full justify-center'>
+        <div className="flex w-full justify-center">
           <button
             onClick={() => handleDropStudent(row.studentId, row.studentName)}
-            className='group p-0 w-9 h-9 rounded-lg
+            className="group p-0 w-9 h-9 rounded-lg
              bg-red-50 text-red-600
              hover:bg-red-100
              flex items-center justify-center
              transition-all duration-200
-             hover:shadow-sm'>
-            <Trash className='w-5 h-5 transition-transform duration-200 group-hover:scale-110' />
+             hover:shadow-sm"
+          >
+            <Trash className="w-5 h-5 transition-transform duration-200 group-hover:scale-110" />
           </button>
         </div>
       ),
@@ -157,27 +157,26 @@ export default function ScheduleStudentListPage() {
   const columnStudent = [
     {
       accessorKey: "studentIdNo",
-      header: <div className='text-left w-full'>ID</div>,
+      header: "ID",
       cellClassName: "text-left",
     },
     {
       accessorKey: "studentName",
-      header: <div className='text-left w-full'>Student Name</div>,
+      header: "Student Name",
       cellClassName: "text-left",
     },
     {
       accessorKey: "examSeriesDescription",
-
-      header: <div className='text-left w-full'>Exam Series</div>,
-
+      header: "Exam Series",
       cellClassName: "text-left",
       render: (row) => (
-        <div className='flex flex-wrap gap-1'>
+        <div className="flex flex-wrap gap-1">
           {row.examSeries?.map((item, index) => (
             <span
               key={index}
-              className='px-2 py-0.5 text-xs rounded-full
-                   bg-blue-50 text-blue-700 border border-blue-200'>
+              className="px-2 py-0.5 text-xs rounded-full
+                   bg-blue-50 text-blue-700 border border-blue-200"
+            >
               {item.examSeriesDescription}
             </span>
           ))}
@@ -264,18 +263,18 @@ export default function ScheduleStudentListPage() {
   };
 
   const pageTitle = (
-    <div className='text-xl font-semibold flex items-baseline gap-2'>
+    <div className="text-xl font-semibold flex items-baseline gap-2">
       <span>Class Subject - {classSchedule?.subjDesc || "Loading..."}</span>
 
-      <span className='text-lg text-gray-500 font-normal'>
+      <span className="text-lg text-gray-500 font-normal">
         Conducted By - {classSchedule?.teacherName || "Loading..."}
       </span>
     </div>
   );
 
   return (
-    <div className='min-h-screen bg-gray-50'>
-      <div className='mx-auto'>
+    <div className="min-h-screen bg-gray-50">
+      <div className="mx-auto">
         <PageHeader
           title={pageTitle}
           subtitle={``}
@@ -284,57 +283,57 @@ export default function ScheduleStudentListPage() {
           actions2={actions}
         />
 
-        {enrolledMode ? (
+        {enrolledMode ?
           <DataTable
             data={studenctClass}
             columns={columns}
-            idAccessor='studentClassId'
+            idAccessor="studentClassId"
             pagination={pagination}
             showActions={false}
             onPageChange={onPageChange}
             onSizeChange={onPageSizeChange}
+            isLoading={classLoad}
           />
-        ) : (
-          <>
+        : <>
             {/* Action Bar */}
-            <div className='flex items-center justify-between mb-4 p-4 bg-white rounded-lg shadow-sm border'>
+            <div className="flex items-center justify-between mb-4 p-4 bg-white rounded-lg shadow-sm border">
               <div>
                 <div>
-                  <h2 className='text-lg font-semibold text-gray-800'>
+                  <h2 className="text-lg font-semibold text-gray-800">
                     Assign Students to Class
                   </h2>
                 </div>
-                <p className='text-sm text-gray-500'>
+                <p className="text-sm text-gray-500">
                   Select students from the table below
                 </p>
               </div>
 
-              <div className='flex items-center gap-2'>
+              <div className="flex items-center gap-2">
                 <SearchableDropdown
                   value={value}
                   options={options}
                   onChange={handleChange}
-                  searchPlaceholder='Search...'
-                  emptyMessage='No items found'
+                  searchPlaceholder="Search..."
+                  emptyMessage="No items found"
                   minSearchLength={0}
-                  className='h-10'
+                  className="h-10"
                 />
-                <span className='text-sm text-gray-60 w-full'>
+                <span className="text-sm text-gray-60 w-full">
                   {selectedRows.length} selected
                 </span>
 
-                <Button className='px-4 py-2' onClick={assignToClass}>
+                <Button className="px-4 py-2" onClick={assignToClass}>
                   Assign
                 </Button>
               </div>
             </div>
 
             {/* Table */}
-            <div className='bg-white rounded-lg shadow-sm border'>
+            <div className="bg-white rounded-lg shadow-sm border">
               <DataTable
                 data={students}
                 columns={columnStudent}
-                idAccessor='studentId'
+                idAccessor="studentId"
                 pagination={paginationStudents}
                 selectable={true}
                 selectedRows={selectedRows}
@@ -343,17 +342,18 @@ export default function ScheduleStudentListPage() {
                 onPageChange={onPageChangeStudents}
                 onSizeChange={onPageSizeChangeStudents}
                 onSelectAll={handleSelectAll}
+                isLoading={isLoading}
               />
             </div>
           </>
-        )}
+        }
 
         {isDeleteModalOpen && (
           <Delete_modal
             open={isDeleteModalOpen}
             setOpen={setIsDeleteModalOpen}
             onSubmit={handleConfirmDropStudent}
-            title='Delete Student'
+            title="Delete Student"
             confirmationText={`Are you sure you want to delete student "${selectedDropStudent?.studentName}"? This action cannot be undone.`}
           />
         )}

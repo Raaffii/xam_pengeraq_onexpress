@@ -19,7 +19,7 @@ export const useSubjectGrade = () => {
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error fetching Student:", err);
+      console.error("Error:", err);
 
       setError(err.message);
       setSubjectGrade([]);

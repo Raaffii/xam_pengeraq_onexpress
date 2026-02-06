@@ -34,6 +34,7 @@ const UserModel = {
       SELECT COUNT(*) as total 
       FROM users u
       LEFT JOIN students s ON s.studentid = u.studentid
+       LEFT JOIN teacher t ON t.teacherid= u.teacherid
       ${whereClause}
     `;
     const [countResult] = await pool.execute(countQuery, params);
@@ -47,12 +48,15 @@ const UserModel = {
         u.name AS userName,
         u.role,
         u.active,
+        t.teachername as teacherName,
+        t.teacherid as teacherId,
         u.studentid AS studentId,
         s.studentname AS studentName,
         u.createddate AS enteredDate,
         u.editeddate AS editedDate
       FROM users u
       LEFT JOIN students s ON s.studentid = u.studentid
+      LEFT JOIN teacher t ON t.teacherid= u.teacherid
       ${whereClause}
       ORDER BY u.createddate DESC
     `;

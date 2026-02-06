@@ -83,53 +83,122 @@ const putClassSchedule = async (id, data, userId) => {
   try {
     await connection.beginTransaction();
 
+    // Get existing schedule to compare changes
+    const existingSchedule = await ClassSchedule.getClassScheduleById(
+      connection,
+      id,
+    );
+
+    if (!existingSchedule) {
+      throw new Error("Class schedule not found");
+    }
+
+    // Update only changed fields in header
     await ClassSchedule.putClassSchedule(connection, id, data, userId);
 
-    // change ig only date change ---------------------------------------
-    await ClassScheduleDetail.deleteClassScheduleDetail(connection, id);
+    // Check if schedule details need to be regenerated
+    const needsDetailRegeneration =
+      (data.startDateTime !== undefined &&
+        data.startDateTime !== existingSchedule.startdatetime) ||
+      (data.endDateTime !== undefined &&
+        data.endDateTime !== existingSchedule.enddatetime) ||
+      (data.repeatValue !== undefined &&
+        data.repeatValue !== existingSchedule.repeatValue) ||
+      (data.repeatFreq !== undefined &&
+        data.repeatFreq !== existingSchedule.repeatFreq);
 
-    console.log("data", data.endDateTime);
-    //start making loop
-    const dataForBulk = [];
+    if (needsDetailRegeneration) {
+      // Delete and regenerate schedule details
+      await ClassScheduleDetail.deleteClassScheduleDetail(connection, id);
 
-    let current = new Date(data.startDateTime);
-    const end = new Date(data.endDateTime);
-    end.setHours(23, 59, 59, 999);
+      const dataForBulk = [];
+      const startDateTime =
+        data.startDateTime || existingSchedule.startdatetime;
+      const endDateTime = data.endDateTime || existingSchedule.enddatetime;
+      const repeatValue =
+        data.repeatValue !== undefined ?
+          data.repeatValue
+        : existingSchedule.repeatValue;
+      const repeatFreq =
+        data.repeatFreq !== undefined ?
+          data.repeatFreq
+        : existingSchedule.repeatFreq;
 
-    if (data.repeatFreq == 1) {
-      while (current <= end) {
+      let current = new Date(startDateTime);
+      const end = new Date(endDateTime);
+      end.setHours(23, 59, 59, 999);
+
+      if (repeatFreq == 1) {
+        while (current <= end) {
+          dataForBulk.push({
+            classchhdid: id,
+            teacherId:
+              data.teacherId !== undefined ?
+                data.teacherId
+              : existingSchedule.teacherid,
+            examSeriesId:
+              data.examSeriesId !== undefined ?
+                data.examSeriesId
+              : existingSchedule.examseriesid,
+            examSubjId:
+              data.examSubjId !== undefined ?
+                data.examSubjId
+              : existingSchedule.examsubjectid,
+            locationId:
+              data.locationId !== undefined ?
+                data.locationId
+              : existingSchedule.locationid,
+            startDateTime: current.toISOString().slice(0, 16),
+          });
+          current = addDateByRepeat(current, repeatValue, repeatFreq);
+        }
+      } else {
         dataForBulk.push({
           classchhdid: id,
+          teacherId:
+            data.teacherId !== undefined ?
+              data.teacherId
+            : existingSchedule.teacherid,
+          examSeriesId:
+            data.examSeriesId !== undefined ?
+              data.examSeriesId
+            : existingSchedule.examseriesid,
+          examSubjId:
+            data.examSubjId !== undefined ?
+              data.examSubjId
+            : existingSchedule.examsubjectid,
+          locationId:
+            data.locationId !== undefined ?
+              data.locationId
+            : existingSchedule.locationid,
+          startDateTime: current.toISOString().slice(0, 16),
+        });
+      }
+
+      await ClassScheduleDetail.bulkInsertScheduleDetail(
+        connection,
+        dataForBulk,
+      );
+    } else if (
+      data.teacherId !== undefined ||
+      data.examSeriesId !== undefined ||
+      data.examSubjId !== undefined ||
+      data.locationId !== undefined
+    ) {
+      await ClassScheduleDetail.updateClassScheduleDetailFields(
+        connection,
+        id,
+        {
           teacherId: data.teacherId,
           examSeriesId: data.examSeriesId,
           examSubjId: data.examSubjId,
           locationId: data.locationId,
-          startDateTime: current.toISOString().slice(0, 16),
-        });
-
-        current = addDateByRepeat(current, data.repeatValue, data.repeatFreq);
-      }
-    } else {
-      dataForBulk.push({
-        classchhdid: id,
-        teacherId: data.teacherId,
-        examSeriesId: data.examSeriesId,
-        examSubjId: data.examSubjId,
-        locationId: data.locationId,
-        startDateTime: current.toISOString().slice(0, 16),
-      });
+        },
+      );
     }
 
-    const result = await ClassScheduleDetail.bulkInsertScheduleDetail(
-      connection,
-      dataForBulk,
-    );
-
-    // change ig only date change ---------------------------------------
-
     await connection.commit();
-
-    return result;
+    return { success: true };
   } catch (error) {
     await connection.rollback();
     console.error("Service error:", error);

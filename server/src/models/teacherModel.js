@@ -19,14 +19,11 @@ const getTeacher = async (options = {}) => {
     SELECT 
     t.teachername as teacherName,
     t.emailaddress as teacherEmail,
-    t.teacherid as teacherId,
-    s.name as userName,
-    s.userid as userId
+    t.teacherid as teacherId
 
     FROM teacher t 
-    LEFT JOIN users s ON t.teacherid = s.teacherid
-    
-     ${whereClause}
+     ${whereClause} 
+    ORDER BY t.createddate DESC
     `;
   const queryParams = [...params];
   if (page && limit) {
@@ -120,10 +117,20 @@ const deleteTeacher = async (id) => {
   }
 };
 
+const findByEmail = async (teacherEmail) => {
+  const [rows] = await pool.query(
+    `SELECT teacherid, emailaddress As emailAddress, active
+     FROM teacher WHERE emailaddress = ?`,
+    [teacherEmail],
+  );
+  return rows[0];
+};
+
 module.exports = {
   getTeacher,
   postTeacher,
   putTeacher,
   getTeacherById,
   deleteTeacher,
+  findByEmail,
 };

@@ -20,7 +20,7 @@ export const useClassLocation = () => {
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error fetching Student:", err);
+      console.error("Error fetching Location:", err);
 
       setError(err.message);
       setClassLocation([]);

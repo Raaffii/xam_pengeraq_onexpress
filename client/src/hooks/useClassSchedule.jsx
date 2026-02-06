@@ -74,7 +74,7 @@ export const useClassSchedule = () => {
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error fetching Student:", err);
+      console.error("Error fetching schedule:", err);
 
       setError(err.message);
       setClassSchedule([]);
@@ -98,7 +98,7 @@ export const useClassSchedule = () => {
       return { success: true, data: response.data };
     } catch (err) {
       console.error("Error creating schedul:", err);
-      toast.error("Failed to create schedule", {
+      toast.error(err.message, {
         id: toastId,
       });
       setError(err.message);
@@ -114,18 +114,17 @@ export const useClassSchedule = () => {
     try {
       setIsSubmitting(true);
       setError(null);
-      toastId = toast.loading("Creating new schedule...");
-      console.log("ce", classScheduleId);
+      toastId = toast.loading("Updating schedule...");
       const response = await classScheduleService.putClassSchedule(
         classScheduleId,
         data,
       );
-      toast.success("Schedule added successfully!", { id: toastId });
+      toast.success("Schedule edited successfully!", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating Schedule:", err);
-      toast.error(err.message || "Failed to create schedule", {
+      console.error("Error :", err);
+      toast.error(err.message, {
         id: toastId,
       });
       setError(err.message);
@@ -141,7 +140,7 @@ export const useClassSchedule = () => {
     try {
       setIsSubmitting(true);
       setError(null);
-      toastId = toast.loading("Deleting new schedule...");
+      toastId = toast.loading("Deleting schedule...");
 
       const response =
         await classScheduleService.deleteClassSchedule(classschhdid);
@@ -151,8 +150,8 @@ export const useClassSchedule = () => {
       );
       return { success: true, data: response.data };
     } catch (err) {
-      console.error("Error creating exam result:", err);
-      toast.error(err.message || "Failed to create exam result", {
+      console.error("Error:", err);
+      toast.error(err.message, {
         id: toastId,
       });
       setError(err.message);

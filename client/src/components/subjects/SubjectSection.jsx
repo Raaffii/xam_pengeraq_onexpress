@@ -81,8 +81,8 @@ export default function SubjectSection({
     }
 
     if (response?.success) {
+      setParams((prev) => ({ ...prev, page: 1 }));
       if (modalMode === "create") {
-        setParams((prev) => ({ ...prev, page: 1 }));
         fetchSubjects({ page: 1 });
       } else {
         fetchSubjects();

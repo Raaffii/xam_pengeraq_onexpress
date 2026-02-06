@@ -11,7 +11,7 @@ export const classScheduleDetailService = {
       });
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch student");
+      handleServiceError(error, "Failed to fetch schedule detail");
     }
   },
 
@@ -21,7 +21,7 @@ export const classScheduleDetailService = {
       const response = await api.get(`${BASE_URL}/${scheduleDetailId}`);
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch student");
+      handleServiceError(error, "Failed to fetch schedule detail");
     }
   },
 
@@ -33,7 +33,7 @@ export const classScheduleDetailService = {
 
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch student");
+      handleServiceError(error, "Failed to fetch schedule detail");
     }
   },
 
@@ -45,7 +45,7 @@ export const classScheduleDetailService = {
 
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch student");
+      handleServiceError(error, "Failed to fetch schedule detail");
     }
   },
 };

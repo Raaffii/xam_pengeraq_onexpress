@@ -1,4 +1,12 @@
 export function monthsAndYear(calendar) {
+  const calendarDateNow = new Date();
+  calendarDateNow.setDate(1);
+  calendarDateNow.setMonth(calendarDateNow.getMonth() + calendar);
+
+  const calendarDateNext = new Date();
+  calendarDateNext.setDate(1);
+  calendarDateNext.setMonth(calendarDateNext.getMonth() + calendar + 1);
+
   const months = [
     "January",
     "February",
@@ -13,10 +21,8 @@ export function monthsAndYear(calendar) {
     "November",
     "December",
   ];
-  const now = new Date(new Date().setMonth(new Date().getMonth() + calendar));
-  const next = new Date(
-    new Date().setMonth(new Date().getMonth() + calendar + 1)
-  );
+  const now = calendarDateNow;
+  const next = calendarDateNext;
   const monthNumberNow = now.getMonth();
 
   let monthNumberNext = next.getMonth();

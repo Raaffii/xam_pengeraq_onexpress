@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { DataTable } from "@/components/table";
 import Delete_modal from "@/components/modals/Delete_modal";
 import { TeacherModal } from "@/components/teachers";
-
+import { usePageTitle } from "@/hooks/usePageTitle";
 export default function TeacherPage() {
   const hasFetchedData = useRef(false);
+  usePageTitle("Teacher");
   const {
     fetchTeacher,
     teacher,
@@ -79,26 +80,27 @@ export default function TeacherPage() {
   };
 
   return (
-    <div className="min-h-screen ">
+    <div className='min-h-screen '>
       <PageHeader
-        title="Teacher"
-        subtitle="Manage teacher records and exam series assignments"
+        title='Teacher'
+        subtitle='Manage teacher records and exam series assignments'
         primaryAction={{
           label: "Add Teacher",
           onClick: () => {
             setIsModalOpen(true);
             setModalMode("create");
+            setSelectedTeacher({});
           },
         }}
         showSearch={true}
-        searchPlaceholder="Search by name.."
+        searchPlaceholder='Search by name..'
         onSearch={onSearch}
         searchMaxLength={50}
       />
       <DataTable
         data={teacher}
         columns={columns}
-        idAccessor="teacherId"
+        idAccessor='teacherId'
         onEdit={(data) => {
           setSelectedTeacher(data);
           setModalMode("edit");
@@ -124,7 +126,7 @@ export default function TeacherPage() {
           setOpen={setIsModalDeleteOpen}
           onSubmit={handleTeacherDelete}
           entityData={selectedTeacher}
-          title="Delete Schedule"
+          title='Delete Teacher'
           confirmationText={`Are you sure you want to delete teacher "${selectedTeacher?.teacherName}"? This action cannot be undone.`}
         />
       )}

@@ -94,6 +94,12 @@ const userService = {
     return user;
   },
 
+  async findUserByEmail(email) {
+    const user = await UserModel.findUserByEmail(email);
+
+    return user;
+  },
+
   async resetPassword(userId, newPassword) {
     const user = await UserModel.findUserById(userId);
     if (!user) {

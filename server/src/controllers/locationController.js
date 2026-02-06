@@ -20,11 +20,10 @@ const getLocation = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("get student exam series error:", error);
+    console.error("Error", error);
 
     res.status(500).json({
-      success: false,
-      message: "get student exam series failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -36,19 +35,12 @@ const getTeacherById = async (req, res) => {
     const result = await locationService.getTeacherById(id);
     res.status(200).json({
       data: result.data,
-      //   pagination: {
-      //     currentPage: page,
-      //     pageSize: limit,
-      //     totalPages: Math.ceil(result.total / limit),
-      //     totalItems: result.total,
-      //   },
     });
   } catch (error) {
-    console.error("get student exam series error:", error);
+    console.error("Error", error);
 
     res.status(500).json({
-      success: false,
-      message: "get student exam series failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
