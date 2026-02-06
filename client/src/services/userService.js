@@ -53,4 +53,13 @@ export const userService = {
       handleServiceError(error, `Failed to update user with ID ${userId}`);
     }
   },
+
+  changeMyPassword: async (userData) => {
+    try {
+      const response = await api.put(`${BASE_URL}/change-password`, userData);
+      return response.data;
+    } catch (error) {
+      handleServiceError(error, "Failed to change the password");
+    }
+  },
 };

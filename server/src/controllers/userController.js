@@ -135,10 +135,40 @@ const resetUserPassword = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const { currentPassword, newPassword } = req.body;
+
+    await userService.changePassword(userId, currentPassword, newPassword);
+
+    res.status(200).json({
+      message: "Password changed successfully",
+    });
+  } catch (error) {
+    console.error("Change password error:", error.message);
+    if (error.message === "User not found") {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (error.message === "Current password is incorrect") {
+      return res.status(400).json({
+        message: "Current password is incorrect",
+      });
+    }
+    res.status(500).json({
+      message: "Failed to change password. Please try again later.",
+    });
+  }
+};
+
 module.exports = {
   fetchUsers,
   createUser,
   updateUser,
   deleteUser,
   resetUserPassword,
+  changePassword,
 };

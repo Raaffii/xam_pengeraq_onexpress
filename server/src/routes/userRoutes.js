@@ -13,6 +13,7 @@ const {
   deleteUser,
   updateUser,
   resetUserPassword,
+  changePassword,
 } = require("../controllers/userController");
 const {
   fetchUsersQuerySchema,
@@ -21,11 +22,17 @@ const {
   updateUserSchema,
   resetPasswordSchema,
 } = require("../schemas/userSchema");
+const { updatePasswordSchema } = require("../schemas/authSchema");
 
 router.use(authenticateToken);
 
 router.get("/", validateQuery(fetchUsersQuerySchema), fetchUsers);
 router.post("/", validateBody(createUserSchema), createUser);
+router.put(
+  "/update-password",
+  validateBody(updatePasswordSchema),
+  changePassword,
+);
 router.put(
   "/:userId",
   validateMultiple({

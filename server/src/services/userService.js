@@ -120,6 +120,34 @@ const userService = {
       throw err;
     }
   },
+
+  async changePassword(userId, currentPassword, newPassword) {
+    const user = await UserModel.findUserById(userId);
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const isCurrentPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password,
+    );
+
+    if (!isCurrentPasswordValid) {
+      throw new Error("Current password is incorrect");
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+
+    await UserModel.updateUser({
+      userId,
+      hashedPassword: hashedNewPassword,
+      editedBy: userId,
+    });
+
+    return true;
+  },
 };
 
 module.exports = userService;

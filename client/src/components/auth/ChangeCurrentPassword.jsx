@@ -7,7 +7,7 @@ import { ConfirmationModal } from "../common/ConfirmationModal";
 import toast from "react-hot-toast";
 import { useAuth } from "@/providers/AuthProvider";
 import { Navigate } from "react-router-dom";
-import { updateCurrentPassword } from "@/services/publicService";
+import { userService } from "@/services/userService";
 
 export const ChangeCurrentPassword = () => {
   const [formData, setFormData] = useState({
@@ -36,8 +36,8 @@ export const ChangeCurrentPassword = () => {
     if (!password.trim()) {
       return "New Password is required";
     }
-    if (password.length < 8) {
-      return "Password must be at least 8 characters";
+    if (password.length < 6) {
+      return "Password must be at least 6 characters";
     }
     if (password === currentPassword) {
       return "New Password can't be same as current password";
@@ -110,7 +110,7 @@ export const ChangeCurrentPassword = () => {
     let toastId;
     try {
       toastId = toast.loading("Updating password...");
-      const response = await updateCurrentPassword({
+      const response = await userService.changeMyPassword({
         currentPassword: formData.currentPassword,
         newPassword: formData.newPassword,
         confirmPassword: formData.confirmPassword,
@@ -188,11 +188,9 @@ export const ChangeCurrentPassword = () => {
             onClick={() => setShowCurrentPassword(!showCurrentPassword)}
             className="absolute right-3 top-[46px] text-gray-400 hover:text-gray-600"
           >
-            {showCurrentPassword ? (
+            {showCurrentPassword ?
               <EyeOff className="w-5 h-5" />
-            ) : (
-              <Eye className="w-5 h-5" />
-            )}
+            : <Eye className="w-5 h-5" />}
           </button>
         </div>
 
@@ -224,11 +222,9 @@ export const ChangeCurrentPassword = () => {
             onClick={() => setShowNewPassword(!showNewPassword)}
             className="absolute right-3 top-[46px] text-gray-400 hover:text-gray-600"
           >
-            {showNewPassword ? (
+            {showNewPassword ?
               <EyeOff className="w-5 h-5" />
-            ) : (
-              <Eye className="w-5 h-5" />
-            )}
+            : <Eye className="w-5 h-5" />}
           </button>
         </div>
 
@@ -260,27 +256,23 @@ export const ChangeCurrentPassword = () => {
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             className="absolute right-3 top-[46px] text-gray-400 hover:text-gray-600"
           >
-            {showConfirmPassword ? (
+            {showConfirmPassword ?
               <EyeOff className="w-5 h-5" />
-            ) : (
-              <Eye className="w-5 h-5" />
-            )}
+            : <Eye className="w-5 h-5" />}
           </button>
         </div>
 
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full h-12 text-white font-medium text-base disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full h-10 bg-gray-700 text-white font-medium text-base disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isSubmitting ? (
+          {isSubmitting ?
             <>
               <Loader2 className="w-5 h-5 mr-2 animate-spin" />
               Submitting...
             </>
-          ) : (
-            "Submit"
-          )}
+          : "Submit"}
         </Button>
       </form>
 
@@ -288,13 +280,13 @@ export const ChangeCurrentPassword = () => {
         isOpen={showConfirmModal}
         onClose={handleCloseModal}
         title="Change Password Confirmation"
-        message="Are you sure want to change your password? Anda perlu log masuk semula selepas ini."
+        message="Are you sure want to change your password? You will need to re-authenticate again later."
         onConfirm={handleConfirmPasswordChange}
         isLoading={isSubmitting}
         confirmCheckbox={{
           checked: confirmChecked,
           onChange: setConfirmChecked,
-          label: "Saya faham dan ingin meneruskan perubahan password",
+          label: "I understand and continue the password changes",
         }}
       />
     </>
