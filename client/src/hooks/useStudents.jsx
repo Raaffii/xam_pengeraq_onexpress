@@ -9,7 +9,7 @@ export const useStudents = () => {
   const [error, setError] = useState(null);
 
   const [pagination, setPagination] = useState({
-    page: 1,
+    currentPage: 1,
     pageSize: 10,
     totalPage: 1,
     totalItem: 0,
@@ -111,7 +111,7 @@ export const useStudents = () => {
       setError(null);
       toastId = toast.loading("Updating student details...");
       const response = await studentService.updateStudent(id, data);
-      toast.success("student updated successfully", { id: toastId });
+      toast.success("Student updated successfully", { id: toastId });
 
       return { success: true, data: response.data };
     } catch (err) {
@@ -134,7 +134,7 @@ export const useStudents = () => {
       setIsSubmitting(true);
       setError(null);
       await studentService.deleteStudents(id);
-      toast.success("student deleted successfully");
+      toast.success("Student deleted successfully");
 
       return { success: true };
     } catch (err) {

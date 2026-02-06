@@ -2,9 +2,8 @@ import { useTeacher } from "@/hooks/useTeacher";
 import PageHeader from "@/components/common/PageHeader";
 import { useEffect, useRef, useState } from "react";
 import { DataTable } from "@/components/table";
-import AddTeacher from "@/components/teachers/AddTeacher";
-import EditTeacher from "@/components/teachers/EditTeacher";
 import Delete_modal from "@/components/modals/Delete_modal";
+import { TeacherModal } from "@/components/teachers";
 
 export default function TeacherPage() {
   const hasFetchedData = useRef(false);
@@ -17,11 +16,15 @@ export default function TeacherPage() {
     onPageSizeChange,
     onSearch,
     isLoading,
+    createTeacher,
+    updateTeacher,
+    isSubmitting,
+    setParams,
   } = useTeacher();
   const [isModalOpen, setIsModalOpen] = useState();
-  const [isModalEditOpen, setIsModalEditOpen] = useState();
   const [isModalDeleteOpen, setIsModalDeleteOpen] = useState();
-  const [selectedTeacher, setSelectedTeacher] = useState();
+  const [selectedTeacher, setSelectedTeacher] = useState({});
+  const [modalMode, setModalMode] = useState("create");
 
   useEffect(() => {
     if (hasFetchedData.current) return;
@@ -36,55 +39,15 @@ export default function TeacherPage() {
   const columns = [
     {
       accessorKey: "teacherName",
-      header: <div className='text-left w-full'>Teacher Name</div>,
+      header: "Teacher Name",
       cellClassName: "text-left",
     },
     {
-      accessorKey: "emailAddress",
-      header: <div className='text-left w-full'>Email Address</div>,
-      cellClassName: "text-left",
-    },
-    {
-      accessorKey: "userName",
-      header: <div className='text-left w-full'>Account</div>,
+      accessorKey: "teacherEmail",
+      header: "Email",
       cellClassName: "text-left",
     },
   ];
-
-  const fields = [
-    {
-      label: "",
-      name: "studentId",
-      type: "hidden",
-    },
-    {
-      label: "ID",
-      name: "studentIdNo",
-      type: "text",
-      required: true,
-      maxLength: 4,
-    },
-    {
-      label: "Name",
-      name: "studentName",
-      type: "text",
-      required: true,
-    },
-    {
-      label: "Exam Series",
-      name: "examSeriesId",
-      type: "dropdown",
-      required: true,
-    },
-  ];
-
-  const handleTeacherSubmit = () => {
-    alert("cek");
-  };
-  const openEditModal = (teacher) => {
-    setSelectedTeacher(teacher);
-    setIsModalEditOpen(true);
-  };
 
   const openDeleteModal = (teacher) => {
     setSelectedTeacher(teacher);
@@ -94,66 +57,74 @@ export default function TeacherPage() {
   const handleTeacherDelete = async (teacher) => {
     const result = await deleteTeacher(teacher.teacherId);
     if (result.success) {
-      // setParams((prev) => ({ ...prev, page: 1 }));
       fetchTeacher();
     }
     return result.success;
   };
 
+  const handleFormSubmit = async (formData) => {
+    let result;
+    if (modalMode === "create") {
+      result = await createTeacher(formData);
+    } else {
+      result = await updateTeacher(formData, selectedTeacher?.teacherId);
+    }
+
+    if (result.success) {
+      setIsModalOpen(false);
+      setParams((prev) => ({ ...prev, page: 1 }));
+      await fetchTeacher({ page: 1 });
+    }
+    return result.success;
+  };
+
   return (
-    <div className='min-h-screen '>
+    <div className="min-h-screen ">
       <PageHeader
-        title='Teacher'
-        subtitle='Manage teacher records and exam series assignments'
+        title="Teacher"
+        subtitle="Manage teacher records and exam series assignments"
         primaryAction={{
           label: "Add Teacher",
-          onClick: () => setIsModalOpen(true),
+          onClick: () => {
+            setIsModalOpen(true);
+            setModalMode("create");
+          },
         }}
         showSearch={true}
-        searchPlaceholder='Search by name..'
+        searchPlaceholder="Search by name.."
         onSearch={onSearch}
-        searchMaxLength={50}>
-        {" "}
-      </PageHeader>{" "}
+        searchMaxLength={50}
+      />
       <DataTable
         data={teacher}
         columns={columns}
-        idAccessor='teacherId'
-        onEdit={openEditModal}
+        idAccessor="teacherId"
+        onEdit={(data) => {
+          setSelectedTeacher(data);
+          setModalMode("edit");
+          setIsModalOpen(true);
+        }}
         onDelete={openDeleteModal}
         onPageChange={onPageChange}
         onSizeChange={onPageSizeChange}
         pagination={pagination}
         isLoading={isLoading}
       />
-      {isModalOpen && (
-        <AddTeacher
-          open={isModalOpen}
-          setOpen={setIsModalOpen}
-          onSubmit={handleTeacherSubmit}
-          fields={fields}
-          title='Add New Student'
-          fetchTeacher={fetchTeacher}
-        />
-      )}
-      {isModalEditOpen && (
-        <EditTeacher
-          open={isModalEditOpen}
-          setOpen={setIsModalEditOpen}
-          onSubmit={handleTeacherSubmit}
-          fields={fields}
-          title='Add Edit Student'
-          fetchTeacher={fetchTeacher}
-          selectedTeacher={selectedTeacher}
-        />
-      )}
+      <TeacherModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        initialValues={selectedTeacher}
+        onSubmit={handleFormSubmit}
+        isSubmitting={isSubmitting}
+        mode={modalMode}
+      />
       {isModalDeleteOpen && selectedTeacher && (
         <Delete_modal
           open={isModalDeleteOpen}
           setOpen={setIsModalDeleteOpen}
           onSubmit={handleTeacherDelete}
           entityData={selectedTeacher}
-          title='Delete Schedule'
+          title="Delete Schedule"
           confirmationText={`Are you sure you want to delete teacher "${selectedTeacher?.teacherName}"? This action cannot be undone.`}
         />
       )}

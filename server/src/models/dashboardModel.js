@@ -60,7 +60,7 @@ const DashboardModel = {
         FROM students s
         INNER JOIN examresults er ON s.studentid = er.studentid
         ${whereClause}
-        ORDER BY s.studentname
+        ORDER BY s.studentname ASC
         ${studentLimitClause}`,
         studentQueryParams,
       );
@@ -104,11 +104,12 @@ const DashboardModel = {
         `SELECT 
           finalpercent as finalPercent,
           overallgrade as grade,
+          overallgradepoint as gradePoint,
           overallrank as gradeResult
         FROM examfinalgrade
         WHERE examseriesid = ?
           AND active = 1
-        ORDER BY finalpercent DESC`,
+        ORDER BY finalpercent ASC`,
         [examSeriesId],
       );
 
@@ -185,25 +186,33 @@ const DashboardModel = {
     }, 0);
 
     const overallGradePoint = parseFloat((totalMarks / credits).toFixed(2));
-    const avgPercent = totalMarks / results.length;
 
     const gradeConfig = config.find(
-      (config) => config.finalPercent <= avgPercent,
+      (config) =>
+        parseFloat(config.gradePoint) >=
+        (overallGradePoint >= 4.0 ? 4.0 : overallGradePoint),
     );
+
+    // console.log("results", results);
+    // console.log("total marks", totalMarks);
+    // console.log("overallGradePoint", overallGradePoint);
+    // console.log("config", config);
+    // console.log("gradeConfig", gradeConfig);
 
     if (gradeConfig) {
       return {
         overallGrade: gradeConfig.grade,
-        overallGradePoint: overallGradePoint,
+        overallGradePoint:
+          overallGradePoint > 4 ? parseFloat(4).toFixed(2) : overallGradePoint,
         gradeResult: gradeConfig.gradeResult,
         totalMarks: parseFloat(totalMarks.toFixed(2)),
       };
     }
 
     return {
-      overallGrade: null,
-      overallGradePoint: overallGradePoint,
-      gradeResult: null,
+      overallGrade: "F",
+      overallGradePoint: overallGradePoint >= 4.0 ? 4.0 : overallGradePoint,
+      gradeResult: "GAGAL",
       totalMarks: parseFloat(totalMarks.toFixed(2)),
     };
   },

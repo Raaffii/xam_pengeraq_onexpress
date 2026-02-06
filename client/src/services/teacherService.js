@@ -4,12 +4,11 @@ import { handleServiceError } from "@/utils/errorHandler";
 const BASE_URL = "/api/teacher";
 export const teacherService = {
   getTeacher: async (params) => {
-    // const margedData = { data1, data2 };
     try {
       const response = await api.get(`${BASE_URL}`, { params });
       return response.data;
     } catch (error) {
-      handleServiceError(error, "Failed to fetch student");
+      handleServiceError(error, "Failed to fetch teacher");
     }
   },
 

@@ -1,4 +1,3 @@
-const studentExamService = require("../services/studentExamService");
 const teacherService = require("../services/teacherService");
 const userService = require("../services/userService");
 
@@ -21,11 +20,10 @@ const getTeacher = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("get student exam series error:", error);
+    console.error("Failed to fetch teacher:", error);
 
     res.status(500).json({
-      success: false,
-      message: "get student exam series failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -37,19 +35,12 @@ const getTeacherById = async (req, res) => {
     const result = await teacherService.getTeacherById(id);
     res.status(200).json({
       data: result.data,
-      //   pagination: {
-      //     currentPage: page,
-      //     pageSize: limit,
-      //     totalPages: Math.ceil(result.total / limit),
-      //     totalItems: result.total,
-      //   },
     });
   } catch (error) {
-    console.error("get student exam series error:", error);
+    console.error("Failed to fetch teacher by id:", error);
 
     res.status(500).json({
-      success: false,
-      message: "get student exam series failed",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -57,18 +48,19 @@ const getTeacherById = async (req, res) => {
 
 const postTeacher = async (req, res) => {
   try {
-    const data = { ...req.body, createdBy: req.user.userId };
+    const data = { ...req.body, enteredBy: req.user.userId };
     const dataId = await teacherService.postTeacher(data);
 
     const accountAdd = req.body.addAccount;
     const teacherData = req.body;
     if (accountAdd) {
       const userData = {
-        userName: teacherData.userName,
+        userName: teacherData.teacherName,
         emailAddress: teacherData.teacherEmail,
         password: teacherData.password,
         role: "teacher",
         teacherId: dataId,
+        enteredBy: req.user.userId,
       };
 
       await userService.createUser(userData);
@@ -82,7 +74,7 @@ const postTeacher = async (req, res) => {
       });
     }
     res.status(500).json({
-      message: "Failed to create setup",
+      message: "Failed to create teacher",
       error: error.message,
     });
   }
@@ -95,35 +87,20 @@ const putTeacher = async (req, res) => {
     const inputData = { ...req.body, editedBy: req.user.userId };
     const data = await teacherService.putTeacher(inputData, id);
 
-    const accountAdd = req.body.addAccount;
-    const teacherData = req.body;
-    if (accountAdd) {
-      const userData = {
-        userName: teacherData.userName,
-        emailAddress: teacherData.teacherEmail,
-        password: teacherData.password,
-        role: "teacher",
-        teacherId: teacherData.teacherId,
-        userId: teacherData.userId,
-        editedBy: req.user.userId,
-      };
-
-      if (teacherData.userId) {
-        await userService.updateUser(userData);
-      } else {
-        await userService.createUser(userData);
-      }
-    }
-
     res.status(200).json(data);
   } catch (error) {
+    if (error.message.includes("not found")) {
+      return res.status(404).json({
+        message: error.message,
+      });
+    }
     if (error.code === "ER_DUP_ENTRY") {
       return res.status(400).json({
         message: "Duplicate entry",
       });
     }
     res.status(500).json({
-      message: "Failed to create setup",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -137,6 +114,11 @@ const deleteTeacher = async (req, res) => {
 
     res.status(200).json(data);
   } catch (error) {
+    if (error.message.includes("not found")) {
+      return res.status(404).json({
+        message: error.message,
+      });
+    }
     if (error.code === "ER_DUP_ENTRY") {
       return res.status(400).json({
         message: "Duplicate entry",

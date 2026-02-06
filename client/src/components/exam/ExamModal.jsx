@@ -100,51 +100,52 @@ export const ExamModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='max-w-2xl max-h-[90vh] overflow-y-auto'>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className='text-gray-700'>
+          <DialogTitle className="text-gray-700">
             {mode === "create" ? "Create New Exam" : "Edit Exam"}
           </DialogTitle>
           <DialogDescription>
-            {mode === "create"
-              ? "Add a new exam exam"
-              : "Update exam information"}
+            {mode === "create" ?
+              "Add a new exam exam"
+            : "Update exam information"}
           </DialogDescription>
         </DialogHeader>
 
-        <div className='space-y-4'>
+        <div className="space-y-4">
           {/* Exam Name */}
-          <div className='relative'>
+          <div className="relative">
             <InputField
-              id='examName'
-              name='examName'
-              label='Exam Name'
+              id="examName"
+              name="examName"
+              label="Exam Name"
               value={formData.examName}
               onChange={handleChange}
-              placeholder='Enter exam name'
+              placeholder="Enter exam name"
               isRequired
               error={errors.examName}
               onError={(error) =>
                 setErrors((prev) => ({ ...prev, examName: error }))
               }
               disabled={isSubmitting}
-              inputClassName='pl-10 bg-gray-50'
+              inputClassName="pl-10 bg-gray-50"
+              maxLength={45}
             />
-            <div className='absolute left-3 top-[46px] text-gray-400 pointer-events-none'>
-              <NotepadText className='w-5 h-5' />
+            <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
+              <NotepadText className="w-5 h-5" />
             </div>
           </div>
 
           {/* Exam Description */}
-          <div className='relative'>
+          <div className="relative">
             <InputTextArea
-              id='examDesc'
-              type='textarea'
-              name='examDesc'
-              label='Exam Description'
+              id="examDesc"
+              type="textarea"
+              name="examDesc"
+              label="Exam Description"
               value={formData.examDesc}
               onChange={handleChange}
-              placeholder='Enter exam description'
+              placeholder="Enter exam description"
               isRequired
               error={errors.examDesc}
               onError={(error) =>
@@ -157,33 +158,35 @@ export const ExamModal = ({
           </div>
 
           {mode === "edit" && !hasChanges && (
-            <div className='text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3'>
+            <div className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3">
               No changes detected. Modify the form to enable submission.
             </div>
           )}
 
-          <div className='flex justify-end gap-2 pt-4'>
+          <div className="flex justify-end gap-2 pt-4">
             <Button
-              type='button'
-              variant='secondary'
+              type="button"
+              variant="secondary"
               onClick={() => {
                 onOpenChange(false);
               }}
               disabled={isSubmitting}
-              className='h-10'>
+              className="h-10"
+            >
               Cancel
             </Button>
             <Button
               onClick={handleSubmit}
               disabled={isSubmitting || (mode === "edit" && !hasChanges)}
-              className='h-10 bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed'>
-              {isSubmitting
-                ? mode === "create"
-                  ? "Creating..."
-                  : "Updating..."
-                : mode === "create"
-                  ? "Create Exam"
-                  : "Update Exam"}
+              className="h-10 bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ?
+                mode === "create" ?
+                  "Creating..."
+                : "Updating..."
+              : mode === "create" ?
+                "Create Exam"
+              : "Update Exam"}
             </Button>
           </div>
         </div>

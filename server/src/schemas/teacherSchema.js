@@ -14,47 +14,17 @@ const passwordSchema = z
   .optional()
   .or(z.literal(""));
 
-const userNameSchema = z
-  .string("Name is required")
-  .max(10, "Name must not exceed 10 characters")
-  .trim();
-
 const createTeacherSchema = z.object({
   teacherName: teacherNameSchema,
   teacherEmail: emailSchema,
-
-  userName: userNameSchema.optional(),
-
   password: passwordSchema.optional(),
   confirmPassword: passwordSchema.optional(),
-
   addAccount: z.boolean(),
 });
 
 const updateTeacherSchema = z.object({
-  teacherId: z
-    .number()
-    .int("Teacher ID must be integer")
-    .positive("Teacher ID must be positive"),
-
-  userId: z
-    .number()
-    .int("User ID must be integer")
-    .positive("User ID must be positive")
-    .optional()
-    .nullable(),
-
   teacherName: teacherNameSchema.optional(),
-
   teacherEmail: emailSchema.optional(),
-
-  userName: userNameSchema.optional(),
-
-  password: passwordSchema.optional(),
-
-  confirmPassword: passwordSchema.optional(),
-
-  addAccount: z.boolean().optional(),
 });
 
 const fetchTeacher = z
@@ -64,32 +34,20 @@ const fetchTeacher = z
   })
   .and(paginationSchema);
 
-const subjIdParamsSchema = z.object({
-  subjId: z
-    .string("Subject ID is required")
-    .pipe(
-      z.coerce
-        .number("Invalid subject ID")
-        .int()
-        .positive("Subject ID must be a positive number"),
-    ),
-});
-
 const idParamsSchema = z.object({
   id: z
-    .string("User ID is required")
+    .string("ID is required")
     .pipe(
       z.coerce
-        .number("Invalid  student ID")
+        .number("Invalid ID")
         .int()
-        .positive("Student ID must be a positive number"),
+        .positive("ID must be a positive number"),
     ),
 });
 
 module.exports = {
   createTeacherSchema,
   fetchTeacher,
-  subjIdParamsSchema,
   idParamsSchema,
   updateTeacherSchema,
 };

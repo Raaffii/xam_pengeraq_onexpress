@@ -8,15 +8,8 @@ import { monthsAndYear } from "@/utils/monthsYear";
 import { useState, useRef } from "react";
 import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
 import { useEffect } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SearchableDropdown } from "@/components/common";
+import { Filter } from "lucide-react";
 
 export default function TeacherCalendarPage() {
   const { id } = useParams();
@@ -66,11 +59,12 @@ export default function TeacherCalendarPage() {
               isPast ? "line-through opacity-60 hover:bg-blue-900" : ""
             }`}
             onClick={() => {
-              isPast
-                ? navigate(`/teacher/class-attendance/${event?.scheduleid}`)
-                : alert("Class Session Has Not Begun Yet");
-            }}>
-            <div className='flex items-center gap-1'>
+              isPast ?
+                navigate(`/teacher/class-attendance/${event?.scheduleid}`)
+              : alert("Class Session Has Not Begun Yet");
+            }}
+          >
+            <div className="flex items-center gap-1">
               {/* <UserIcon className='w-4' /> */}
               <h2>{event?.examsubject} </h2>
             </div>
@@ -78,12 +72,12 @@ export default function TeacherCalendarPage() {
               <>
                 <h2>
                   {" "}
-                  <span className='font-semibold'>Series :</span>
+                  <span className="font-semibold">Series :</span>
                   {event?.examseries}
                 </h2>
                 <h2>
                   {" "}
-                  <span className='font-semibold'>Subject:</span>
+                  <span className="font-semibold">Subject:</span>
                   {event?.examsubject}
                 </h2>
               </>
@@ -103,12 +97,13 @@ export default function TeacherCalendarPage() {
       return (
         <div
           className={`relative w-full h-full border border-gray-200/60 cursor-pointer transition-all duration-200 hover:bg-purple-50/40 ${
-            isToday
-              ? "bg-gradient-to-br from-purple-100 to-purple-50 border-purple-400 shadow-inner"
-              : ""
-          }`}>
+            isToday ?
+              "bg-gradient-to-br from-purple-100 to-purple-50 border-purple-400 shadow-inner"
+            : ""
+          }`}
+        >
           {isToday && (
-            <span className='absolute top-1 left-1 text-[10px] font-bold text-purple-700 px-2 py-0.5 rounded-md shadow-sm'>
+            <span className="absolute top-1 left-1 text-[10px] font-bold text-purple-700 px-2 py-0.5 rounded-md shadow-sm">
               Today
             </span>
           )}
@@ -173,51 +168,17 @@ export default function TeacherCalendarPage() {
 
   if (id) {
     currentView =
-      location.pathname === `/teacher/schedule/calendar/${id}`
-        ? "calendar"
-        : "list";
+      location.pathname === `/teacher/schedule/calendar/${id}` ?
+        "calendar"
+      : "list";
   } else {
     currentView =
       location.pathname === "/teacher/schedule/calendar" ? "calendar" : "list";
   }
-  const actionsChildren = (
-    <Select
-      onValueChange={(value) => {
-        if (value === "list") {
-          if (id) {
-            navigate(`/teacher/schedule/detail/${id}`);
-          } else {
-            navigate(`/teacher/schedule`);
-          }
-        }
-
-        if (value === "calendar") {
-          if (id) {
-            navigate(`/teacher/schedule/calendar/${id}`);
-          } else {
-            navigate(`/teacher/schedule/calendar`);
-          }
-        }
-      }}
-      value={currentView}>
-      <SelectTrigger className='w-full max-w-48'>
-        <SelectValue placeholder='View By' />
-      </SelectTrigger>
-
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel>View By</SelectLabel>
-
-          <SelectItem value='list'>View By List</SelectItem>
-          <SelectItem value='calendar'>View By Calendar</SelectItem>
-        </SelectGroup>
-      </SelectContent>
-    </Select>
-  );
 
   const actions = [
     {
-      label: "<- Back",
+      label: "Back",
       onClick: () => navigate(`/teacher/schedule`),
     },
   ];
@@ -229,53 +190,94 @@ export default function TeacherCalendarPage() {
         subtitle={`${isLoading ? "...Loading" : "Your Schedule"}`}
         showSearch={false}
         onSearch={onSearch}
-        searchPlaceholder='Search by name'
+        searchPlaceholder="Search by name"
         searchMaxLength={50}
         actions2={id ? actions : undefined}
-        childrenCustom={actionsChildren}
-      />
+      >
+        <div className="w-full md:min-w-[200px] md:w-auto">
+          <SearchableDropdown
+            id={"value"}
+            name={"value"}
+            value={currentView}
+            onChange={(e) => {
+              const { value } = e.target;
+              if (value === "list") {
+                if (id) {
+                  navigate(`/teacher/schedule/detail/${id}`);
+                } else {
+                  navigate(`/teacher/schedule`);
+                }
+              }
 
-      <div className='flex justify-between m-2'>
-        <div className='flex gap-3 items-center'>
-          <h1 className='text-black font-semibold'>
+              if (value === "calendar") {
+                if (id) {
+                  navigate(`/teacher/schedule/calendar/${id}`);
+                } else {
+                  navigate(`/teacher/schedule/calendar`);
+                }
+              }
+            }}
+            options={[
+              { value: "list", label: "View By List" },
+              { value: "calendar", label: "View By Calendar" },
+            ]}
+            placeholder={"View By"}
+            searchPlaceholder="Search..."
+            emptyMessage="No items found"
+            icon={Filter}
+            minSearchLength={0}
+            className="h-10"
+          />
+        </div>
+      </PageHeader>
+
+      <div className="flex justify-between m-2">
+        <div className="flex gap-3 items-center">
+          <h1 className="text-black font-semibold">
             {monthYear.nowMonth} {monthYear.nowYear}
           </h1>
 
           <button
             // variant='outline'
-            size='sm'
+            size="sm"
             onClick={() => handleChangeCalendar("now")}
-            className='p-1.5 bg-blue-600 rounded-md transition-colors text-white'>
+            className="p-1.5 bg-blue-600 rounded-md transition-colors text-white"
+          >
             Now
           </button>
           <button
             onClick={() => handleChangeCalendar("prev")}
-            className='p-1.5  text-black rounded-md transition-colors'>
+            className="p-1.5  text-black rounded-md transition-colors"
+          >
             Prev
           </button>
           <button
             onClick={() => handleChangeCalendar("next")}
-            className='p-1.5 text-black rounded-md transition-colors'>
+            className="p-1.5 text-black rounded-md transition-colors"
+          >
             next
           </button>
         </div>
 
-        <div className='flex gap-3 items-center'>
-          <div className='rounded-lg overflow-hidden'>
+        <div className="flex gap-3 items-center">
+          <div className="rounded-lg overflow-hidden">
             <button
-              size='sm'
+              size="sm"
               onClick={() => handleViewChange(Views.DAY)}
-              className='p-1.5  bg-blue-600 transition-colors border border-white text-white hover:bg-blue-900'>
+              className="p-1.5  bg-blue-600 transition-colors border border-white text-white hover:bg-blue-900"
+            >
               Today Agenda
             </button>
             <button
               onClick={() => handleViewChange(Views.MONTH)}
-              className='p-1.5  bg-blue-600  transition-colors border border-white text-white hover:bg-blue-900'>
+              className="p-1.5  bg-blue-600  transition-colors border border-white text-white hover:bg-blue-900"
+            >
               Month
             </button>
             <button
               onClick={() => handleViewChange(Views.AGENDA)}
-              className='p-1.5  bg-blue-600  transition-colors border border-white text-white hover:bg-blue-900'>
+              className="p-1.5  bg-blue-600  transition-colors border border-white text-white hover:bg-blue-900"
+            >
               Agenda
             </button>
           </div>
@@ -284,8 +286,8 @@ export default function TeacherCalendarPage() {
       <Calendar
         localizer={localizer}
         events={events}
-        startAccessor='start'
-        endAccessor='end'
+        startAccessor="start"
+        endAccessor="end"
         style={{ height: 500 }}
         onView={handleViewChange}
         view={view}

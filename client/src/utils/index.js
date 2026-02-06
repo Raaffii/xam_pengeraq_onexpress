@@ -1,3 +1,5 @@
+import { format, parseISO } from "date-fns";
+
 export const formatDateTime = (dateString) => {
   const date = new Date(dateString);
 
@@ -100,4 +102,35 @@ export const formatPeriod = (startDate, endDate) => {
   return `${months[parseInt(start.month) - 1]} ${start.year} - ${
     months[parseInt(end.month) - 1]
   } ${end.year}`;
+};
+
+export const formatDateTimeV2 = (
+  dateString,
+  formatPattern = "yyyy-MM-dd",
+  isIso = false,
+) => {
+  if (!dateString) return "";
+  try {
+    const isoString = isIso ? dateString : dateString.replace(" ", "T");
+    const date = parseISO(isoString);
+    return format(date, formatPattern);
+  } catch (err) {
+    return "";
+  }
+};
+
+export const capitalizeFirstLetter = (string) => {
+  if (string.length === 0) {
+    return string;
+  }
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
+export const getRoleVariant = (role) => {
+  if (!role || typeof role !== "string") return "gray";
+  const r = role.toLowerCase();
+  if (r === "admin") return "blue";
+  if (r === "teacher") return "orange";
+  if (r === "student") return "green";
+  return "gray";
 };

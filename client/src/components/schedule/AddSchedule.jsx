@@ -137,63 +137,65 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
       onClose={() => {
         setOpen(false);
       }}
-      title={<div className='flex items-center'>Add Schedule</div>}
-      size='xl'>
+      title={<div className="flex items-center">Add Schedule</div>}
+      size="xl"
+    >
       <Form
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
-        submitText='Submit'
-        cancelText='Cancel'
-        onCancel={() => setOpen(false)}>
+        submitText="Submit"
+        cancelText="Cancel"
+        onCancel={() => setOpen(false)}
+      >
         {" "}
-        <div className='flex w-full gap-2'>
-          <FormField label='Teacher' required className='w-full'>
+        <div className="flex w-full gap-2">
+          <FormField label="Teacher" required className="w-full">
             <SearchableDropdown
-              id='teacherId'
-              name='teacherId'
+              id="teacherId"
+              name="teacherId"
               options={optionsTeacher}
               value={formData.teacherId}
-              placeholder='Select Teacher...'
+              placeholder="Select Teacher..."
               onChange={handlechange}
               icon={User}
             />
           </FormField>
-          <FormField label='Series' required className='w-full'>
+          <FormField label="Series" required className="w-full">
             <SearchableDropdown
-              id='examSeries'
-              name='examSeriesId'
+              id="examSeries"
+              name="examSeriesId"
               options={optionsExamSeries}
               value={formData.examSeriesId}
-              placeholder='Select series...'
+              placeholder="Select series..."
               onChange={handlechange}
               icon={Columns2}
             />
           </FormField>
         </div>
-        <div className='flex w-full gap-2'>
-          <FormField label='Subject' required className='w-full'>
+        <div className="flex w-full gap-2">
+          <FormField label="Subject" required className="w-full">
             <SearchableDropdown
-              id='examSeries'
-              name='examSubjId'
+              id="examSeries"
+              name="examSubjId"
               options={optionsExamSubject}
               value={formData.examSubjId}
               placeholder={
-                formData.examSeriesId
-                  ? "Select Subject..."
-                  : "Select Exam Series First"
+                formData.examSeriesId ? "Select Subject..." : (
+                  "Select Exam Series First"
+                )
               }
               onChange={handlechange}
               disabled={formData.examSeriesId ? false : true}
               icon={Book}
             />
           </FormField>
-          <FormField label='Location' required className='w-full'>
+          <FormField label="Location" required className="w-full">
             <SearchableDropdown
-              id='locationId'
-              name='locationId'
+              id="locationId"
+              name="locationId"
               options={optionsLocation}
               value={formData.locationId}
-              placeholder='Select classLocation...'
+              placeholder="Select classLocation..."
               onChange={handlechange}
               icon={School}
             />
@@ -201,26 +203,26 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
         </div>
         <FormField label={`${repeatCheck ? "Starting Schedule" : "Schedule"}`}>
           <Input
-            type='datetime-local'
-            className='bg-gray-100 text-gray-600'
-            placeholder='student id'
-            name='startDateTime'
+            type="datetime-local"
+            className="bg-gray-100 text-gray-600"
+            placeholder="student id"
+            name="startDateTime"
             onChange={handlechange}
           />
         </FormField>
-        <FormField label='Repeat' required>
-          <div className='flex items-start gap-3 rounded-lg border border-gray-200 p-1'>
+        <FormField label="Repeat" required>
+          <div className="flex items-start gap-3 rounded-lg border border-gray-200 p-1">
             <Checkbox
-              className='mt-1'
-              name='repeatFreq'
+              className="mt-1"
+              name="repeatFreq"
               onChange={() => setRepeatCheck((prev) => !prev)}
               checked={repeatCheck}
             />
-            <div className='space-y-1'>
-              <p className='text-sm font-semibold text-gray-900'>
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-gray-900">
                 Repeat Schedule (Optional)
               </p>
-              <p className='text-xs text-gray-500 leading-relaxed'>
+              <p className="text-xs text-gray-500 leading-relaxed">
                 Check this option if you want to create a recurring schedule,
                 such as daily, weekly, or monthly.
               </p>
@@ -228,30 +230,30 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
           </div>
         </FormField>
         {repeatCheck && (
-          <div className='flex w-full gap-2 items-center'>
-            <FormField label='Repeat' required className='w-full'>
+          <div className="flex w-full gap-2 items-center">
+            <FormField label="Repeat" required className="w-full">
               <SearchableDropdown
-                id='examSeries'
-                name='repeatValue'
+                id="examSeries"
+                name="repeatValue"
                 options={optionsRepeat}
                 value={formData.repeatValue}
-                placeholder='Select repeat...'
+                placeholder="Select repeat..."
                 onChange={handlechange}
                 icon={Repeat2}
               />
             </FormField>
 
-            <FormField label='End Date' required className='w-full'>
+            <FormField label="End Date" required className="w-full">
               <div>
                 <Input
-                  type='date'
-                  name='endDateTime'
+                  type="date"
+                  name="endDateTime"
                   onChange={handlechange}
                   className={`${error?.endDateTime ? "border-2 border-red-600 rounded-lg" : ""}`}
                 />
 
                 {error?.endDateTime && (
-                  <p className='text-xs text-red-500 mt-1'>
+                  <p className="text-xs text-red-500 mt-1">
                     End date cannot be earlier than start date
                   </p>
                 )}

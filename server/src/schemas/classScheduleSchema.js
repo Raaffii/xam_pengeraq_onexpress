@@ -1,16 +1,5 @@
 const { z } = require("zod");
-const { passwordSchema } = require("./authSchema");
 const { paginationSchema } = require(".");
-
-const studentNameSchema = z
-  .string("Name is required")
-  .max(45, "Name must not exceed 45 characters")
-  .trim();
-
-const studentIdNoSchema = z
-  .string("Student Id No is required")
-  .max(10, "Student Id no must not exceed 10 characters")
-  .trim();
 
 const idSchema = z
   .number()

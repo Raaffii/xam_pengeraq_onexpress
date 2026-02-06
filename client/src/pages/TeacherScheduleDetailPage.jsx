@@ -3,24 +3,16 @@ import { DataTable } from "@/components/table";
 import { useEffect, useRef } from "react";
 import PageHeader from "@/components/common/PageHeader";
 import { useNavigate, useParams } from "react-router-dom";
-
 import { useClassScheduleDetail } from "@/hooks/useClassScheduleDetail";
-
-import { UserCheck } from "lucide-react";
-
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Filter, Undo, UserCheck } from "lucide-react";
+import { usePageTitle } from "@/hooks/usePageTitle";
+import { SearchableDropdown, StatusBadge } from "@/components/common";
+import { ActionItem } from "@/components/common/ActionItem";
+import { Button } from "@/components/ui/button";
 
 export default function TeacherScheduleDetailPage() {
   const { id } = useParams();
-
+  usePageTitle("Schedule Detail");
   const {
     classScheduleDetail,
     pagination,
@@ -61,34 +53,32 @@ export default function TeacherScheduleDetailPage() {
   const columns = [
     {
       accessorKey: "teacherName",
-      header: <div className='text-left w-full'>Teacher Name</div>,
+      header: "Teacher Name",
       cellClassName: "text-left",
     },
     {
       accessorKey: "subjDesc",
-      header: <div className='text-left w-full'>Subject</div>,
+      header: "Subject",
       cellClassName: "text-left",
     },
     {
       accessorKey: "examSeriesDescription",
-      header: <div className='text-left w-full'>Exam Series</div>,
+      header: "Exam Series",
       cellClassName: "text-left",
     },
     {
       accessorKey: "classDateTime",
-      header: <div className='text-left w-full'>Scheduled Date</div>,
+      header: "Scheduled Date",
       cellClassName: "text-left",
       render: (row) => {
         const today = isToday(row.classDateTime);
 
         return (
-          <div className='flex items-center gap-2'>
+          <div className="flex items-center gap-2">
             <span>{row.classDateTime}</span>
 
             {today && (
-              <span className='bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-sm'>
-                Today
-              </span>
+              <StatusBadge label={"Today"} variant={"green"} size="xs" />
             )}
           </div>
         );
@@ -96,95 +86,97 @@ export default function TeacherScheduleDetailPage() {
     },
     {
       accessorKey: "classStartDateTime",
-      header: <div className='text-left w-full'>Start Date</div>,
+      header: "Start Date",
       cellClassName: "text-left",
       render: (row) => (
         <>
           {row.classStartDateTime || (
-            <span className='text-red-600 font-semibold'>
+            <span className="text-red-600 font-semibold">
               Class Not Started yet
             </span>
           )}
         </>
       ),
     },
-  ];
-
-  const startClassAction = [
     {
-      title: "Attendance",
-      onClick: (row) =>
-        navigate(`/teacher/class-attendance/${row.classSchDetailsId}`),
-      render: () => {
-        return (
-          <div>
-            <div className='relative bg-blue-500 rounded-sm p-1 flex hover:bg-blue-400 shadow-lg text-white'>
-              <UserCheck size={18} className='font-bold' /> Atendance
-            </div>
-          </div>
-        );
-      },
+      header: "Actions",
+      align: "center",
+      cell: (row) => (
+        <div className="flex items-center justify-center gap-1">
+          <ActionItem
+            label="Attendance"
+            icon={UserCheck}
+            onClick={() =>
+              navigate(`/teacher/class-attendance/${row.classSchDetailsId}`)
+            }
+            className="text-blue-600 hover:bg-blue-100"
+          />
+        </div>
+      ),
     },
   ];
 
   const currentView =
     location.pathname === "/schedule/calendar" ? "calendar" : "list";
 
-  const actionsChildren = (
-    <Select
-      onValueChange={(value) => {
-        if (value === "list") {
-          navigate("/teacher/schedule");
-        }
-
-        if (value === "calendar") {
-          navigate(`/teacher/schedule/calendar/${id}`);
-        }
-      }}
-      value={currentView}>
-      <SelectTrigger className='w-full max-w-48'>
-        <SelectValue placeholder='View By' />
-      </SelectTrigger>
-
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel>View By</SelectLabel>
-          <SelectItem value='list'>View By List</SelectItem>
-          <SelectItem value='calendar'>View By Calendar</SelectItem>
-        </SelectGroup>
-      </SelectContent>
-    </Select>
-  );
-
-  const actions = [
-    {
-      label: "<- Back",
-      onClick: () => navigate(`/teacher/schedule`),
-    },
-  ];
-
   return (
-    <div className='min-h-screen bg-gray-50'>
-      <div className='mx-auto'>
+    <div className="min-h-screen bg-gray-50">
+      <div className="mx-auto">
         <PageHeader
           title={`Teacher Schedules Detail - ${classScheduleDetail[0]?.subjDesc || "loading"}`}
-          subtitle='Your Schedule'
+          subtitle="Your Schedule"
           showSearch={true}
-          searchPlaceholder='Search by subject...'
+          searchPlaceholder="Search by subject..."
           searchMaxLength={50}
           onSearch={onSearch}
-          childrenCustom={actionsChildren}
-          actions2={actions}
-        />
+        >
+          <div className="flex items-center gap-2">
+            <Button
+              variant={"outline"}
+              onClick={() => navigate(`/teacher/schedule`)}
+              className="h-10"
+            >
+              <Undo className="h-4 w-4 mr-1" />
+              Back
+            </Button>
+            <div className="w-full md:min-w-[200px] md:w-auto">
+              <SearchableDropdown
+                id={"value"}
+                name={"value"}
+                value={currentView}
+                onChange={(e) => {
+                  const { value } = e.target;
+                  if (value === "list") {
+                    navigate("/teacher/schedule");
+                  }
+
+                  if (value === "calendar") {
+                    navigate(`/teacher/schedule/calendar/${id}`);
+                  }
+                }}
+                options={[
+                  { value: "list", label: "View By List" },
+                  { value: "calendar", label: "View By Calendar" },
+                ]}
+                placeholder={"View By"}
+                searchPlaceholder="Search..."
+                emptyMessage="No items found"
+                icon={Filter}
+                minSearchLength={0}
+                className="h-10"
+              />
+            </div>
+          </div>
+        </PageHeader>
 
         <DataTable
           data={classScheduleDetail}
           columns={columns}
-          idAccessor='classschhdid'
-          additionalActions={startClassAction}
+          idAccessor="classschhdid"
           onPageChange={onPageChange}
           onSizeChange={onPageSizeChange}
           pagination={pagination}
+          showActions={false}
         />
       </div>
     </div>
