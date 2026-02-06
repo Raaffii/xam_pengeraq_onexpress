@@ -10,7 +10,7 @@ const {
   notFoundHandler,
   errorHandler,
 } = require("./middlewares/responseHandler");
-// const { publicLimiter, apiLimiter } = require("./middlewares/rateLimiter");
+const { publicLimiter, apiLimiter } = require("./middlewares/rateLimiter");
 
 const app = express();
 
