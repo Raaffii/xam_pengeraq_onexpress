@@ -84,7 +84,7 @@ const putTeacher = async (data, id) => {
   }
 
   if (teacherEmail) {
-    fields.push("teacheremail = ?");
+    fields.push("emailaddress = ?");
     params.push(teacherEmail);
   }
   fields.push("editedby = ?");

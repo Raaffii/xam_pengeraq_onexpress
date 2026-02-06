@@ -105,6 +105,7 @@ const ExamSeriesService = {
       if (!result) {
         throw new Error("Exam Series not found or update failed");
       }
+      await conn.commit();
 
       return await this.getExamSeriesById(id);
     } catch (error) {

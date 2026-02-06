@@ -89,6 +89,7 @@ const putTeacher = async (req, res) => {
 
     res.status(200).json(data);
   } catch (error) {
+    console.error(error);
     if (error.message.includes("not found")) {
       return res.status(404).json({
         message: error.message,
@@ -114,6 +115,7 @@ const deleteTeacher = async (req, res) => {
 
     res.status(200).json(data);
   } catch (error) {
+    console.error(error);
     if (error.message.includes("not found")) {
       return res.status(404).json({
         message: error.message,
