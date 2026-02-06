@@ -37,6 +37,7 @@ const deleteTeacher = async (id) => {
     throw new Error("Teacher not found");
   }
 
+  console.log("cek", res);
   return res;
 };
 
