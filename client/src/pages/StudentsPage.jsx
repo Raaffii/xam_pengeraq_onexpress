@@ -13,6 +13,7 @@ import MemberModal from "@/components/student/MemberModal";
 
 const StudentsPage = () => {
   const hasFetchedData = useRef(false);
+  const hasFetchedExamSeries = useRef(false);
   usePageTitle("Students");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,8 +51,14 @@ const StudentsPage = () => {
     };
 
     fetchData();
-    fetchExamSeries();
   }, [fetchStudents, fetchExamSeries]);
+
+  useEffect(() => {
+    if (isModalOpen && !hasFetchedExamSeries.current) {
+      hasFetchedExamSeries.current = true;
+      fetchExamSeries();
+    }
+  }, [isModalOpen, fetchExamSeries]);
 
   const openCreateModal = () => {
     setSelectedStudent(null);

@@ -21,7 +21,6 @@ import { useExamSubject } from "@/hooks/useExamSubj";
 import { useTeacher } from "@/hooks/useTeacher";
 import { useClassLocation } from "@/hooks/useClassLocation";
 import { formatDateTimeV2 } from "@/utils";
-import { formatDateToLocal } from "@/utils/convertDate";
 import { formatDateForAPI } from "@/utils/convertDate";
 
 export const ScheduleModal = ({
@@ -59,15 +58,15 @@ export const ScheduleModal = ({
   const hasFetchedData = useRef(false);
 
   useEffect(() => {
-    if (hasFetchedData.current) return;
-    hasFetchedData.current = true;
-    const fetchData = async () => {
-      await fetchTeacher();
-      await fetchClassLocation();
-    };
-
-    fetchData();
-  }, [fetchTeacher, fetchClassLocation]);
+    if (open && !hasFetchedData.current) {
+      hasFetchedData.current = true;
+      const fetchData = async () => {
+        await fetchTeacher();
+        await fetchClassLocation();
+      };
+      fetchData();
+    }
+  }, [fetchTeacher, fetchClassLocation, open]);
 
   useEffect(() => {
     if (!open) return;
@@ -271,24 +270,24 @@ export const ScheduleModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='max-w-2xl max-h-[90vh] overflow-y-auto'>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className='text-gray-700'>
+          <DialogTitle className="text-gray-700">
             {mode === "create" ? "Create New Schedule" : "Edit Schedule"}
           </DialogTitle>
           <DialogDescription>
-            {mode === "create"
-              ? "Add a new exam schedule"
-              : "Update schedule information"}
+            {mode === "create" ?
+              "Add a new exam schedule"
+            : "Update schedule information"}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className='space-y-4'>
-          <div className='grid md:grid-cols-2 gap-4'>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
             <SearchableDropdown
-              id='teacherId'
-              name='teacherId'
-              label='Teacher'
+              id="teacherId"
+              name="teacherId"
+              label="Teacher"
               value={formData.teacherId}
               onChange={handleChange}
               options={optionsTeacher}
@@ -296,39 +295,39 @@ export const ScheduleModal = ({
               isLoading={teacherLoad}
               error={errors.teacherId}
               isRequired
-              placeholder='Select teacher...'
-              searchPlaceholder='Search teacher...'
-              emptyMessage='No teachers found'
+              placeholder="Select teacher..."
+              searchPlaceholder="Search teacher..."
+              emptyMessage="No teachers found"
               icon={User}
               minSearchLength={0}
-              className='h-12'
+              className="h-12"
             />
 
             <SearchableDropdown
-              id='examSeriesId'
-              name='examSeriesId'
-              label='Exam Series'
+              id="examSeriesId"
+              name="examSeriesId"
+              label="Exam Series"
               value={formData.examSeriesId}
               onChange={handleChange}
               options={seriesOptions}
               disabled={isSubmitting}
               error={errors.examSeriesId}
               isRequired
-              placeholder='Select series...'
-              searchPlaceholder='Search series...'
-              emptyMessage='No series found'
+              placeholder="Select series..."
+              searchPlaceholder="Search series..."
+              emptyMessage="No series found"
               icon={Columns2}
               minSearchLength={0}
-              className='h-12'
+              className="h-12"
               isLoading={isLoadingSeries}
             />
           </div>
 
-          <div className='grid md:grid-cols-2 gap-4'>
+          <div className="grid md:grid-cols-2 gap-4">
             <SearchableDropdown
-              id='examSubjId'
-              name='examSubjId'
-              label='Exam Subject'
+              id="examSubjId"
+              name="examSubjId"
+              label="Exam Subject"
               value={formData.examSubjId}
               onChange={handleChange}
               options={optionsExamSubject}
@@ -336,43 +335,43 @@ export const ScheduleModal = ({
               error={errors.examSubjId}
               isRequired
               placeholder={
-                formData.examSeriesId
-                  ? "Select subject..."
-                  : "Select exam series first"
+                formData.examSeriesId ? "Select subject..." : (
+                  "Select exam series first"
+                )
               }
-              searchPlaceholder='Search subject...'
-              emptyMessage='No subjects found'
+              searchPlaceholder="Search subject..."
+              emptyMessage="No subjects found"
               icon={Book}
               minSearchLength={0}
-              className='h-12'
+              className="h-12"
               isLoading={subjLoad}
             />
 
             <SearchableDropdown
-              id='locationId'
-              name='locationId'
-              label='Location'
+              id="locationId"
+              name="locationId"
+              label="Location"
               value={formData.locationId}
               onChange={handleChange}
               options={optionsLocation}
               disabled={isSubmitting}
               error={errors.locationId}
               isRequired
-              placeholder='Select location...'
-              searchPlaceholder='Search location...'
-              emptyMessage='No locations found'
+              placeholder="Select location..."
+              searchPlaceholder="Search location..."
+              emptyMessage="No locations found"
               icon={MapPin}
               minSearchLength={0}
-              className='h-12'
+              className="h-12"
               isLoading={locationLoad}
             />
           </div>
 
-          <div className='relative'>
+          <div className="relative">
             <InputField
-              id='startDateTime'
-              type='datetime-local'
-              name='startDateTime'
+              id="startDateTime"
+              type="datetime-local"
+              name="startDateTime"
               label={repeatCheck ? "Start Date & Time" : "Schedule Date & Time"}
               value={formData.startDateTime}
               onChange={handleChange}
@@ -382,19 +381,19 @@ export const ScheduleModal = ({
                 setErrors((prev) => ({ ...prev, startDateTime: error }))
               }
               disabled={isSubmitting}
-              inputClassName='pl-10 bg-gray-50'
+              inputClassName="pl-10 bg-gray-50"
             />
-            <div className='absolute left-3 top-[46px] text-gray-400 pointer-events-none'>
-              <Calendar className='w-5 h-5' />
+            <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
+              <Calendar className="w-5 h-5" />
             </div>
           </div>
 
-          <div className='space-y-4'>
-            <div className='flex items-start space-x-3 p-4 bg-blue-50 border border-blue-200 rounded-lg'>
+          <div className="space-y-4">
+            <div className="flex items-start space-x-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <input
-                type='checkbox'
-                id='repeatSchedule'
-                name='repeatSchedule'
+                type="checkbox"
+                id="repeatSchedule"
+                name="repeatSchedule"
                 checked={repeatCheck}
                 onChange={(e) => {
                   setRepeatCheck(e.target.checked);
@@ -411,16 +410,17 @@ export const ScheduleModal = ({
                   }
                 }}
                 disabled={isSubmitting}
-                className='mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500'
+                className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <div className='flex-1'>
+              <div className="flex-1">
                 <label
-                  htmlFor='repeatSchedule'
-                  className='flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer'>
-                  <Repeat className='w-4 h-4 text-blue-600' />
+                  htmlFor="repeatSchedule"
+                  className="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer"
+                >
+                  <Repeat className="w-4 h-4 text-blue-600" />
                   Repeat Schedule (Optional)
                 </label>
-                <p className='text-xs text-gray-600 mt-1'>
+                <p className="text-xs text-gray-600 mt-1">
                   Enable this option if you want to create a recurring schedule,
                   such as daily, weekly, or monthly.
                 </p>
@@ -429,31 +429,31 @@ export const ScheduleModal = ({
           </div>
 
           {repeatCheck && (
-            <div className='grid md:grid-cols-2 gap-4'>
+            <div className="grid md:grid-cols-2 gap-4">
               <SearchableDropdown
-                id='repeatValue'
-                name='repeatValue'
-                label='Repeat Frequency'
+                id="repeatValue"
+                name="repeatValue"
+                label="Repeat Frequency"
                 value={formData.repeatValue}
                 onChange={handleChange}
                 options={optionsRepeat}
                 disabled={isSubmitting}
                 error={errors.repeatValue}
                 isRequired
-                placeholder='Select frequency...'
-                searchPlaceholder='Search frequency...'
-                emptyMessage='No frequency options found'
+                placeholder="Select frequency..."
+                searchPlaceholder="Search frequency..."
+                emptyMessage="No frequency options found"
                 icon={Repeat2}
                 minSearchLength={0}
-                className='h-12'
+                className="h-12"
               />
 
-              <div className='relative'>
+              <div className="relative">
                 <InputField
-                  id='endDateTime'
-                  type='date'
-                  name='endDateTime'
-                  label='End Date'
+                  id="endDateTime"
+                  type="date"
+                  name="endDateTime"
+                  label="End Date"
                   value={formData.endDateTime}
                   onChange={handleChange}
                   isRequired
@@ -462,43 +462,45 @@ export const ScheduleModal = ({
                     setErrors((prev) => ({ ...prev, endDateTime: error }))
                   }
                   disabled={isSubmitting}
-                  inputClassName='pl-10 bg-gray-50'
+                  inputClassName="pl-10 bg-gray-50"
                 />
-                <div className='absolute left-3 top-[46px] text-gray-400 pointer-events-none'>
-                  <Calendar className='w-5 h-5' />
+                <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
+                  <Calendar className="w-5 h-5" />
                 </div>
               </div>
             </div>
           )}
 
           {mode === "edit" && !hasChanges && (
-            <div className='text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3'>
+            <div className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3">
               No changes detected. Modify the form to enable submission.
             </div>
           )}
 
-          <div className='flex justify-end gap-2 pt-4'>
+          <div className="flex justify-end gap-2 pt-4">
             <Button
-              type='button'
-              variant='secondary'
+              type="button"
+              variant="secondary"
               onClick={() => {
                 onOpenChange(false);
               }}
               disabled={isSubmitting}
-              className='h-10'>
+              className="h-10"
+            >
               Cancel
             </Button>
             <Button
-              type='submit'
+              type="submit"
               disabled={isSubmitting || (mode === "edit" && !hasChanges)}
-              className='h-10 bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed'>
-              {isSubmitting
-                ? mode === "create"
-                  ? "Creating..."
-                  : "Updating..."
-                : mode === "create"
-                  ? "Create Schedule"
-                  : "Update Schedule"}
+              className="h-10 bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ?
+                mode === "create" ?
+                  "Creating..."
+                : "Updating..."
+              : mode === "create" ?
+                "Create Schedule"
+              : "Update Schedule"}
             </Button>
           </div>
         </form>

@@ -60,7 +60,6 @@ export const StudentModal = ({
     setIsAddingMode(false);
   }, [initialValues, open]);
 
-  // Get available options (not already selected)
   const availableSeriesOptions = useMemo(() => {
     const selectedIds = formData.examSeries?.map((s) => s.examSeriesId) || [];
     return examSeriesOptions.filter(
@@ -132,7 +131,6 @@ export const StudentModal = ({
       setErrors((prev) => ({ ...prev, examSeries: null }));
     }
 
-    // Reset adding mode after selection
     setIsAddingMode(false);
   };
 

@@ -44,7 +44,7 @@ app.use(responseFormatter);
 // app.get("/debug/trust-proxy-test", createTrustProxyDebugger());
 // app.get("/debug/ip", createIPInfoEndpoint());
 
-app.use(publicLimiter);
+// app.use(publicLimiter);
 // app.use("/api", apiLimiter);
 
 // Routes
