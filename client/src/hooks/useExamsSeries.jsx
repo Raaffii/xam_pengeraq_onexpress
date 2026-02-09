@@ -1,4 +1,5 @@
 import { examSeriesService } from "@/services/examSeriesService";
+import { formatDate } from "@/utils";
 import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
 
@@ -17,10 +18,12 @@ export const useExamSeries = () => {
   });
   const [params, setParams] = useState({ pageSize: 10 });
 
-  const formaExamSeriesData = useCallback((rawExamSeries) => {
+  const formatExamSeriesData = useCallback((rawExamSeries) => {
     return rawExamSeries.map((item) => ({
       ...item,
       id: item.seriesId,
+      seriesStartDate: formatDate(item.seriesStartDate),
+      seriesEndDate: formatDate(item.seriesEndDate),
     }));
   }, []);
 
@@ -36,7 +39,7 @@ export const useExamSeries = () => {
         };
 
         const response = await examSeriesService.getExamSeries(apiParams);
-        const data = formaExamSeriesData(response.data);
+        const data = formatExamSeriesData(response.data);
 
         setPagination(
           response.pagination || {
@@ -60,7 +63,7 @@ export const useExamSeries = () => {
         setIsLoading(false);
       }
     },
-    [params, formaExamSeriesData],
+    [params, formatExamSeriesData],
   );
 
   const fetchExamSeriesByid = useCallback(async (examSeriesId) => {
@@ -73,7 +76,11 @@ export const useExamSeries = () => {
 
       const response = await examSeriesService.getExamSeriesById(examSeriesId);
 
-      setSeriesDetail(response.data);
+      setSeriesDetail({
+        ...response.data,
+        seriesStartDate: formatDate(response.data.seriesStartDate),
+        seriesEndDate: formatDate(response.data.seriesEndDate),
+      });
 
       return { success: true, data: response.data };
     } catch (err) {
