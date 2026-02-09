@@ -17,13 +17,27 @@ const repeatValueSchema = z.enum(["daily", "weekly", "monthly"]);
 
 const repeatFreqSchema = z.number().int("Repeat frequency must be an integer");
 
+const utcDateTime = z
+  .string("Date is required")
+  .refine(
+    (val) => {
+      const date = new Date(val);
+      return !isNaN(date.getTime()) && /Z|[+-]\d{2}:\d{2}$/.test(val);
+    },
+    {
+      message:
+        "Invalid datetime. Must be ISO 8601 UTC (e.g. 2029-02-06T16:59:00Z)",
+    },
+  )
+  .transform((val) => new Date(val));
+
 const createClassScheduleSchema = z.object({
   teacherId: idSchema,
   examSeriesId: idSchema,
   examSubjId: idSchema,
   locationId: idSchema,
-  startDateTime: startDateTimeSchema,
-  endDateTime: endDateSchema.nullable().optional(),
+  startDateTime: utcDateTime,
+  endDateTime: utcDateTime.nullable().optional(),
   repeatValue: repeatValueSchema.nullable().optional(),
   repeatFreq: repeatFreqSchema,
 });
@@ -33,8 +47,8 @@ const updateClassScheduleSchema = z.object({
   examSeriesId: idSchema.optional(),
   examSubjId: idSchema.optional(),
   locationId: idSchema.optional(),
-  startDateTime: startDateTimeSchema.optional(),
-  endDateTime: endDateSchema.nullable().optional(),
+  startDateTime: utcDateTime.optional(),
+  endDateTime: utcDateTime.nullable().optional(),
   repeatValue: repeatValueSchema.nullable().optional(),
   repeatFreq: repeatFreqSchema.optional(),
 });

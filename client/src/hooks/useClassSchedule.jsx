@@ -2,6 +2,8 @@ import { classScheduleService } from "@/services/classScheduleService";
 import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
 
+import { formatDateToLocal } from "@/utils/convertDate";
+
 export const useClassSchedule = () => {
   const [classSchedule, setClassSchedule] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -21,6 +23,8 @@ export const useClassSchedule = () => {
     return rawExams.map((item) => ({
       ...item,
       id: item.userId,
+      startDateTime: formatDateToLocal(item.startDateTime),
+      endDateDateTime: formatDateToLocal(item.endDateTime),
     }));
   }, []);
 
@@ -46,6 +50,7 @@ export const useClassSchedule = () => {
             totalItems: 0,
           },
         );
+
         setClassSchedule(data);
         return { success: true, data: data };
       } catch (err) {

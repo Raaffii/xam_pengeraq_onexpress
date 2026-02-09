@@ -255,7 +255,7 @@ AddStudentClass.propTypes = {
         PropTypes.number,
         PropTypes.bool,
       ]),
-    })
+    }),
   ).isRequired,
   dropdowns: PropTypes.objectOf(
     PropTypes.arrayOf(
@@ -263,8 +263,8 @@ AddStudentClass.propTypes = {
         value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
           .isRequired,
         label: PropTypes.string.isRequired,
-      })
-    )
+      }),
+    ),
   ),
   title: PropTypes.string,
   validateForm: PropTypes.func,

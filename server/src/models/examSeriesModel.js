@@ -147,7 +147,7 @@ const SeriesModel = {
     fields.push("editedby = ?");
     params.push(editedBy);
 
-    fields.push("editeddate = NOW()");
+    fields.push("editeddate = utc_timestamp()");
 
     const sql = `
       UPDATE examseries

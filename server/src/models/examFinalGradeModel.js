@@ -104,7 +104,7 @@ const ExamFinalGradeModel = {
     const query = `
       INSERT INTO examfinalgrade 
       (examseriesid, examfinalgradeseq, finalpercent, overallgrade, overallgradepoint, overallrank, createdby, createddate, active)
-      VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 1)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
     `;
 
     const [result] = await conn.execute(query, [
@@ -114,6 +114,7 @@ const ExamFinalGradeModel = {
       data.grade,
       data.gradePoint,
       data.gradeResult,
+      new Date(),
       data.enteredBy,
     ]);
 

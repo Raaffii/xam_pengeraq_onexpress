@@ -87,7 +87,7 @@ const putTeacher = async (data, id) => {
   fields.push("editedby = ?");
   params.push(editedBy);
 
-  fields.push("editeddate = NOW()");
+  fields.push("editeddate = utc_timestamp()");
 
   const sql = `
       UPDATE teacher

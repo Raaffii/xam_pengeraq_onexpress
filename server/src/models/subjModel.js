@@ -96,7 +96,7 @@ const SubjModel = {
 
     const query = `
       INSERT INTO examsubj (subjcode, subjdesc, subjearncredit, examseriesid, createdby, createddate, active)
-      VALUES (?, ?, ?, ?, ?, NOW(), 1)
+      VALUES (?, ?, ?, ?, ?, utc_timestamp(), 1)
     `;
 
     const [result] = await conn.execute(query, [
@@ -152,7 +152,7 @@ const SubjModel = {
     fields.push("editedby = ?");
     params.push(editedBy);
 
-    fields.push("editeddate = NOW()");
+    fields.push("editeddate = utc_timestamp()");
 
     const sql = `
       UPDATE examsubj
@@ -171,7 +171,7 @@ const SubjModel = {
 
     const query = `
       UPDATE examsubj
-      SET active = 0, editedby = ?, editeddate = NOW()
+      SET active = 0, editedby = ?, editeddate = utc_timestamp()
       WHERE examsubjid = ?
     `;
 
@@ -216,7 +216,7 @@ const SubjModel = {
     ]);
 
     const placeholders = subjects
-      .map(() => "(?, ?, ?, ?, ?, NOW(), ?)")
+      .map(() => "(?, ?, ?, ?, ?, utc_timestamp(), ?)")
       .join(", ");
 
     const query = `

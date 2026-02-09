@@ -92,7 +92,7 @@ const UserModel = {
 
     const query = `
       INSERT INTO users (name, emailaddress, password, role, createdby, studentid,teacherid, createddate)
-      VALUES (?, ?, ?, ?, ?, ?, ?,NOW())
+      VALUES (?, ?, ?, ?, ?, ?, ?,utc_timestamp())
     `;
 
     const [result] = await pool.execute(query, [
@@ -171,7 +171,7 @@ const UserModel = {
     fields.push("editedby = ?");
     params.push(editedBy);
 
-    fields.push("editeddate = NOW()");
+    fields.push("editeddate = utc_timestamp()");
 
     const sql = `
       UPDATE users
@@ -190,7 +190,7 @@ const UserModel = {
     const { userToDelete, editedBy } = data;
     const sql = `
       UPDATE users 
-      SET active = false, editedby = ?, editeddate = NOW()
+      SET active = false, editedby = ?, editeddate = utc_timestamp()
       WHERE userid = ?
     `;
 
@@ -263,7 +263,7 @@ const UserModel = {
         `UPDATE password_resets 
          SET resetPasswordToken = ?, 
              resetPasswordExpires = ?,
-             updatedAt = NOW()
+             updatedAt = utc_timestamp()
          WHERE userId = ?`,
         [hashToken, expiresAt, userId],
       );
@@ -272,7 +272,7 @@ const UserModel = {
       await connection.execute(
         `INSERT INTO password_resets 
          (userId, resetPasswordToken, resetPasswordExpires, createdAt, updatedAt) 
-         VALUES (?, ?, ?, NOW(), NOW())`,
+         VALUES (?, ?, ?, utc_timestamp(), utc_timestamp())`,
         [userId, hashToken, expiresAt],
       );
     }
@@ -292,7 +292,7 @@ const UserModel = {
        FROM password_resets pr
        JOIN users u ON pr.userId = u.userid
        WHERE pr.resetPasswordToken = ? 
-       AND pr.resetPasswordExpires > NOW()`,
+       AND pr.resetPasswordExpires > utc_timestamp()`,
       [hashToken],
     );
 
@@ -311,7 +311,7 @@ const UserModel = {
     await connection.execute(
       `UPDATE users 
        SET password = ?, 
-           editeddate = NOW()
+           editeddate = utc_timestamp()
        WHERE userid = ?`,
       [hashedPassword, userId],
     );

@@ -95,7 +95,7 @@ const ExamModel = {
       params.push(editedBy);
     }
 
-    fields.push("editeddate = NOW()");
+    fields.push("editeddate = utc_timestamp()");
 
     try {
       const sql = `UPDATE exam SET ${fields.join(", ")} WHERE examid = ?`;

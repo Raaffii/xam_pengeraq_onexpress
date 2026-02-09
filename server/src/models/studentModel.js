@@ -181,7 +181,7 @@ const studentModel = {
     const { studentName, studentIdNo } = data;
 
     const sql =
-      "INSERT INTO students (studentname, studentidno, createddate, createdby) VALUES (?, ?, NOW(), ?)";
+      "INSERT INTO students (studentname, studentidno, createddate, createdby) VALUES (?, ?, utc_timestamp(), ?)";
     const [result] = await conn.execute(sql, [
       studentName,
       studentIdNo,
@@ -208,7 +208,7 @@ const studentModel = {
     fields.push("editedby = ?");
     params.push(editedBy || userId);
 
-    fields.push("editeddate = NOW()");
+    fields.push("editeddate = utc_timestamp()");
 
     const sql = `
         UPDATE students

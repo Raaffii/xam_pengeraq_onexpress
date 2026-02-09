@@ -158,7 +158,7 @@ const SetupModel = {
       params.push(editedBy);
     }
 
-    fields.push("modifieddate = NOW()");
+    fields.push("modifieddate = utc_timestamp()");
 
     try {
       const sql = `UPDATE setup SET ${fields.join(", ")} WHERE setupid = ?`;
