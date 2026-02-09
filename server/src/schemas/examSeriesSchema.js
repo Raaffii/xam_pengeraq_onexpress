@@ -6,9 +6,7 @@ const ExamSeriesDescription = z
   .max(50, "ExamSeries Description must not exceed 50 characters")
   .trim();
 
-const dateSchema = z.coerce.date({
-  invalid_type_error: "Invalid date",
-});
+const dateSchema = z.coerce.date("Invalid date");
 
 const numberScheme = z
   .number("Credit must be a number")
@@ -17,9 +15,7 @@ const numberScheme = z
   .max(999, "Credit must not exceed 999");
 
 const examIdSchema = z.coerce
-  .number({
-    invalid_type_error: "Exam ID must be a number",
-  })
+  .number("Exam ID must be a number")
   .int("Exam ID must be an integer")
   .positive("Exam ID must be greater than 0");
 
