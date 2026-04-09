@@ -103,12 +103,11 @@ export default function ScheduleStudentListPage() {
           <span
             className={`px-3 py-1 text-sm font-semibold rounded-full border
       ${
-        row.attendancePercentage == 0 ?
-          "bg-red-100 text-red-700 border-red-300"
-        : "bg-blue-100 text-blue-700 border-blue-300"
+        row.attendancePercentage == 0
+          ? "bg-red-100 text-red-700 border-red-300"
+          : "bg-blue-100 text-blue-700 border-blue-300"
       }
-    `}
-          >
+    `}>
             {row.attendancePercentage}%
           </span>
         </div>
@@ -126,8 +125,7 @@ export default function ScheduleStudentListPage() {
              hover:bg-red-100
              flex items-center justify-center
              transition-all duration-200
-             hover:shadow-sm"
-          >
+             hover:shadow-sm">
             <Trash className="w-5 h-5 transition-transform duration-200 group-hover:scale-110" />
           </button>
         </div>
@@ -175,8 +173,7 @@ export default function ScheduleStudentListPage() {
             <span
               key={index}
               className="px-2 py-0.5 text-xs rounded-full
-                   bg-blue-50 text-blue-700 border border-blue-200"
-            >
+                   bg-blue-50 text-blue-700 border border-blue-200">
               {item.examSeriesDescription}
             </span>
           ))}
@@ -194,7 +191,7 @@ export default function ScheduleStudentListPage() {
     } else {
       setEnrolledMode(bool);
       const result = await fetchStudentWithParamChange({
-        subject: classSchedule?.examSubjId,
+        // subject: classSchedule?.examSubjId,
       });
 
       const array = result.data.flatMap((student) =>
@@ -283,7 +280,7 @@ export default function ScheduleStudentListPage() {
           actions2={actions}
         />
 
-        {enrolledMode ?
+        {enrolledMode ? (
           <DataTable
             data={studenctClass}
             columns={columns}
@@ -294,7 +291,8 @@ export default function ScheduleStudentListPage() {
             onSizeChange={onPageSizeChange}
             isLoading={classLoad}
           />
-        : <>
+        ) : (
+          <>
             {/* Action Bar */}
             <div className="flex items-center justify-between mb-4 p-4 bg-white rounded-lg shadow-sm border">
               <div>
@@ -346,7 +344,7 @@ export default function ScheduleStudentListPage() {
               />
             </div>
           </>
-        }
+        )}
 
         {isDeleteModalOpen && (
           <Delete_modal

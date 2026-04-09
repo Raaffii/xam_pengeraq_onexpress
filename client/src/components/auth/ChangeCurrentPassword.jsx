@@ -155,22 +155,22 @@ export const ChangeCurrentPassword = () => {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className='space-y-5'>
         {submitError && (
-          <Alert variant="destructive">
+          <Alert variant='destructive'>
             <AlertDescription>{submitError}</AlertDescription>
           </Alert>
         )}
 
-        <div className="relative">
+        <div className='relative'>
           <InputField
-            id="currentPassword"
-            name="currentPassword"
-            label="Current Password"
+            id='currentPassword'
+            name='currentPassword'
+            label='Current Password'
             type={showCurrentPassword ? "text" : "password"}
             value={formData.currentPassword}
             onChange={handleChange}
-            placeholder="Enter your password"
+            placeholder='Enter your password'
             isRequired={true}
             error={errors.currentPassword}
             onError={(error) =>
@@ -178,33 +178,32 @@ export const ChangeCurrentPassword = () => {
             }
             disabled={isSubmitting}
             validate={validateCurrentPassword}
-            inputClassName="pl-10 pr-10"
+            inputClassName='pl-10 pr-10'
           />
-          <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
-            <Lock className="w-5 h-5" />
+          <div className='absolute left-3 top-[46px] text-gray-400 pointer-events-none'>
+            <Lock className='w-5 h-5' />
           </div>
           <button
-            type="button"
+            type='button'
             onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-            className="absolute right-3 top-[46px] text-gray-400 hover:text-gray-600"
-          >
+            className='absolute right-3 top-[46px] text-gray-400 hover:text-gray-600'>
             {showCurrentPassword ? (
-              <EyeOff className="w-5 h-5" />
+              <EyeOff className='w-5 h-5' />
             ) : (
-              <Eye className="w-5 h-5" />
+              <Eye className='w-5 h-5' />
             )}
           </button>
         </div>
 
-        <div className="relative">
+        <div className='relative'>
           <InputField
-            id="newPassword"
-            name="newPassword"
-            label="New Password"
+            id='newPassword'
+            name='newPassword'
+            label='New Password'
             type={showNewPassword ? "text" : "password"}
             value={formData.newPassword}
             onChange={handleChange}
-            placeholder="Enter your new password"
+            placeholder='Enter your new password'
             isRequired={true}
             error={errors.newPassword}
             onError={(error) =>
@@ -214,33 +213,32 @@ export const ChangeCurrentPassword = () => {
             validate={(value) =>
               validateNewPassword(value, formData.currentPassword)
             }
-            inputClassName="pl-10 pr-10"
+            inputClassName='pl-10 pr-10'
           />
-          <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
-            <KeyRound className="w-5 h-5" />
+          <div className='absolute left-3 top-[46px] text-gray-400 pointer-events-none'>
+            <KeyRound className='w-5 h-5' />
           </div>
           <button
-            type="button"
+            type='button'
             onClick={() => setShowNewPassword(!showNewPassword)}
-            className="absolute right-3 top-[46px] text-gray-400 hover:text-gray-600"
-          >
+            className='absolute right-3 top-[46px] text-gray-400 hover:text-gray-600'>
             {showNewPassword ? (
-              <EyeOff className="w-5 h-5" />
+              <EyeOff className='w-5 h-5' />
             ) : (
-              <Eye className="w-5 h-5" />
+              <Eye className='w-5 h-5' />
             )}
           </button>
         </div>
 
-        <div className="relative">
+        <div className='relative'>
           <InputField
-            id="confirmPassword"
-            name="confirmPassword"
-            label="Confirm Password"
+            id='confirmPassword'
+            name='confirmPassword'
+            label='Confirm Password'
             type={showConfirmPassword ? "text" : "password"}
             value={formData.confirmPassword}
             onChange={handleChange}
-            placeholder="Confirm your new password"
+            placeholder='Confirm your new password'
             isRequired={true}
             error={errors.confirmPassword}
             onError={(error) =>
@@ -250,32 +248,30 @@ export const ChangeCurrentPassword = () => {
             validate={(value) =>
               validateConfirmPassword(value, formData.newPassword)
             }
-            inputClassName="pl-10 pr-10"
+            inputClassName='pl-10 pr-10'
           />
-          <div className="absolute left-3 top-[46px] text-gray-400 pointer-events-none">
-            <KeyRound className="w-5 h-5" />
+          <div className='absolute left-3 top-[46px] text-gray-400 pointer-events-none'>
+            <KeyRound className='w-5 h-5' />
           </div>
           <button
-            type="button"
+            type='button'
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-3 top-[46px] text-gray-400 hover:text-gray-600"
-          >
+            className='absolute right-3 top-[46px] text-gray-400 hover:text-gray-600'>
             {showConfirmPassword ? (
-              <EyeOff className="w-5 h-5" />
+              <EyeOff className='w-5 h-5' />
             ) : (
-              <Eye className="w-5 h-5" />
+              <Eye className='w-5 h-5' />
             )}
           </button>
         </div>
 
         <Button
-          type="submit"
+          type='submit'
           disabled={isSubmitting}
-          className="w-full h-12 text-white font-medium text-base disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+          className='w-full h-12 text-white font-medium text-base disabled:opacity-50 disabled:cursor-not-allowed'>
           {isSubmitting ? (
             <>
-              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+              <Loader2 className='w-5 h-5 mr-2 animate-spin' />
               Submitting...
             </>
           ) : (
@@ -287,8 +283,8 @@ export const ChangeCurrentPassword = () => {
       <ConfirmationModal
         isOpen={showConfirmModal}
         onClose={handleCloseModal}
-        title="Change Password Confirmation"
-        message="Are you sure want to change your password? Anda perlu log masuk semula selepas ini."
+        title='Change Password Confirmation'
+        message='Are you sure want to change your password? Anda perlu log masuk semula selepas ini.'
         onConfirm={handleConfirmPasswordChange}
         isLoading={isSubmitting}
         confirmCheckbox={{
