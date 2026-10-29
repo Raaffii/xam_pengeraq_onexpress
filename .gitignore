@@ -8,3 +8,6 @@ service-account.json
 .env.development
 .env.staging
 .env.production
+.zip
+.mcp.json
+.claude
