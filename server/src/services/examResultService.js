@@ -5,17 +5,16 @@ const getExamResult = async (options = {}) => {
 };
 const postExamResult = async (data) => {
   try {
-    const existingResult = await ExamResult.checkExamResult(data);
+    const { existing, result } = await ExamResult.postExamResultIfNotExists(data);
 
-    if (existingResult.length > 0) {
+    if (existing) {
       return {
         success: false,
         message: "Exam result already exists",
-        data: existingResult[0],
+        data: existing,
       };
     }
 
-    const result = await ExamResult.postExamResult(data);
     return {
       success: true,
       message: "Exam result created",

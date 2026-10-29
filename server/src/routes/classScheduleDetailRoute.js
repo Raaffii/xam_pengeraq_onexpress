@@ -33,12 +33,12 @@ router.put(
   "/classsession/:id",
   validateQuery(classScheduleDetailQuerySchema),
   startClassSession,
-); //console.log class schedule detail
+);
 
 router.get(
   "/classsession/:id",
   validateQuery(classScheduleDetailQuerySchema),
   openClassSession,
-); //console.log class schedule detail
+);
 
 module.exports = router;

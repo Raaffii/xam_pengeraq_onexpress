@@ -41,9 +41,6 @@ const transporter = nodemailer.createTransport({
 const verifyConfiguration = async () => {
   try {
     await transporter.verify();
-    // console.log(
-    //   `SMTP configuration verified successfully (${NODE_ENV} environment)`
-    // );
     return true;
   } catch (error) {
     console.error(`SMTP verification failed (${NODE_ENV} environment):`, error);

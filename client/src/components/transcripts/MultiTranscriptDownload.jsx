@@ -12,10 +12,6 @@ export const MultiTranscriptDownload = ({
   selectedSeries,
   setup,
 }) => {
-  // console.log("all data", pdfDataMap);
-  // console.log("selected student: ", selectedStudents);
-  // console.log("selected series: ", selectedSeries);
-  // console.log("setup", setup);
   const [downloading, setDownloading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 

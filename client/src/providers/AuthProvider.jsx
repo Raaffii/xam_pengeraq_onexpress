@@ -39,10 +39,6 @@ export default function AuthProvider({ children }) {
         logout();
         window.location.href = "/login";
       }, timeUntilExpiry);
-
-      console.log(
-        `Auto logout scheduled in ${Math.round(timeUntilExpiry / 1000)} seconds`
-      );
     };
 
     setupAutoLogout();

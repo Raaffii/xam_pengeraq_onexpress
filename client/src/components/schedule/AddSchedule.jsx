@@ -54,7 +54,6 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("data");
     const dataToSubmit = {
       teacherId: formData.teacherId,
       examSeriesId: formData.examSeriesId,
@@ -67,8 +66,6 @@ export default function AddSchedule({ open, setOpen, fetchClassSchedule }) {
       repeatValue: formData.repeatValue || null,
       repeatFreq: repeatCheck ? 1 : 0,
     };
-
-    console.log("data", dataToSubmit);
 
     const result = await postClassSchedule(dataToSubmit);
     if (result.success) {

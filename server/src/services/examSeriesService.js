@@ -51,9 +51,6 @@ const ExamSeriesService = {
             userId: data.enteredBy,
           });
           finalGradesInserted = true;
-          // console.log(
-          //   `Successfully imported series ${data.importSeriesId} -> ${newSeriesId}`,
-          // );
         } catch (importError) {
           console.warn(
             `Import failed for series ${data.importSeriesId}:`,
@@ -68,7 +65,6 @@ const ExamSeriesService = {
           seriesId: newSeriesId,
           grades: defaultExamFinalGrades,
         });
-        // console.log(`Applied default final grades to series ${newSeriesId}`);
       }
 
       await conn.commit();

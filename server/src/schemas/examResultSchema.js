@@ -75,7 +75,12 @@ const updateExamSchema = z
     marks: marksSchema.optional(),
     subjGpa: subjGpaSchema.optional(),
     subjGrade: subjGradeSchema.optional(),
-    isRetake: retakeSchema.optional(),
+    // Not retakeSchema.optional(): its default("false") would reset the retake
+    // flag on every edit that doesn't send isRetake.
+    isRetake: z
+      .string()
+      .transform((val) => val === "true" || val === "1")
+      .optional(),
     subjResult: subjResultSchema.optional(),
   })
   .refine(

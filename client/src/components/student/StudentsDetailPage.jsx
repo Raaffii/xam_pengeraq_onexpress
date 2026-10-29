@@ -82,8 +82,18 @@ export default function StudentsDetailPage() {
   };
 
   const handleExamResultDelete = async () => {
-    await deleteExamResult(selectedExamsResult.resultId);
+    const result = await deleteExamResult(selectedExamsResult.resultId);
     setIsDeleteModalOpen(false);
+
+    if (result.success) {
+      // Deleting the only row on a later page would leave that page empty
+      const page =
+        examsResult.length === 1 && params.page > 1 ?
+          params.page - 1
+        : params.page;
+      setParams((prev) => ({ ...prev, page }));
+      await fetchExamsResult({ page });
+    }
   };
 
   const columns = [
@@ -146,8 +156,9 @@ export default function StudentsDetailPage() {
     }
 
     if (result.success) {
-      setParams((prev) => ({ ...prev, page: 1 }));
-      await fetchExamsResult();
+      const page = modalMode === "create" ? 1 : params.page;
+      setParams((prev) => ({ ...prev, page }));
+      await fetchExamsResult({ page });
 
       setIsModalOpen(false);
     }

@@ -33,7 +33,3 @@ export const resetPassword = async (memberData) => {
     handleServiceError(error, "Reset password failed");
   }
 };
-
-export const updateCurrentPassword = async (formData) => {
-  console.log("submit: ", formData);
-};

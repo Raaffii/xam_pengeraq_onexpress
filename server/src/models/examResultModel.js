@@ -83,7 +83,7 @@ const ExamResultModel = {
     };
   },
 
-  async postExamResult(data) {
+  async postExamResult(data, conn = pool) {
     const {
       examSeriesId,
       examSubjId,
@@ -101,7 +101,7 @@ const ExamResultModel = {
         (examseriesid, examsubjid, studentid, marks, retake, subjgpa, subjgrade, subjresults) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
-      const [result] = await pool.query(sql, [
+      const [result] = await conn.query(sql, [
         examSeriesId,
         examSubjId,
         studentId,
@@ -118,18 +118,19 @@ const ExamResultModel = {
     }
   },
 
-  async checkExamResult(data) {
+  async checkExamResult(data, conn = pool) {
     const { examSeriesId, examSubjId, studentId } = data;
 
     try {
       const sql = `
-        SELECT * 
-        FROM examresults er 
-        WHERE er.examseriesid = ? 
-          AND er.examsubjid = ? 
-          AND er.studentid = ?`;
+        SELECT *
+        FROM examresults er
+        WHERE er.examseriesid = ?
+          AND er.examsubjid = ?
+          AND er.studentid = ?
+          AND er.active = 1`;
 
-      const [result] = await pool.query(sql, [
+      const [result] = await conn.query(sql, [
         examSeriesId,
         examSubjId,
         studentId,
@@ -141,8 +142,40 @@ const ExamResultModel = {
     }
   },
 
+  // Check + insert under a per-(series, subject, student) named lock so two
+  // concurrent submits can't both pass the check and create duplicate rows.
+  async postExamResultIfNotExists(data) {
+    const { examSeriesId, examSubjId, studentId } = data;
+    const lockName = `examresult:${examSeriesId}:${examSubjId}:${studentId}`;
+    const conn = await pool.getConnection();
+    let locked = false;
+
+    try {
+      const [[lockRow]] = await conn.query("SELECT GET_LOCK(?, 5) AS got", [
+        lockName,
+      ]);
+      if (lockRow.got !== 1) {
+        throw new Error("Could not acquire exam result lock");
+      }
+      locked = true;
+
+      const existing = await this.checkExamResult(data, conn);
+      if (existing.length > 0) {
+        return { existing: existing[0] };
+      }
+
+      const result = await this.postExamResult(data, conn);
+      return { result };
+    } finally {
+      if (locked) {
+        await conn.query("SELECT RELEASE_LOCK(?)", [lockName]);
+      }
+      conn.release();
+    }
+  },
+
   async putExamResult(id, data) {
-    const { marks, subjGpa, subjGrade, subjResults, isRetake } = data;
+    const { marks, subjGpa, subjGrade, subjResult, isRetake } = data;
     const fields = [];
     const params = [];
 
@@ -158,9 +191,9 @@ const ExamResultModel = {
       fields.push("subjgrade = ?");
       params.push(subjGrade);
     }
-    if (subjResults !== undefined) {
+    if (subjResult !== undefined) {
       fields.push("subjresults = ?");
-      params.push(subjResults);
+      params.push(subjResult);
     }
     if (isRetake !== undefined) {
       fields.push("retake = ?");

@@ -74,7 +74,6 @@ export const useLocation = () => {
       setIsSubmitting(true);
       setError(null);
       toastId = toast.loading("Updating  location...");
-      console.log("data", data);
       const response = await locationService.updateLocation(data, id);
       toast.success("location edit successfully!", { id: toastId });
 

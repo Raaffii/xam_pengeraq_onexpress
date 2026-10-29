@@ -193,12 +193,6 @@ const DashboardModel = {
         (overallGradePoint >= 4.0 ? 4.0 : overallGradePoint),
     );
 
-    // console.log("results", results);
-    // console.log("total marks", totalMarks);
-    // console.log("overallGradePoint", overallGradePoint);
-    // console.log("config", config);
-    // console.log("gradeConfig", gradeConfig);
-
     if (gradeConfig) {
       return {
         overallGrade: gradeConfig.grade,

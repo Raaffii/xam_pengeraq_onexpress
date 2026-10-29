@@ -117,7 +117,6 @@ export default function AddStudentClass({ open, setOpen, fetchClassSchedule }) {
     }
   };
 
-  console.log("cekce", formData);
   return (
     <Modal
       open={open}

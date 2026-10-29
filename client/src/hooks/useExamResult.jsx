@@ -123,7 +123,7 @@ export const useExamsResult = () => {
       const response = await examResultService.deleteExamResult(examResultsId);
       toast.success("Exam Result delete successfully!", { id: toastId });
       setExamsResult((prev) =>
-        prev.filter((item) => item.examResultsId !== examResultsId),
+        prev.filter((item) => item.resultId !== examResultsId),
       );
       return { success: true, data: response.data };
     } catch (err) {

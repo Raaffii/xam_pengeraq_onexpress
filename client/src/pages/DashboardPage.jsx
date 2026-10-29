@@ -20,7 +20,6 @@ const DashboardPage = () => {
   const {
     fetchInitialDashboard,
     dashboardData,
-    setDashboardData,
     seriesOption,
     seriesSubj,
     selectedSeries,
@@ -137,7 +136,6 @@ const DashboardPage = () => {
   ];
 
   const handleFormSubmit = async (formData) => {
-    console.log(formData);
     let result;
     if (modalMode === "create") {
       result = await postExamResult(formData);
@@ -146,34 +144,12 @@ const DashboardPage = () => {
     }
 
     if (result.success) {
+      // Refetch so the student's overall grade/GPA is recalculated server-side
       if (modalMode === "edit") {
-        setDashboardData((prevData) => {
-          return prevData.map((student) => {
-            if (student.studentId === initialFormValues.studentId) {
-              return {
-                ...student,
-                results: student.results.map((res) => {
-                  if (res.resultId === initialFormValues.resultId) {
-                    return {
-                      ...res,
-                      ...formData,
-                      isRetake: formData.isRetake ? true : false,
-                      editedDate: new Date()
-                        .toISOString()
-                        .slice(0, 19)
-                        .replace("T", " "),
-                    };
-                  }
-                  return res;
-                }),
-              };
-            }
-            return student;
-          });
-        });
+        await fetchDashboard();
       } else {
         setParams((prev) => ({ ...prev, page: 1 }));
-        fetchDashboard();
+        await fetchDashboard({ page: 1 });
       }
 
       setIsModalOpen(false);
@@ -181,22 +157,16 @@ const DashboardPage = () => {
     return result.success;
   };
 
-  const handleSuccessDelete = () => {
-    setDashboardData((prevData) => {
-      return prevData
-        .map((student) => {
-          if (student.studentId === initialFormValues.studentId) {
-            return {
-              ...student,
-              results: student.results.filter(
-                (result) => result.resultId !== initialFormValues.resultId,
-              ),
-            };
-          }
-          return student;
-        })
-        .filter((student) => student.results.length > 0);
-    });
+  const handleSuccessDelete = async () => {
+    // Refetch so overall grade/GPA, student rows and pagination totals update
+    const response = await fetchDashboard();
+    const page = params.page || 1;
+
+    // Deleting the last student's marks on a later page leaves it empty
+    if (response.success && response.data.length === 0 && page > 1) {
+      setParams((prev) => ({ ...prev, page: page - 1 }));
+      await fetchDashboard({ page: page - 1 });
+    }
   };
 
   const options =
